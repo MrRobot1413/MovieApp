@@ -14,12 +14,10 @@ import ru.mrrobot1413.lesson3homework.R
 import ru.mrrobot1413.lesson3homework.adapters.FavoriteAdapter
 import ru.mrrobot1413.lesson3homework.data.DataStorage
 import ru.mrrobot1413.lesson3homework.model.Movie
-import ru.mrrobot1413.lesson3homework.ui.fragments.DetailsFragment
 
 class FavoriteActivity : AppCompatActivity() {
 
     private lateinit var bottomNav: BottomNavigationView
-    private var isAddedFragment: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +28,6 @@ class FavoriteActivity : AppCompatActivity() {
         val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = FavoriteAdapter(DataStorage.favoriteList, noMoviesSign){ movie ->
-            openDetailsActivity(movie)
         }
 
         bottomNav = findViewById(R.id.bottom_navigation)
@@ -54,23 +51,8 @@ class FavoriteActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun openDetailsActivity(movie: Movie) {
-        isAddedFragment = true
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.relative, DetailsFragment.newInstance(movie), "DetailsFragment")
-            .addToBackStack("null")
-            .commit()
-    }
-
     override fun onBackPressed() {
-        if(isAddedFragment){
-            supportFragmentManager
-                .popBackStack()
-            isAddedFragment = false
-        } else{
-            showExitDialog()
-        }
+        showExitDialog()
     }
 
     private fun showExitDialog() {
