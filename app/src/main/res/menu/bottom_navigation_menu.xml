@@ -2,13 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/page_1"
-        android:enabled="true"
         android:icon="@drawable/ic_baseline_local_movies_24"
         android:title="@string/movies"/>
     <item
         android:id="@+id/page_2"
-        android:enabled="true"
         android:icon="@drawable/ic_favorite"
-        android:checked="true"
         android:title="@string/favorite"/>
 </menu>

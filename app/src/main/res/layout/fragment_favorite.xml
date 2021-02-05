@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/relative"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relative"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.fragments.FavoriteListFragment">
 
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="50dp"
         android:background="@color/colorPrimary" />
-
-    <include
-        layout="@layout/item_bottom_navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"/>
+    </FrameLayout>
 
     <TextView
         android:id="@+id/txt_no_movie"
@@ -26,6 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:fontFamily="sans-serif-black"
+        android:gravity="center"
         android:text="@string/no_movies_sign"
         android:textColor="@color/white"
         android:textSize="24sp" />

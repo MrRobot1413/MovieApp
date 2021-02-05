@@ -23,6 +23,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomNav: BottomNavigationView
     private var isAddedFragment: Boolean = false
 
+    companion object{
+        const val DETAILS_FRAGMENT = "DetailsFragment"
+        const val FAVORITE_LIST_FRAGMENT = "FavoriteListFragment"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -55,6 +60,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.page_1 -> {
                     val menuItem: MenuItem = bottomNav.menu.findItem(R.id.page_1)
                     menuItem.isChecked = true
+                    openMainActivity()
                     true
                 }
                 R.id.page_2 -> {
@@ -66,11 +72,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun openMainActivity() {
+        isAddedFragment = false
+        supportFragmentManager
+            .popBackStack()
+    }
+
     private fun openDetailsActivity(movie: Movie) {
         isAddedFragment = true
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.relative, DetailsFragment.newInstance(movie), "DetailsFragment")
+            .setCustomAnimations(R.anim.anim_in, R.anim.anim_out)
+            .replace(R.id.container, DetailsFragment.newInstance(movie), DETAILS_FRAGMENT)
             .addToBackStack(null)
             .commit()
     }
@@ -79,7 +92,8 @@ class MainActivity : AppCompatActivity() {
         isAddedFragment = true
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.relative, FavoriteListFragment(), "FavoriteFragment")
+            .setCustomAnimations(R.anim.anim_in, R.anim.anim_out)
+            .replace(R.id.container, FavoriteListFragment.newInstance(), FAVORITE_LIST_FRAGMENT)
             .addToBackStack(null)
             .commit()
     }

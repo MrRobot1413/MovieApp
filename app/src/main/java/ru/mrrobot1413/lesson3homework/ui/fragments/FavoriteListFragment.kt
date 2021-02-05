@@ -24,10 +24,10 @@ class FavoriteListFragment : Fragment() {
     private var isAddedFragment: Boolean = false
 
     companion object {
-        fun newInstance(): DetailsFragment {
+        fun newInstance(): FavoriteListFragment {
             val args = Bundle()
 
-            val fragment = DetailsFragment()
+            val fragment = FavoriteListFragment()
             fragment.arguments = args
             return fragment
         }
@@ -46,9 +46,6 @@ class FavoriteListFragment : Fragment() {
 
 
         initFields(view)
-        initBottomNav()
-        val item: MenuItem = bottomNav.menu.findItem(R.id.page_2)
-        item.isChecked = true
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -57,47 +54,25 @@ class FavoriteListFragment : Fragment() {
         initRecycler()
     }
 
-    private fun initFields(view: View){
+    private fun initFields(view: View) {
         noMoviesSign = view.findViewById(R.id.txt_no_movie)
         noMoviesSign.visibility = View.VISIBLE
 
         recyclerView = view.findViewById(R.id.recycler_view)
-        bottomNav = view.findViewById(R.id.bottom_navigation)
     }
 
-    private fun initRecycler(){
+    private fun initRecycler() {
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = FavoriteAdapter(DataStorage.favoriteList, noMoviesSign){ movie ->
+        recyclerView.adapter = FavoriteAdapter(DataStorage.favoriteList, noMoviesSign) { movie ->
             openDetailsActivity(movie)
         }
-    }
-
-    private fun initBottomNav(){
-        bottomNav.setOnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.page_1 -> {
-                    openMainActivity()
-
-                    val itemMenu: MenuItem = bottomNav.menu.findItem(R.id.page_1)
-                    itemMenu.isChecked = true
-                    true
-                }
-                else -> false
-            }
-        }
-    }
-
-    private fun openMainActivity() {
-        isAddedFragment = false
-        activity?.supportFragmentManager
-            ?.popBackStack()
     }
 
     private fun openDetailsActivity(movie: Movie) {
         isAddedFragment = true
         activity?.supportFragmentManager
             ?.beginTransaction()
-            ?.replace(R.id.relative, DetailsFragment.newInstance(movie), "DetailsFragment")
+            ?.replace(R.id.container, DetailsFragment.newInstance(movie), "DetailsFragment")
             ?.addToBackStack(null)
             ?.commit()
     }
