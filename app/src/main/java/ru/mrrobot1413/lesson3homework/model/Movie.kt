@@ -1,6 +1,7 @@
 package ru.mrrobot1413.lesson3homework.model
 
 import android.os.Parcelable
+import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -14,5 +15,6 @@ class Movie(
     val movieInviteText: Int
 ) :
     Parcelable{
+        @IgnoredOnParcel
         var liked = false
     }

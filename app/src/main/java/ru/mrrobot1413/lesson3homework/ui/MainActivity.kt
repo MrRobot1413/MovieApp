@@ -1,8 +1,11 @@
 package ru.mrrobot1413.lesson3homework.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -23,8 +26,9 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
     private lateinit var adapter: MoviesAdapter
     private lateinit var bottomNav: BottomNavigationView
     private var isAddedFragment: Boolean = false
+    private val beginTransaction = supportFragmentManager.beginTransaction()
 
-    companion object{
+    companion object {
         const val DETAILS_FRAGMENT = "DetailsFragment"
         const val FAVORITE_LIST_FRAGMENT = "FavoriteListFragment"
     }
@@ -35,11 +39,6 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
 
         initRecycler()
         initBottomNav()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        recyclerView.adapter?.notifyDataSetChanged()
     }
 
     private fun initRecycler() {
@@ -54,18 +53,21 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
 
     }
 
-    private fun initBottomNav(){
+    private fun initBottomNav() {
         bottomNav = findViewById(R.id.bottom_navigation)
         bottomNav.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.page_1 -> {
                     val menuItem: MenuItem = bottomNav.menu.findItem(R.id.page_1)
                     menuItem.isChecked = true
+
                     openMainActivity()
+
+                    adapter.notifyDataSetChanged()
                     true
                 }
                 R.id.page_2 -> {
-                    if(!isAddedFragment){
+                    if (!isAddedFragment) {
                         openFavoriteActivity()
                     }
                     true
@@ -77,26 +79,28 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
 
     private fun openMainActivity() {
         isAddedFragment = false
+
         supportFragmentManager
             .popBackStack()
     }
 
     private fun openDetailsActivity(movie: Movie) {
         isAddedFragment = true
-        supportFragmentManager
-            .beginTransaction()
-            .setCustomAnimations(R.anim.anim_in, R.anim.anim_out)
-            .replace(R.id.container, DetailsFragment.newInstance(movie), DETAILS_FRAGMENT)
-            .addToBackStack(null)
-            .commit()
+
+        replaceFragment(DetailsFragment.newInstance(movie), R.id.relative)
     }
 
     private fun openFavoriteActivity() {
         isAddedFragment = true
+
+        replaceFragment(FavoriteListFragment.newInstance(), R.id.container)
+    }
+
+    private fun replaceFragment(fragment: Fragment, container: Int){
         supportFragmentManager
             .beginTransaction()
-            .setCustomAnimations(R.anim.anim_in, R.anim.anim_out)
-            .replace(R.id.container, FavoriteListFragment.newInstance(), FAVORITE_LIST_FRAGMENT)
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .replace(container, fragment, FAVORITE_LIST_FRAGMENT)
             .addToBackStack(null)
             .commit()
     }
@@ -106,11 +110,12 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
     }
 
     override fun onBackPressed() {
-        if(isAddedFragment){
+        if (isAddedFragment) {
+            isAddedFragment = false
+
             supportFragmentManager
                 .popBackStack()
-            isAddedFragment = false
-        } else{
+        } else {
             showExitDialog()
         }
     }
@@ -118,7 +123,7 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
     private fun showExitDialog() {
         val builder = MaterialAlertDialogBuilder(this)
 
-            builder.setTitle(R.string.exit_text)
+        builder.setTitle(R.string.exit_text)
             .setPositiveButton(getString(R.string.confirm_exit)) { _, _ ->
                 finish()
             }
