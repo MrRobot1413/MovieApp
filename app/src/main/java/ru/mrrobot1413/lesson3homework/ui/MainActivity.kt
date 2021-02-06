@@ -1,6 +1,5 @@
 package ru.mrrobot1413.lesson3homework.ui
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
