@@ -10,12 +10,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import ru.mrrobot1413.lesson3homework.R
 import ru.mrrobot1413.lesson3homework.adapters.MoviesAdapter
 import ru.mrrobot1413.lesson3homework.data.DataStorage
+import ru.mrrobot1413.lesson3homework.interfaces.FragmentsClickListener
 import ru.mrrobot1413.lesson3homework.model.Movie
 import ru.mrrobot1413.lesson3homework.ui.fragments.DetailsFragment
 import ru.mrrobot1413.lesson3homework.ui.fragments.FavoriteListFragment
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), FragmentsClickListener {
 
     private lateinit var recyclerView: RecyclerView
     private val moviesList = DataStorage.moviesList
@@ -64,7 +65,9 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.page_2 -> {
-                    openFavoriteActivity()
+                    if(!isAddedFragment){
+                        openFavoriteActivity()
+                    }
                     true
                 }
                 else -> false
@@ -96,6 +99,10 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.container, FavoriteListFragment.newInstance(), FAVORITE_LIST_FRAGMENT)
             .addToBackStack(null)
             .commit()
+    }
+
+    override fun onClick(movie: Movie) {
+        openDetailsActivity(movie)
     }
 
     override fun onBackPressed() {

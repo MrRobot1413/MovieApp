@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -12,7 +13,6 @@ import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import ru.mrrobot1413.lesson3homework.R
 import ru.mrrobot1413.lesson3homework.model.Movie
-import ru.mrrobot1413.lesson3homework.ui.MainActivity
 
 class DetailsFragment : Fragment() {
 
@@ -54,10 +54,6 @@ class DetailsFragment : Fragment() {
         initFields(view)
 
         movie?.let { setContent(it) }
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
 
         toolbar.setOnClickListener {
             activity?.onBackPressed()

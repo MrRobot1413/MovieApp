@@ -14,16 +14,16 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import ru.mrrobot1413.lesson3homework.R
 import ru.mrrobot1413.lesson3homework.adapters.FavoriteAdapter
 import ru.mrrobot1413.lesson3homework.data.DataStorage
+import ru.mrrobot1413.lesson3homework.interfaces.FragmentsClickListener
 import ru.mrrobot1413.lesson3homework.model.Movie
 
 class FavoriteListFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var bottomNav: BottomNavigationView
     private lateinit var noMoviesSign: TextView
-    private var isAddedFragment: Boolean = false
 
     companion object {
+
         fun newInstance(): FavoriteListFragment {
             val args = Bundle()
 
@@ -44,36 +44,20 @@ class FavoriteListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         initFields(view)
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
         initRecycler()
     }
 
     private fun initFields(view: View) {
         noMoviesSign = view.findViewById(R.id.txt_no_movie)
         noMoviesSign.visibility = View.VISIBLE
-
         recyclerView = view.findViewById(R.id.recycler_view)
     }
 
     private fun initRecycler() {
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = FavoriteAdapter(DataStorage.favoriteList, noMoviesSign) { movie ->
-            openDetailsActivity(movie)
+        recyclerView.adapter = FavoriteAdapter(DataStorage.favoriteList, noMoviesSign) {
+            (activity as? FragmentsClickListener)?.onClick(it)
         }
-    }
-
-    private fun openDetailsActivity(movie: Movie) {
-        isAddedFragment = true
-        activity?.supportFragmentManager
-            ?.beginTransaction()
-            ?.replace(R.id.container, DetailsFragment.newInstance(movie), "DetailsFragment")
-            ?.addToBackStack(null)
-            ?.commit()
     }
 }
