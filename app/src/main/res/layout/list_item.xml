@@ -13,13 +13,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="18dp"
         android:layout_marginTop="18dp"
-        android:maxWidth="180dp"
+        android:maxWidth="200dp"
         android:fontFamily="sans-serif-black"
         android:text="@string/movie_1_name"
         android:textColor="@color/white"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="24sp" />
 
     <com.sackcentury.shinebuttonlib.ShineButton
         android:id="@+id/add_to_favor_toggle"
