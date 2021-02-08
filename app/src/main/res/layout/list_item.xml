@@ -13,8 +13,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="18dp"
         android:layout_marginTop="18dp"
-        android:maxWidth="200dp"
+        android:ellipsize="end"
         android:fontFamily="sans-serif-black"
+        android:maxEms="8"
+        android:singleLine="true"
         android:text="@string/movie_1_name"
         android:textColor="@color/white"
         android:textSize="24sp" />
@@ -23,7 +25,6 @@
         android:id="@+id/add_to_favor_toggle"
         android:layout_width="26dp"
         android:layout_height="26dp"
-        android:layout_marginStart="4dp"
         android:layout_marginTop="22dp"
         android:layout_toEndOf="@id/txt_name"
         app:allow_random_color="false"
@@ -44,7 +45,7 @@
         android:layout_below="@id/txt_name"
         android:layout_marginStart="10dp"
         android:layout_toEndOf="@id/txt_rating"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/movie_1_time"
         android:textColor="@color/white"
         android:textSize="20sp" />
@@ -63,7 +64,7 @@
     <ImageView
         android:id="@+id/image_main"
         android:layout_width="wrap_content"
-        android:layout_height="400dp"
+        android:layout_height="450dp"
         android:layout_below="@id/txt_name"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
@@ -76,7 +77,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/txt_name"
         android:layout_toEndOf="@id/image_star"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/movie_1_rating"
         android:textColor="@color/white"
         android:textSize="20sp" />
