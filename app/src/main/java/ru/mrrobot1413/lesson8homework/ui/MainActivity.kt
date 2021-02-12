@@ -2,6 +2,9 @@ package ru.mrrobot1413.lesson8homework.ui
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.animation.Animation
+import androidx.annotation.AnimRes
+import androidx.annotation.AnimatorRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -86,22 +89,47 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
     private fun openDetailsActivity(movie: Movie) {
         isAddedFragment = true
 
-        replaceFragment(DetailsFragment.newInstance(movie), R.id.relative)
+        replaceFragment(
+            DetailsFragment.newInstance(movie),
+            R.id.relative,
+            false,
+            null,
+            null
+        )
     }
 
     private fun openFavoriteActivity() {
         isAddedFragment = true
 
-        replaceFragment(FavoriteListFragment.newInstance(), R.id.container)
+        replaceFragment(
+            FavoriteListFragment.newInstance(),
+            R.id.container,
+            true,
+            R.anim.anim_enter_favorite_list,
+            R.anim.anim_exit_favorite_list
+        )
     }
 
-    private fun replaceFragment(fragment: Fragment, container: Int){
-        supportFragmentManager
-            .beginTransaction()
-            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-            .replace(container, fragment, FAVORITE_LIST_FRAGMENT)
-            .addToBackStack(null)
-            .commit()
+    private fun replaceFragment(
+        fragment: Fragment,
+        container: Int,
+        addAnimation: Boolean,
+        @AnimatorRes @AnimRes animEnter: Int?,
+        @AnimatorRes @AnimRes animExit: Int?
+    ) {
+        val supportFragmentManager =
+            supportFragmentManager
+                .beginTransaction()
+                .addToBackStack(null)
+                .replace(container, fragment, FAVORITE_LIST_FRAGMENT)
+        if (addAnimation) {
+            supportFragmentManager
+                .setCustomAnimations(animEnter!!, animExit!!)
+        } else {
+            supportFragmentManager
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+        }
+        supportFragmentManager.commit()
     }
 
     override fun onClick(movie: Movie) {
