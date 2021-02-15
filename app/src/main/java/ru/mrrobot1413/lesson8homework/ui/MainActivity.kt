@@ -5,6 +5,9 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -16,6 +19,7 @@ import ru.mrrobot1413.lesson8homework.interfaces.FragmentsClickListener
 import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.ui.fragments.DetailsFragment
 import ru.mrrobot1413.lesson8homework.ui.fragments.FavoriteListFragment
+import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
 
 class MainActivity : AppCompatActivity(), FragmentsClickListener {
 
@@ -24,13 +28,24 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
     private lateinit var adapter: MoviesAdapter
     private lateinit var bottomNav: BottomNavigationView
     private var isAddedFragment: Boolean = false
+    private lateinit var moviesViewModel: MoviesViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        initViewModel()
         initRecycler()
         initBottomNav()
+    }
+
+    private fun initViewModel(){
+        moviesViewModel = ViewModelProvider(this).get(MoviesViewModel::class.java)
+        moviesViewModel.init()
+
+        moviesViewModel.getMovies().observe(this, Observer {
+
+        })
     }
 
     private fun initRecycler() {
@@ -38,9 +53,11 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter = MoviesAdapter(moviesList) { movie ->
-            openDetailsActivity(movie)
-        }
+        adapter = moviesViewModel.getMovies().value?.let {
+            MoviesAdapter(it) { movie ->
+                openDetailsActivity(movie)
+            }
+        }!!
         recyclerView.adapter = adapter
 
     }
@@ -50,8 +67,7 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
         bottomNav.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.page_1 -> {
-                    val menuItem: MenuItem = bottomNav.menu.findItem(R.id.page_1)
-                    menuItem.isChecked = true
+                    changeFocusOnBottomNavToMainActivity()
 
                     openMainActivity()
 
@@ -67,6 +83,11 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
                 else -> false
             }
         }
+    }
+
+    private fun changeFocusOnBottomNavToMainActivity(){
+        val menuItem: MenuItem = bottomNav.menu.findItem(R.id.page_1)
+        menuItem.isChecked = true
     }
 
     private fun openMainActivity() {
@@ -116,6 +137,8 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
 
             supportFragmentManager
                 .popBackStack()
+
+            changeFocusOnBottomNavToMainActivity()
         } else {
             showExitDialog()
         }
