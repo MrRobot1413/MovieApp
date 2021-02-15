@@ -2,15 +2,15 @@
     <string name="app_name">Lesson 3 homework</string>
     <string name="movies">Movies</string>
     <string name="details">Details</string>
-    <string name="movie_1_name">Tenet (2020)</string>
+    <string name="movie_1_name">Tenet</string>
     <string name="movie_1_time">2h 30m</string>
-    <string name="movie_2_name">The hunt (2020)</string>
+    <string name="movie_2_name">The hunt</string>
     <string name="movie_2_time">1h 55m</string>
-    <string name="movie_3_name">Soul (2020)</string>
+    <string name="movie_3_name">Soul</string>
     <string name="movie_3_time">1h 47m</string>
-    <string name="movie_4_name">Wonder Woman 1984 (2020)</string>
+    <string name="movie_4_name">Wonder Woman 1984</string>
     <string name="movie_4_time">2h 35m</string>
-    <string name="movie_5_name">Unknown (2006)</string>
+    <string name="movie_5_name">Unknown</string>
     <string name="movie_5_time">1h 25m</string>
     <string name="movie_1_descr">Fighting for the survival of the entire world, the Protagonist journeys through a twilight world of international espionage on a mission that will unfold in something beyond real time.</string>
     <string name="movie_2_descr">Twelve strangers awake in clearing with no memory of how or why are they are there, but its not long before they realise that they are being hunted down. One of the hunted (Gilpin) manages to turn the tables on their pursuers and attempts to make her way to the mysterious woman behind it all.</string>
@@ -60,47 +60,47 @@
     </string>
     <string name="movie_3_actors">
         Jamie Foxx (Joe (voice),
-        Tina Fey (22 (voice))
-        Graham Norton Moonwind (voice)
-        Rachel House (Terry (voice))
-        Alice Braga	(Counselor Jerry (voice))
-        Richard Ayoade (Counselor Jerry (voice))
-        Phylicia Rashad (Libba (voice))
-        Donnell Rawlings (Dez (voice))
-        Questlove (Curley (voice))
-        Angela Bassett (Dorothea (voice))
-        Cora Champommier (Connie (voice))
-        Margo Hall (Melba (voice))
-        Daveed Diggs (Paul (voice))
-        Rhodessa Jones (Lulu (voice))
+        Tina Fey (22 (voice)),
+        Graham Norton Moonwind (voice),
+        Rachel House (Terry (voice)),
+        Alice Braga	(Counselor Jerry (voice)),
+        Richard Ayoade (Counselor Jerry (voice)),
+        Phylicia Rashad (Libba (voice)),
+        Donnell Rawlings (Dez (voice)),
+        Questlove (Curley (voice)),
+        Angela Bassett (Dorothea (voice)),
+        Cora Champommier (Connie (voice)),
+        Margo Hall (Melba (voice)),
+        Daveed Diggs (Paul (voice)),
+        Rhodessa Jones (Lulu (voice)),
         Wes Studi (Counselor Jerry (voice))
     </string>
     <string name="movie_4_actors">
-        Gal Gadot (Diana Prince - Wonder Woman)
-        Chris Pine (Steve Trevor)
-        Kristen Wiig (Barbara Ann Minerva - Cheetah)
-        Pedro Pascal (Maxwell Lord)
-        Robin Wright (General Antiope)
-        Connie Nielsen (Queen Hippolyta)
-        Lilly Aspell (young Diana)
-        Lucian Perez (Alistair Lord son of Max)
-        Kristoffer Polaha (the man in whose body Steve lives)
-        Oliver Cotton (Simon Stagg Max\'s investor)
-        Amr Waked (Emir Said bin Abydos ruler of Bialia)
-        Stuart Milligan (President of the United States)
-        Ravi Patel (Babajide)
-        Natasha Rothwell (Carols boss Barbara)
-        Calvin Yu (Jake is Barbara\'s colleague)
-        Gabriella Wilde (Raquel Max\'s assistant)
+        Gal Gadot (Diana Prince - Wonder Woman),
+        Chris Pine (Steve Trevor),
+        Kristen Wiig (Barbara Ann Minerva - Cheetah),
+        Pedro Pascal (Maxwell Lord),
+        Robin Wright (General Antiope),
+        Connie Nielsen (Queen Hippolyta),
+        Lilly Aspell (young Diana),
+        Lucian Perez (Alistair Lord son of Max),
+        Kristoffer Polaha (the man in whose body Steve lives),
+        Oliver Cotton (Simon Stagg Max\'s investor),
+        Amr Waked (Emir Said bin Abydos ruler of Bialia),
+        Stuart Milligan (President of the United States),
+        Ravi Patel (Babajide),
+        Natasha Rothwell (Carols boss Barbara),
+        Calvin Yu (Jake is Barbara\'s colleague),
+        Gabriella Wilde (Raquel Max\'s assistant),
         Lynda Carter (Asteria (cameo))
     </string>
     <string name="movie_5_actors">
-        James Caviezel (Mitch, main character)
+        James Caviezel (Mitch, main character),
         Greg Kinnear (Richard McCain guy with a broken nose, businessman),
         Bridget Moynahan (Eliza Coles, William\'s wife),
-        Joe Pantoliano (Brockman, tied guy)
+        Joe Pantoliano (Brockman, tied guy),
         Barry Pepper (William Coles, one of the businessmen),
-        Jeremy Sisto (Bobby Kincaid, handcuffed)
+        Jeremy Sisto (Bobby Kincaid, handcuffed),
         Peter Stormare (Stefan Burian, leader of the criminal gang)
     </string>
     <string name="movie_1_rating">7.6</string>
@@ -108,6 +108,21 @@
     <string name="movie_3_rating">8.0</string>
     <string name="movie_4_rating">5.4</string>
     <string name="movie_5_rating">6.7</string>
+    <string name="movie_1_release_date">12 Aug 2020</string>
+    <string name="movie_2_release_date">11 Mar 2020</string>
+    <string name="movie_3_release_date">25 Dec 2020</string>
+    <string name="movie_4_release_date">16 Dec 2020</string>
+    <string name="movie_5_release_date">3 Nov 2006</string>
+    <string name="movie_1_country">USA</string>
+    <string name="movie_2_country">UK</string>
+    <string name="movie_3_country">USA</string>
+    <string name="movie_4_country">USA</string>
+    <string name="movie_5_country">USA</string>
+    <string name="movie_1_restriction">2+</string>
+    <string name="movie_2_restriction">18+</string>
+    <string name="movie_3_restriction">12+</string>
+    <string name="movie_4_restriction">16+</string>
+    <string name="movie_5_restriction">18+</string>
     <string name="no_movies_sign">There aren\'t any movies yet</string>
     <string name="exit_text">Are you sure you want to exit?</string>
     <string name="confirm_exit">Exit</string>
@@ -116,4 +131,8 @@
     <string name="toast_delete"> was deleted from favorite</string>
     <string name="toast_add"> was added to favorite</string>
     <string name="undo">Undo</string>
+    <string name="time">Time:</string>
+    <string name="release_date">Release date:</string>
+    <string name="age_restrictions">Age restrictions:</string>
+    <string name="country">Country:</string>
 </resources>

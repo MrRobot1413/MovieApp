@@ -2,9 +2,6 @@ package ru.mrrobot1413.lesson8homework.ui
 
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.animation.Animation
-import androidx.annotation.AnimRes
-import androidx.annotation.AnimatorRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -20,7 +17,6 @@ import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.ui.fragments.DetailsFragment
 import ru.mrrobot1413.lesson8homework.ui.fragments.FavoriteListFragment
 
-
 class MainActivity : AppCompatActivity(), FragmentsClickListener {
 
     private lateinit var recyclerView: RecyclerView
@@ -28,12 +24,6 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
     private lateinit var adapter: MoviesAdapter
     private lateinit var bottomNav: BottomNavigationView
     private var isAddedFragment: Boolean = false
-    private val beginTransaction = supportFragmentManager.beginTransaction()
-
-    companion object {
-        const val DETAILS_FRAGMENT = "DetailsFragment"
-        const val FAVORITE_LIST_FRAGMENT = "FavoriteListFragment"
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,10 +81,7 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
 
         replaceFragment(
             DetailsFragment.newInstance(movie),
-            R.id.relative,
-            false,
-            null,
-            null
+            R.id.relative
         )
     }
 
@@ -103,33 +90,20 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
 
         replaceFragment(
             FavoriteListFragment.newInstance(),
-            R.id.container,
-            true,
-            R.anim.anim_enter_favorite_list,
-            R.anim.anim_exit_favorite_list
+            R.id.container
         )
     }
 
     private fun replaceFragment(
         fragment: Fragment,
-        container: Int,
-        addAnimation: Boolean,
-        @AnimatorRes @AnimRes animEnter: Int?,
-        @AnimatorRes @AnimRes animExit: Int?
+        container: Int
     ) {
-        val supportFragmentManager =
-            supportFragmentManager
-                .beginTransaction()
-                .addToBackStack(null)
-                .replace(container, fragment, FAVORITE_LIST_FRAGMENT)
-        if (addAnimation) {
-            supportFragmentManager
-                .setCustomAnimations(animEnter!!, animExit!!)
-        } else {
-            supportFragmentManager
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-        }
-        supportFragmentManager.commit()
+        supportFragmentManager
+            .beginTransaction()
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .addToBackStack(null)
+            .replace(container, fragment, fragment.tag)
+            .commit()
     }
 
     override fun onClick(movie: Movie) {

@@ -32,11 +32,11 @@ class FavoriteAdapter(
         setOnDetailsClickListener(holder, moviesList[position])
         setOnLikeListener(holder, moviesList[position], position)
         showNoMoviesSign()
-        holder.addToFavorToggle.isChecked = true
+        holder.addToFavorToggle.isLiked = true
     }
 
     private fun setOnDetailsClickListener(holder: MoviesViewHolder, movie: Movie) {
-        holder.btnDetails.setOnClickListener {
+        holder.holder.setOnClickListener {
 
             notifyDataSetChanged()
 

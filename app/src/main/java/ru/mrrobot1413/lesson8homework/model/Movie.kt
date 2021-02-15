@@ -12,6 +12,9 @@ class Movie(
     val movieRating: Int,
     val movieActors: Int,
     val movieDescr: Int,
+    val movieReleaseDate: Int,
+    val movieCountry: Int,
+    val movieRestrictions: Int,
     val movieInviteText: Int
 ) :
     Parcelable{
