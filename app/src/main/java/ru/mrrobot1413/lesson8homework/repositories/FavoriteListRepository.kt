@@ -4,12 +4,12 @@ import androidx.lifecycle.MutableLiveData
 import ru.mrrobot1413.lesson8homework.data.DataStorage
 import ru.mrrobot1413.lesson8homework.model.Movie
 
-class MovieRepository {
-    private lateinit var instance: MovieRepository
-    private var dataSet: MutableList<Movie> = DataStorage.moviesList
+class FavoriteListRepository {
+    private lateinit var instance: FavoriteListRepository
+    private var dataSet: MutableList<Movie> = DataStorage.favoriteList
 
-    fun getInstansce(): MovieRepository {
-        instance = MovieRepository()
+    fun getInstansce(): FavoriteListRepository {
+        instance = FavoriteListRepository()
         return instance
     }
 

@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -15,20 +14,20 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.MoviesAdapter
 import ru.mrrobot1413.lesson8homework.data.DataStorage
-import ru.mrrobot1413.lesson8homework.interfaces.FragmentsClickListener
+import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
 import ru.mrrobot1413.lesson8homework.model.Movie
+import ru.mrrobot1413.lesson8homework.repositories.MovieRepository
 import ru.mrrobot1413.lesson8homework.ui.fragments.DetailsFragment
 import ru.mrrobot1413.lesson8homework.ui.fragments.FavoriteListFragment
 import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
 
-class MainActivity : AppCompatActivity(), FragmentsClickListener {
+class MainActivity : AppCompatActivity(), MovieClickListener {
 
     private lateinit var recyclerView: RecyclerView
-    private val moviesList = DataStorage.moviesList
+    private lateinit var moviesViewModel: MoviesViewModel
     private lateinit var adapter: MoviesAdapter
     private lateinit var bottomNav: BottomNavigationView
     private var isAddedFragment: Boolean = false
-    private lateinit var moviesViewModel: MoviesViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,10 +40,9 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
 
     private fun initViewModel(){
         moviesViewModel = ViewModelProvider(this).get(MoviesViewModel::class.java)
-        moviesViewModel.init()
 
-        moviesViewModel.getMovies().observe(this, Observer {
-
+        moviesViewModel.getMovies().observe(this, {
+            adapter.setMovies(it)
         })
     }
 
@@ -53,11 +51,9 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter = moviesViewModel.getMovies().value?.let {
-            MoviesAdapter(it) { movie ->
+        adapter = MoviesAdapter { movie ->
                 openDetailsActivity(movie)
-            }
-        }!!
+        }
         recyclerView.adapter = adapter
 
     }
@@ -68,15 +64,13 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
             when (item.itemId) {
                 R.id.page_1 -> {
                     changeFocusOnBottomNavToMainActivity()
-
-                    openMainActivity()
-
+                    backToHomeScreen()
                     adapter.notifyDataSetChanged()
                     true
                 }
                 R.id.page_2 -> {
                     if (!isAddedFragment) {
-                        openFavoriteActivity()
+                        openFavoriteListFragment()
                     }
                     true
                 }
@@ -90,7 +84,7 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
         menuItem.isChecked = true
     }
 
-    private fun openMainActivity() {
+    private fun backToHomeScreen() {
         isAddedFragment = false
 
         supportFragmentManager
@@ -106,7 +100,7 @@ class MainActivity : AppCompatActivity(), FragmentsClickListener {
         )
     }
 
-    private fun openFavoriteActivity() {
+    private fun openFavoriteListFragment() {
         isAddedFragment = true
 
         replaceFragment(

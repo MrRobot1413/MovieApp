@@ -8,13 +8,8 @@ import ru.mrrobot1413.lesson8homework.repositories.MovieRepository
 
 class MoviesViewModel : ViewModel() {
 
-    private lateinit var moviesList: MutableLiveData<List<Movie>>
-    private lateinit var movieRepository: MovieRepository
-
-    fun init() {
-        movieRepository = MovieRepository().getInstansce()
-        moviesList = movieRepository.getMovies()
-    }
+    private var movieRepository: MovieRepository = MovieRepository().getInstansce()
+    private var moviesList: MutableLiveData<List<Movie>> = movieRepository.getMovies()
 
     fun getMovies(): LiveData<List<Movie>> {
         return moviesList

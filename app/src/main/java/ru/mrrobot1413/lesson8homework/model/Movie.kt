@@ -5,7 +5,7 @@ import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class Movie(
+data class Movie(
     val movieName: Int,
     val movieTime: Int,
     val movieImage: Int,

@@ -11,12 +11,17 @@ import ru.mrrobot1413.lesson8homework.viewHolders.MoviesViewHolder
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.data.DataStorage
 
-class FavoriteAdapter(
-    private val moviesList: List<Movie>,
+class FavoriteListAdapter(
     private val noMoviesSign: TextView,
     private val clickListener: (movie: Movie) -> Unit
 ) :
     RecyclerView.Adapter<MoviesViewHolder>() {
+
+    private lateinit var moviesList: List<Movie>
+
+    fun setMovies(moviesList: List<Movie>){
+        this.moviesList = moviesList
+    }
 
     override fun getItemCount() = moviesList.size
 

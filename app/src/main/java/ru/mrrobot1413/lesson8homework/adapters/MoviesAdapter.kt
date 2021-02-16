@@ -15,10 +15,15 @@ import ru.mrrobot1413.lesson8homework.viewHolders.MoviesViewHolder
 
 
 class MoviesAdapter(
-    private val moviesList: List<Movie>,
     private val clickListener: (movie: Movie) -> Unit
 ) :
     RecyclerView.Adapter<MoviesViewHolder>() {
+
+    private lateinit var moviesList: List<Movie>
+
+    fun setMovies(moviesList: List<Movie>){
+        this.moviesList = moviesList
+    }
 
     override fun getItemCount() = moviesList.size
 
