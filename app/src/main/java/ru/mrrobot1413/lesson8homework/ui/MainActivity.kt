@@ -5,7 +5,6 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,10 +12,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.MoviesAdapter
-import ru.mrrobot1413.lesson8homework.data.DataStorage
 import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
 import ru.mrrobot1413.lesson8homework.model.Movie
-import ru.mrrobot1413.lesson8homework.repositories.MovieRepository
 import ru.mrrobot1413.lesson8homework.ui.fragments.DetailsFragment
 import ru.mrrobot1413.lesson8homework.ui.fragments.FavoriteListFragment
 import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
@@ -24,26 +21,27 @@ import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
 class MainActivity : AppCompatActivity(), MovieClickListener {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var moviesViewModel: MoviesViewModel
-    private lateinit var adapter: MoviesAdapter
+    private val moviesViewModel by lazy {
+        ViewModelProvider(this).get(MoviesViewModel::class.java)
+    }
+    private val adapter by lazy {
+        MoviesAdapter { movie ->
+            openDetailsActivity(movie)
+        }
+    }
     private lateinit var bottomNav: BottomNavigationView
     private var isAddedFragment: Boolean = false
+
+    companion object{
+        const val MAIN_ACTIVITY = "MAIN_ACTIVITY"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        initViewModel()
         initRecycler()
         initBottomNav()
-    }
-
-    private fun initViewModel(){
-        moviesViewModel = ViewModelProvider(this).get(MoviesViewModel::class.java)
-
-        moviesViewModel.getMovies().observe(this, {
-            adapter.setMovies(it)
-        })
     }
 
     private fun initRecycler() {
@@ -51,11 +49,12 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter = MoviesAdapter { movie ->
-                openDetailsActivity(movie)
-        }
-        recyclerView.adapter = adapter
+        moviesViewModel.movies.observe(this, {
+            adapter.setMovies(it)
+            adapter.notifyDataSetChanged()
+        })
 
+        recyclerView.adapter = adapter
     }
 
     private fun initBottomNav() {
@@ -95,7 +94,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         isAddedFragment = true
 
         replaceFragment(
-            DetailsFragment.newInstance(movie),
+            DetailsFragment.newInstance(movie, MAIN_ACTIVITY),
             R.id.relative
         )
     }
@@ -131,8 +130,6 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
 
             supportFragmentManager
                 .popBackStack()
-
-            changeFocusOnBottomNavToMainActivity()
         } else {
             showExitDialog()
         }
@@ -150,5 +147,6 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
             }
         builder.show()
     }
+
 }
 

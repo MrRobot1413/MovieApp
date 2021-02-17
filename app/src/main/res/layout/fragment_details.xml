@@ -21,7 +21,8 @@
             android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            tools:title="@string/movie_1_name">
+            tools:title="@string/movie_1_name"
+            app:expandedTitleTextAppearance="@style/ToolbarTextStyle">
 
             <ImageView
                 android:id="@+id/image_backdrop"
@@ -42,6 +43,18 @@
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_to_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_favorite_border"
+        app:borderWidth="0dp"
+        app:layout_anchor="@id/appbar_layout"
+        app:layout_anchorGravity="bottom|end"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:contentDescription="@string/favorite" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"

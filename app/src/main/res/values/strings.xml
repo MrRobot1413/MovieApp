@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Lesson 3 homework</string>
+    <string name="app_name">Top Movies</string>
     <string name="movies">Movies</string>
     <string name="details">Details</string>
     <string name="movie_1_name">Tenet</string>

@@ -1,6 +1,7 @@
 package ru.mrrobot1413.lesson8homework.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,8 +19,14 @@ class FavoriteListFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var noMoviesSign: TextView
-    private lateinit var adapter: FavoriteListAdapter
-    private lateinit var favoriteListViewModel: FavoriteListViewModel
+    private val adapter by lazy {
+        FavoriteListAdapter(noMoviesSign) {
+            (activity as? MovieClickListener)?.onClick(it)
+        }
+    }
+    private val favoriteListViewModel by lazy {
+        ViewModelProvider(this).get(FavoriteListViewModel::class.java)
+    }
 
     companion object {
 
@@ -43,7 +50,6 @@ class FavoriteListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initViewModel()
         initFields(view)
         initRecycler()
     }
@@ -54,19 +60,13 @@ class FavoriteListFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recycler_view)
     }
 
-    private fun initViewModel(){
-        favoriteListViewModel = ViewModelProvider(this).get(FavoriteListViewModel::class.java)
-
-        favoriteListViewModel.getMovies().observe(viewLifecycleOwner, {
-            adapter.setMovies(it)
-        })
-    }
-
-    private fun initRecycler() {
+     private fun initRecycler() {
         recyclerView.layoutManager = LinearLayoutManager(context)
-        adapter = FavoriteListAdapter(noMoviesSign) {
-            (activity as? MovieClickListener)?.onClick(it)
-        }
+
+        favoriteListViewModel.movies.observe(viewLifecycleOwner, {
+            adapter.setMovies(it)
+            adapter.notifyDataSetChanged()
+        })
 
         recyclerView.adapter = adapter
     }

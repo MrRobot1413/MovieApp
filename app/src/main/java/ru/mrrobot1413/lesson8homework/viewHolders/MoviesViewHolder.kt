@@ -5,13 +5,11 @@ import android.view.View
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.like.LikeButton
 import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.R
 
 class MoviesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     var txtName: TextView = itemView.findViewById(R.id.txt_name)
-    var addToFavorToggle: LikeButton = itemView.findViewById(R.id.add_to_favor_toggle)
     var image: ImageView = itemView.findViewById(R.id.image_main)
     var holder: RelativeLayout = itemView.findViewById(R.id.holder)
 

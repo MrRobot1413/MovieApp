@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.like.LikeButton
 import com.like.OnLikeListener
@@ -19,6 +20,7 @@ import ru.mrrobot1413.lesson8homework.data.DataStorage
 import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.ui.MainActivity
 import ru.mrrobot1413.lesson8homework.viewHolders.MoviesViewHolder
+import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
 
 class DetailsFragment : Fragment() {
 
@@ -33,14 +35,18 @@ class DetailsFragment : Fragment() {
     private lateinit var inviteText: String
     private lateinit var collapsingToolbarLayout: CollapsingToolbarLayout
     private lateinit var toolbar: MaterialToolbar
+    private lateinit var fabAddToFavorite: FloatingActionButton
+    private var isAddedToFavorite = false
 
     companion object {
 
         private const val MOVIE = "movie"
+        private const val WHERE_CAME_FROM = "WHERE_CAME_FROM"
 
-        fun newInstance(movie: Movie): DetailsFragment {
+        fun newInstance(movie: Movie, whereCameFrom: String): DetailsFragment {
             val args = Bundle()
             args.putParcelable(MOVIE, movie)
+            args.putString(WHERE_CAME_FROM, whereCameFrom)
 
             val fragment = DetailsFragment()
             fragment.arguments = args
@@ -74,7 +80,66 @@ class DetailsFragment : Fragment() {
 
         toolbar.setNavigationOnClickListener {
             activity?.onBackPressed()
+            val frag = FavoriteListFragment()
+            frag.onViewCreated(view, savedInstanceState)
         }
+
+        if (arguments?.getString(WHERE_CAME_FROM).equals(MainActivity.MAIN_ACTIVITY)) {
+            if (movie!!.liked) {
+                setIconLiked()
+                isAddedToFavorite = true
+            }
+        } else {
+            fabAddToFavorite.setImageDrawable(
+                ContextCompat.getDrawable(
+                    context!!,
+                    R.drawable.ic_favorite
+                )
+            )
+            isAddedToFavorite = true
+        }
+
+        setOnFabClickListener(movie)
+    }
+
+    private fun setOnFabClickListener(movie: Movie?) {
+        fabAddToFavorite.setOnClickListener {
+            if (movie != null) {
+                if (isAddedToFavorite) {
+                    isAddedToFavorite = false
+
+                    movie.liked = false
+                    DataStorage.favoriteList.remove(movie)
+
+                    setIconUnliked()
+                } else {
+                    isAddedToFavorite = true
+
+                    movie.liked = true
+                    DataStorage.favoriteList.add(movie)
+
+                    setIconLiked()
+                }
+            }
+        }
+    }
+
+    private fun setIconLiked() {
+        fabAddToFavorite.setImageDrawable(
+            ContextCompat.getDrawable(
+                context!!,
+                R.drawable.ic_favorite
+            )
+        )
+    }
+
+    private fun setIconUnliked() {
+        fabAddToFavorite.setImageDrawable(
+            ContextCompat.getDrawable(
+                context!!,
+                R.drawable.ic_favorite_border
+            )
+        )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -105,6 +170,7 @@ class DetailsFragment : Fragment() {
         txtTime = view.findViewById(R.id.txt_time)
         txtRestriction = view.findViewById(R.id.txt_age)
         collapsingToolbarLayout = view.findViewById(R.id.collapsing_toolbar_layout)
+        fabAddToFavorite = view.findViewById(R.id.fab_add_to_favorite)
     }
 
     @SuppressLint("SetTextI18n")
@@ -119,7 +185,8 @@ class DetailsFragment : Fragment() {
         txtDate.text = getString(R.string.release_date) + " " + getString(movie.movieReleaseDate)
         txtCountry.text = getString(R.string.country) + " " + getString(movie.movieCountry)
         txtTime.text = getString(R.string.time) + " " + getString(movie.movieTime)
-        txtRestriction.text = getString(R.string.age_restrictions) + " " + getString(movie.movieRestrictions)
+        txtRestriction.text =
+            getString(R.string.age_restrictions) + " " + getString(movie.movieRestrictions)
         inviteText = getString(movie.movieInviteText)
     }
 }
