@@ -16,6 +16,7 @@ import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
 import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.ui.fragments.DetailsFragment
 import ru.mrrobot1413.lesson8homework.ui.fragments.FavoriteListFragment
+import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
 import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
 
 class MainActivity : AppCompatActivity(), MovieClickListener {

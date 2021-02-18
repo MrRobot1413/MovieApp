@@ -6,11 +6,10 @@ import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
 
 class FavoriteListViewModel : ViewModel() {
 
-    private var favoriteListRepository: FavoriteListRepository = FavoriteListRepository().getInstansce()
+    private var favoriteListRepository: FavoriteListRepository = FavoriteListRepository().getInstance()
     private var moviesList: MutableLiveData<List<Movie>> = favoriteListRepository.getMovies()
-    val movies: LiveData<List<Movie>> = moviesList
 
-//    fun getMovies(): LiveData<List<Movie>> {
-//        return moviesList
-//    }
+    fun getMovies(): LiveData<List<Movie>> {
+        return moviesList
+    }
 }

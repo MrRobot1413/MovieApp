@@ -20,6 +20,7 @@ class FavoriteListAdapter(
 
     fun setMovies(moviesList: List<Movie>){
         this.moviesList = moviesList
+        notifyDataSetChanged()
     }
 
     override fun getItemCount() = moviesList.size
@@ -52,5 +53,10 @@ class FavoriteListAdapter(
         } else{
             noMoviesSign.visibility = View.GONE
         }
+    }
+
+     fun refreshUsers(list: List<Movie>){
+        this.moviesList = list
+         notifyDataSetChanged()
     }
 }

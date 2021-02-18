@@ -8,7 +8,7 @@ class FavoriteListRepository {
     private lateinit var instance: FavoriteListRepository
     private var dataSet: MutableList<Movie> = DataStorage.favoriteList
 
-    fun getInstansce(): FavoriteListRepository {
+    fun getInstance(): FavoriteListRepository {
         instance = FavoriteListRepository()
         return instance
     }

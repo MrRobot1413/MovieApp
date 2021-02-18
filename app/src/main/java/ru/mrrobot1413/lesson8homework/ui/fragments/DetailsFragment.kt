@@ -1,7 +1,6 @@
 package ru.mrrobot1413.lesson8homework.ui.fragments
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
@@ -9,17 +8,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import com.like.LikeButton
-import com.like.OnLikeListener
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.data.DataStorage
 import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.ui.MainActivity
-import ru.mrrobot1413.lesson8homework.viewHolders.MoviesViewHolder
 import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
 
 class DetailsFragment : Fragment() {
@@ -80,8 +76,7 @@ class DetailsFragment : Fragment() {
 
         toolbar.setNavigationOnClickListener {
             activity?.onBackPressed()
-            val frag = FavoriteListFragment()
-            frag.onViewCreated(view, savedInstanceState)
+
         }
 
         if (arguments?.getString(WHERE_CAME_FROM).equals(MainActivity.MAIN_ACTIVITY)) {
@@ -110,6 +105,10 @@ class DetailsFragment : Fragment() {
 
                     movie.liked = false
                     DataStorage.favoriteList.remove(movie)
+                    val viewModel by lazy {
+                        ViewModelProvider(this).get(FavoriteListViewModel::class.java)
+                    }
+
 
                     setIconUnliked()
                 } else {

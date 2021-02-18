@@ -1,6 +1,7 @@
 package ru.mrrobot1413.lesson8homework.ui.fragments
 
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,10 +11,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.fragment_favorite.*
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.FavoriteListAdapter
 import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
 import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
+import java.util.*
 
 class FavoriteListFragment : Fragment() {
 
@@ -52,6 +55,13 @@ class FavoriteListFragment : Fragment() {
 
         initFields(view)
         initRecycler()
+        relative.setOnRefreshListener {
+
+            favoriteListViewModel.getMovies().observe(viewLifecycleOwner, {
+                adapter.setMovies(it)
+                relative.isRefreshing = false
+            })
+        }
     }
 
     private fun initFields(view: View) {
@@ -60,12 +70,11 @@ class FavoriteListFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recycler_view)
     }
 
-     private fun initRecycler() {
+    private fun initRecycler() {
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        favoriteListViewModel.movies.observe(viewLifecycleOwner, {
+        favoriteListViewModel.getMovies().observe(viewLifecycleOwner, {
             adapter.setMovies(it)
-            adapter.notifyDataSetChanged()
         })
 
         recyclerView.adapter = adapter
