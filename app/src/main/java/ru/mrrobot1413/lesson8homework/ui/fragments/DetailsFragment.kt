@@ -3,6 +3,7 @@ package ru.mrrobot1413.lesson8homework.ui.fragments
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
@@ -12,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.android.synthetic.main.fragment_favorite.*
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.data.DataStorage
 import ru.mrrobot1413.lesson8homework.model.Movie
@@ -76,7 +78,7 @@ class DetailsFragment : Fragment() {
 
         toolbar.setNavigationOnClickListener {
             activity?.onBackPressed()
-
+            (activity as MainActivity?)?.replaceFragment(FavoriteListFragment.newInstance(), R.id.id)
         }
 
         if (arguments?.getString(WHERE_CAME_FROM).equals(MainActivity.MAIN_ACTIVITY)) {
@@ -105,12 +107,9 @@ class DetailsFragment : Fragment() {
 
                     movie.liked = false
                     DataStorage.favoriteList.remove(movie)
-                    val viewModel by lazy {
-                        ViewModelProvider(this).get(FavoriteListViewModel::class.java)
-                    }
-
 
                     setIconUnliked()
+
                 } else {
                     isAddedToFavorite = true
 

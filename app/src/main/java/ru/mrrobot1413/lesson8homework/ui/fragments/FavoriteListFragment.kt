@@ -55,13 +55,16 @@ class FavoriteListFragment : Fragment() {
 
         initFields(view)
         initRecycler()
+
         relative.setOnRefreshListener {
 
-            favoriteListViewModel.getMovies().observe(viewLifecycleOwner, {
-                adapter.setMovies(it)
-                relative.isRefreshing = false
-            })
+
         }
+        favoriteListViewModel.getMovies().observe(viewLifecycleOwner, {
+            favoriteListViewModel.getMovies()
+            adapter.setMovies(it)
+            relative.isRefreshing = false
+        })
     }
 
     private fun initFields(view: View) {
@@ -74,7 +77,9 @@ class FavoriteListFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
 
         favoriteListViewModel.getMovies().observe(viewLifecycleOwner, {
+            favoriteListViewModel.getMovies()
             adapter.setMovies(it)
+            Log.d("updateMovies()", "setAdaptersInit")
         })
 
         recyclerView.adapter = adapter

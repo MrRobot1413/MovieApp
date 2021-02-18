@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         )
     }
 
-    private fun replaceFragment(
+     fun replaceFragment(
         fragment: Fragment,
         container: Int
     ) {
