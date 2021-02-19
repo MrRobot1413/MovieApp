@@ -7,7 +7,8 @@ import ru.mrrobot1413.lesson8homework.model.MovieResponse
 
 interface Api {
 
-    @GET("movie/popular&language=pt-BR")
+    //russian - movie/popular?language=ru
+    @GET("movie/popular")
     fun getMovies(
         @Query("api_key") apiKey: String = "82f337a96c72f107c937a1fcf9d4072c",
         @Query("page") page: Int
