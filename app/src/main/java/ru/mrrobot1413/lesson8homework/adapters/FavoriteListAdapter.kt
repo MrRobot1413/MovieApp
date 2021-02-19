@@ -10,6 +10,8 @@ import ru.mrrobot1413.lesson8homework.viewHolders.MoviesViewHolder
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.data.DataStorage
 
+//import ru.mrrobot1413.lesson8homework.data.DataStorage
+
 class FavoriteListAdapter(
     private val noMoviesSign: TextView,
     private val clickListener: (movie: Movie) -> Unit
@@ -53,10 +55,5 @@ class FavoriteListAdapter(
         } else{
             noMoviesSign.visibility = View.GONE
         }
-    }
-
-     fun refreshUsers(list: List<Movie>){
-        this.moviesList = list
-         notifyDataSetChanged()
     }
 }

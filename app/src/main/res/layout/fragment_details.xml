@@ -22,7 +22,6 @@
             android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            tools:title="@string/movie_1_name"
             app:expandedTitleTextAppearance="@style/ToolbarTextStyle">
 
             <ImageView
@@ -31,7 +30,6 @@
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 android:scaleType="centerCrop"
-                android:src="@drawable/movie_1_image"
                 app:layout_collapseMode="parallax" />
 
             <com.google.android.material.appbar.MaterialToolbar
@@ -70,7 +68,7 @@
             <RelativeLayout
                 android:id="@+id/description"
                 android:layout_width="wrap_content"
-                android:layout_height="174dp"
+                android:layout_height="74dp"
                 android:paddingLeft="16dp"
                 android:paddingTop="16dp"
                 android:paddingRight="16dp"
@@ -85,7 +83,6 @@
                     android:layout_marginTop="2dp"
                     android:layout_toEndOf="@id/image_star"
                     android:fontFamily="@font/basic"
-                    android:text="@string/movie_1_rating"
                     android:textColor="@color/white"
                     android:textSize="20sp"
                     tools:ignore="NotSibling" />
@@ -111,45 +108,6 @@
                     android:textColor="@color/white"
                     android:textSize="20sp"
                     tools:ignore="NotSibling" />
-
-                <TextView
-                    android:id="@+id/txt_country"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/txt_date"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="2dp"
-                    android:fontFamily="@font/allerta"
-                    android:text="@string/country"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
-                    tools:ignore="NotSibling" />
-
-                <TextView
-                    android:id="@+id/txt_time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/txt_country"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="2dp"
-                    android:fontFamily="@font/allerta"
-                    android:text="@string/time"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
-                    tools:ignore="NotSibling" />
-
-                <TextView
-                    android:id="@+id/txt_age"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/txt_time"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="2dp"
-                    android:fontFamily="@font/allerta"
-                    android:text="@string/age_restrictions"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
-                    tools:ignore="NotSibling" />
             </RelativeLayout>
 
             <TextView
@@ -159,37 +117,10 @@
                 android:layout_below="@+id/description"
                 android:fontFamily="@font/allerta"
                 android:padding="10dp"
-                android:text="@string/movie_1_descr"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 tools:ignore="NotSibling" />
 
-            <TextView
-                android:id="@+id/txt_actors_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/txt_descr"
-                android:fontFamily="@font/allerta"
-                android:padding="10dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:text="@string/actors"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                tools:ignore="NotSibling" />
-
-            <TextView
-                android:id="@+id/txt_actors"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/txt_actors_header"
-                android:fontFamily="@font/allerta"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:text="@string/movie_1_actors"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                tools:ignore="NotSibling" />
         </RelativeLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

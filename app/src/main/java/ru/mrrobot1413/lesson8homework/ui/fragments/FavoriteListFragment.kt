@@ -1,8 +1,6 @@
 package ru.mrrobot1413.lesson8homework.ui.fragments
 
 import android.os.Bundle
-import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +14,6 @@ import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.FavoriteListAdapter
 import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
 import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
-import java.util.*
 
 class FavoriteListFragment : Fragment() {
 
@@ -55,16 +52,17 @@ class FavoriteListFragment : Fragment() {
 
         initFields(view)
         initRecycler()
+        favoriteListViewModel.getMovies().observe(viewLifecycleOwner, {
+            adapter.setMovies(it)
+        })
 
         relative.setOnRefreshListener {
-
-
-        }
-        favoriteListViewModel.getMovies().observe(viewLifecycleOwner, {
-            favoriteListViewModel.getMovies()
-            adapter.setMovies(it)
+            favoriteListViewModel.getMovies().observe(viewLifecycleOwner, {
+                adapter.setMovies(it)
+                noMoviesSign.visibility = View.VISIBLE
+            })
             relative.isRefreshing = false
-        })
+        }
     }
 
     private fun initFields(view: View) {
@@ -75,12 +73,6 @@ class FavoriteListFragment : Fragment() {
 
     private fun initRecycler() {
         recyclerView.layoutManager = LinearLayoutManager(context)
-
-        favoriteListViewModel.getMovies().observe(viewLifecycleOwner, {
-            favoriteListViewModel.getMovies()
-            adapter.setMovies(it)
-            Log.d("updateMovies()", "setAdaptersInit")
-        })
 
         recyclerView.adapter = adapter
     }

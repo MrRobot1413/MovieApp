@@ -1,7 +1,9 @@
 package ru.mrrobot1413.lesson8homework.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -14,26 +16,28 @@ import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.MoviesAdapter
 import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
 import ru.mrrobot1413.lesson8homework.model.Movie
+import ru.mrrobot1413.lesson8homework.repositories.MovieRepository
 import ru.mrrobot1413.lesson8homework.ui.fragments.DetailsFragment
 import ru.mrrobot1413.lesson8homework.ui.fragments.FavoriteListFragment
-import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
 import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
 
 class MainActivity : AppCompatActivity(), MovieClickListener {
 
     private lateinit var recyclerView: RecyclerView
+    private val adapter by lazy {
+        MoviesAdapter(mutableListOf()) {
+            openDetailsActivity(it)
+        }
+    }
+    private var linearLayoutManager = LinearLayoutManager(this)
     private val moviesViewModel by lazy {
         ViewModelProvider(this).get(MoviesViewModel::class.java)
     }
-    private val adapter by lazy {
-        MoviesAdapter { movie ->
-            openDetailsActivity(movie)
-        }
-    }
     private lateinit var bottomNav: BottomNavigationView
     private var isAddedFragment: Boolean = false
+    private var moviesPage = 1
 
-    companion object{
+    companion object {
         const val MAIN_ACTIVITY = "MAIN_ACTIVITY"
     }
 
@@ -48,14 +52,40 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
     private fun initRecycler() {
         recyclerView = findViewById(R.id.recycler_view)
 
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = linearLayoutManager
 
-        moviesViewModel.movies.observe(this, {
-            adapter.setMovies(it)
-            adapter.notifyDataSetChanged()
-        })
+        getMovies()
 
         recyclerView.adapter = adapter
+    }
+
+    private fun getMovies() {
+        MovieRepository.getMovies(
+            moviesPage,
+            {
+                adapter.appendMovies(it)
+            },
+            {
+                Toast.makeText(applicationContext, "Error", Toast.LENGTH_LONG).show()
+            }
+        )
+        attachPopularMoviesOnScrollListener()
+    }
+
+    private fun attachPopularMoviesOnScrollListener() {
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                val totalItemCount = linearLayoutManager.itemCount
+                val visibleItemCount = linearLayoutManager.childCount
+                val firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition()
+
+                if (firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
+                    recyclerView.removeOnScrollListener(this)
+                    moviesPage++
+                    getMovies()
+                }
+            }
+        })
     }
 
     private fun initBottomNav() {
@@ -65,7 +95,6 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
                 R.id.page_1 -> {
                     changeFocusOnBottomNavToMainActivity()
                     backToHomeScreen()
-                    adapter.notifyDataSetChanged()
                     true
                 }
                 R.id.page_2 -> {
@@ -79,7 +108,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         }
     }
 
-    private fun changeFocusOnBottomNavToMainActivity(){
+    private fun changeFocusOnBottomNavToMainActivity() {
         val menuItem: MenuItem = bottomNav.menu.findItem(R.id.page_1)
         menuItem.isChecked = true
     }
@@ -109,7 +138,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         )
     }
 
-     fun replaceFragment(
+    private fun replaceFragment(
         fragment: Fragment,
         container: Int
     ) {

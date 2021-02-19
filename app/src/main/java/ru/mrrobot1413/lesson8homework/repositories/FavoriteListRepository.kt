@@ -6,7 +6,7 @@ import ru.mrrobot1413.lesson8homework.model.Movie
 
 class FavoriteListRepository {
     private lateinit var instance: FavoriteListRepository
-    private var dataSet: MutableList<Movie> = DataStorage.favoriteList
+    private var dataSet: MutableList<Movie>? = DataStorage.favoriteList
 
     fun getInstance(): FavoriteListRepository {
         instance = FavoriteListRepository()

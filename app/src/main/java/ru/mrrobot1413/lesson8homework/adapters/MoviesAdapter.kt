@@ -9,17 +9,20 @@ import ru.mrrobot1413.lesson8homework.viewHolders.MoviesViewHolder
 
 
 class MoviesAdapter(
+    private var movies: MutableList<Movie>,
     private val clickListener: (movie: Movie) -> Unit
 ) :
     RecyclerView.Adapter<MoviesViewHolder>() {
 
-    private lateinit var moviesList: List<Movie>
-
-    fun setMovies(moviesList: List<Movie>){
-        this.moviesList = moviesList
+    fun appendMovies(movies: List<Movie>) {
+        this.movies.addAll(movies)
+        notifyItemRangeInserted(
+            this.movies.size,
+            movies.size - 1
+        )
     }
 
-    override fun getItemCount() = moviesList.size
+    override fun getItemCount() = movies.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoviesViewHolder {
         val itemView =
@@ -29,8 +32,8 @@ class MoviesAdapter(
 
     override fun onBindViewHolder(holder: MoviesViewHolder, position: Int) {
 
-        holder.bind(moviesList[position])
-        setOnDetailsClickListener(holder, moviesList[position])
+        holder.bind(movies[position])
+        setOnDetailsClickListener(holder, movies[position])
     }
 
     private fun setOnDetailsClickListener(holder: MoviesViewHolder, movie: Movie) {

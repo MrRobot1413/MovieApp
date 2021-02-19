@@ -10,6 +10,8 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -78,7 +80,8 @@ class DetailsFragment : Fragment() {
 
         toolbar.setNavigationOnClickListener {
             activity?.onBackPressed()
-            (activity as MainActivity?)?.replaceFragment(FavoriteListFragment.newInstance(), R.id.id)
+            val viewModel = ViewModelProvider(this).get(FavoriteListViewModel::class.java)
+            viewModel.getMovies()
         }
 
         if (arguments?.getString(WHERE_CAME_FROM).equals(MainActivity.MAIN_ACTIVITY)) {
@@ -161,30 +164,25 @@ class DetailsFragment : Fragment() {
         toolbar = view.findViewById(R.id.toolbar)
         imageBackdrop = view.findViewById(R.id.image_backdrop)
         txtDescr = view.findViewById(R.id.txt_descr)
-        txtActors = view.findViewById(R.id.txt_actors)
         txtRating = view.findViewById(R.id.txt_rating)
         txtDate = view.findViewById(R.id.txt_date)
-        txtCountry = view.findViewById(R.id.txt_country)
-        txtTime = view.findViewById(R.id.txt_time)
-        txtRestriction = view.findViewById(R.id.txt_age)
         collapsingToolbarLayout = view.findViewById(R.id.collapsing_toolbar_layout)
         fabAddToFavorite = view.findViewById(R.id.fab_add_to_favorite)
     }
 
     @SuppressLint("SetTextI18n")
     private fun setContent(movie: Movie) {
-        imageBackdrop.setImageDrawable(ContextCompat.getDrawable(context!!, movie.movieImage))
+        context?.let {
+            Glide.with(it)
+                .load("https://image.tmdb.org/t/p/w342${movie.posterPath}")
+                .transform(CenterCrop())
+                .into(imageBackdrop)
+        }
 
-        val movieName = getText(movie.movieName)
+        val movieName = movie.title
         collapsingToolbarLayout.title = movieName
-        txtRating.text = getString(movie.movieRating)
-        txtDescr.text = getString(movie.movieDescr)
-        txtActors.text = getString(movie.movieActors)
-        txtDate.text = getString(R.string.release_date) + " " + getString(movie.movieReleaseDate)
-        txtCountry.text = getString(R.string.country) + " " + getString(movie.movieCountry)
-        txtTime.text = getString(R.string.time) + " " + getString(movie.movieTime)
-        txtRestriction.text =
-            getString(R.string.age_restrictions) + " " + getString(movie.movieRestrictions)
-        inviteText = getString(movie.movieInviteText)
+        txtRating.text = movie.rating.toString()
+        txtDescr.text = movie.overview
+        txtDate.text = getString(R.string.release_date) + movie.releaseDate
     }
 }

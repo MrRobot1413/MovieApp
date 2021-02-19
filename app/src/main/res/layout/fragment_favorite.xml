@@ -7,10 +7,6 @@
     tools:context=".ui.fragments.FavoriteListFragment"
     android:background="@color/itemColor">
 
-    <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -39,5 +35,4 @@
                 android:textColor="@color/white"
                 android:textSize="24sp" />
         </RelativeLayout>
-    </ScrollView>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
