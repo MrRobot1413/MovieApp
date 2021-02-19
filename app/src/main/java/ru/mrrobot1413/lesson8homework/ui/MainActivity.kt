@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
     }
 
     private fun getMovies() {
-        MovieRepository.getMovies(
+        moviesViewModel.getMovies(
             moviesPage,
             {
                 adapter.appendMovies(it)

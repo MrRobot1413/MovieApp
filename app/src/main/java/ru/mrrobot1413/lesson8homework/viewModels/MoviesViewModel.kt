@@ -9,6 +9,12 @@ import ru.mrrobot1413.lesson8homework.repositories.MovieRepository
 class MoviesViewModel : ViewModel() {
 
     private var movieRepository: MovieRepository = MovieRepository.getInstance()
-
+    fun getMovies(
+        page: Int = 1,
+        onSuccess: ((movies: List<Movie>) -> Unit),
+        onError: (() -> Unit)
+    ) {
+        movieRepository.getMovies(page, onSuccess, onError)
+    }
 
 }
