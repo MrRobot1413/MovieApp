@@ -4,6 +4,12 @@
         android:id="@+id/page_1"
         android:icon="@drawable/ic_baseline_local_movies_24"
         android:title="@string/movies"/>
+
+<!--    <item-->
+<!--        android:id="@+id/page_2"-->
+<!--        android:icon="@drawable/ic_baseline_live_tv_24"-->
+<!--        android:title="@string/series"/>-->
+
     <item
         android:id="@+id/page_2"
         android:icon="@drawable/ic_favorite"

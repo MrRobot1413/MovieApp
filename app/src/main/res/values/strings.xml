@@ -13,7 +13,9 @@
     <string name="toast_add"> was added to favorite</string>
     <string name="undo">Undo</string>
     <string name="time">Time:</string>
-    <string name="release_date">Release date:</string>
-    <string name="age_restrictions">Age restrictions:</string>
-    <string name="country">Country:</string>
+    <string name="no_connection">No connection</string>
+    <string name="release_date">Release date</string>
+    <string name="language">Language</string>
+    <string name="rating">Rating</string>
+    <string name="series">Series</string>
 </resources>

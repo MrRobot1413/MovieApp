@@ -1,6 +1,7 @@
 package ru.mrrobot1413.lesson8homework
 
 import android.app.Application
+import androidx.room.Room
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -10,6 +11,7 @@ import ru.mrrobot1413.lesson8homework.api.Api
 class App : Application() {
 
     lateinit var api: Api
+    lateinit var db: AppDatabase
 
     companion object {
         const val BASE_URL = "https://api.themoviedb.org/3/"
@@ -20,12 +22,20 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
         instance = this
-        initRetrofit()
+
+        db = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java,
+            "movies"
+        )
+            .allowMainThreadQueries()
+            .fallbackToDestructiveMigration()
+            .build()
+
     }
 
-    private fun initRetrofit() {
+    fun initRetrofit() {
         val client = OkHttpClient.Builder()
             .addInterceptor { chain ->
                 return@addInterceptor chain.proceed(
@@ -37,7 +47,7 @@ class App : Application() {
                 )
             }
             .addInterceptor(HttpLoggingInterceptor().apply {
-                if(BuildConfig.DEBUG){
+                if (BuildConfig.DEBUG) {
                     level = HttpLoggingInterceptor.Level.BODY
                 }
             })
@@ -50,5 +60,13 @@ class App : Application() {
             .build()
 
         api = retrofit.create(Api::class.java)
+    }
+
+    fun getInstance(): App {
+        return instance
+    }
+
+    fun getDatabase(): AppDatabase {
+        return db
     }
 }

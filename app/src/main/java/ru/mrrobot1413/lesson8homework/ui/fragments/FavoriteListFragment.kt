@@ -7,12 +7,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_favorite.*
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.FavoriteListAdapter
 import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
+import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
 import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
 
 class FavoriteListFragment : Fragment() {
@@ -24,8 +26,8 @@ class FavoriteListFragment : Fragment() {
             (activity as? MovieClickListener)?.onClick(it)
         }
     }
-    private val favoriteListViewModel by lazy {
-        ViewModelProvider(this).get(FavoriteListViewModel::class.java)
+    private val favoriteListRepository by lazy {
+        FavoriteListRepository.getInstance()
     }
 
     companion object {
@@ -52,17 +54,15 @@ class FavoriteListFragment : Fragment() {
 
         initFields(view)
         initRecycler()
-        favoriteListViewModel.getMovies().observe(viewLifecycleOwner, {
-            adapter.setMovies(it)
-        })
 
         relative.setOnRefreshListener {
-            favoriteListViewModel.getMovies().observe(viewLifecycleOwner, {
-                adapter.setMovies(it)
-                noMoviesSign.visibility = View.VISIBLE
-            })
+            getMovies()
             relative.isRefreshing = false
         }
+    }
+
+    private fun getMovies(){
+        adapter.setMovies(favoriteListRepository.selectAll())
     }
 
     private fun initFields(view: View) {
@@ -72,7 +72,9 @@ class FavoriteListFragment : Fragment() {
     }
 
     private fun initRecycler() {
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.layoutManager = GridLayoutManager(context, 2)
+
+        getMovies()
 
         recyclerView.adapter = adapter
     }

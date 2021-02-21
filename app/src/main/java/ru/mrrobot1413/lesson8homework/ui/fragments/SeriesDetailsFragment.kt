@@ -11,7 +11,6 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -21,15 +20,13 @@ import com.bumptech.glide.request.target.Target
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.android.synthetic.main.fragment_favorite.*
 import ru.mrrobot1413.lesson8homework.R
-import ru.mrrobot1413.lesson8homework.data.DataStorage
 import ru.mrrobot1413.lesson8homework.model.Movie
+import ru.mrrobot1413.lesson8homework.model.Series
 import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
 import ru.mrrobot1413.lesson8homework.ui.MainActivity
-import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
 
-class DetailsFragment : Fragment() {
+class SeriesDetailsFragment : Fragment() {
 
     private lateinit var imageBackdrop: ImageView
     private lateinit var txtDescr: TextView
@@ -41,23 +38,22 @@ class DetailsFragment : Fragment() {
     private lateinit var toolbar: MaterialToolbar
     private lateinit var fabAddToFavorite: FloatingActionButton
     private lateinit var progressBar: ProgressBar
+    private var isAddedToFavorite = false
     private val favoriteListRepository by lazy {
         FavoriteListRepository.getInstance()
     }
-    private var isAddedToFavorite = false
 
     companion object {
 
-        private const val MOVIE = "movie"
+        private const val SERIES = "series"
         private const val WHERE_CAME_FROM = "WHERE_CAME_FROM"
 
-
-        fun newInstance(movie: Movie, whereCameFrom: String): DetailsFragment {
+        fun newInstance(series: Series, whereCameFrom: String): SeriesDetailsFragment {
             val args = Bundle()
-            args.putParcelable(MOVIE, movie)
+            args.putParcelable(SERIES, series)
             args.putString(WHERE_CAME_FROM, whereCameFrom)
 
-            val fragment = DetailsFragment()
+            val fragment = SeriesDetailsFragment()
             fragment.arguments = args
             return fragment
         }
@@ -80,10 +76,9 @@ class DetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val movie = arguments?.getParcelable<Movie>(MOVIE)
-
         initFields(view)
-        movie?.let { setContent(it) }
+        val series = arguments?.getParcelable<Series>(SERIES)
+        series?.let { setContent(it) }
 
         (activity as MainActivity?)!!.setSupportActionBar(toolbar)
 
@@ -92,7 +87,7 @@ class DetailsFragment : Fragment() {
         }
 
         if (arguments?.getString(WHERE_CAME_FROM).equals(MainActivity.MAIN_ACTIVITY)) {
-            if (movie?.liked == true) {
+            if (series!!.liked) {
                 setIconLiked()
                 isAddedToFavorite = true
             }
@@ -106,29 +101,29 @@ class DetailsFragment : Fragment() {
             isAddedToFavorite = true
         }
 
-        setOnFabClickListener(movie)
+        if (series != null) {
+            setOnFabClickListener(series)
+        }
     }
 
-    private fun setOnFabClickListener(movie: Movie?) {
+    private fun setOnFabClickListener(series: Series) {
         fabAddToFavorite.setOnClickListener {
-            if (movie != null) {
                 if (isAddedToFavorite) {
                     isAddedToFavorite = false
 
-                    movie.liked = false
-                    favoriteListRepository.delete(movie)
+                    series.liked = false
+                    //favoriteListRepository.delete(series)
 
                     setIconUnliked()
 
                 } else {
                     isAddedToFavorite = true
 
-                    movie.liked = true
-                    favoriteListRepository.likeMovie(movie)
+                    series.liked = true
+//                    favoriteListRepository.likeSeries(series)
 
                     setIconLiked()
                 }
-            }
         }
     }
 
@@ -180,10 +175,12 @@ class DetailsFragment : Fragment() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun setContent(movie: Movie) {
+    private fun setContent(series: Series) {
+
+        Log.d("series-view", series.toString())
         context?.let {
             Glide.with(it)
-                .load("https://image.tmdb.org/t/p/w342${movie.posterPath}")
+                .load("https://image.tmdb.org/t/p/w342${series.posterPath}")
                 .transform(CenterCrop())
                 .error(ContextCompat.getDrawable(context!!, R.drawable.ic_round_error_24))
                 .listener(object : RequestListener<Drawable> {
@@ -212,11 +209,11 @@ class DetailsFragment : Fragment() {
                 .into(imageBackdrop)
         }
 
-        val movieName = movie.title
+        val movieName = series.name
         collapsingToolbarLayout.title = movieName
-        txtRating.text = movie.rating.toString()
-        txtDescr.text = movie.overview
-        txtDate.text = movie.releaseDate
-        txtLanguage.text = movie.language
+        txtRating.text = series.rating.toString()
+        txtDescr.text = series.overview
+        txtDate.text = series.releaseDate
+        txtLanguage.text = series.language
     }
 }

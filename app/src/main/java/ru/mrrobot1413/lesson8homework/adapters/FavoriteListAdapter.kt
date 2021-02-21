@@ -9,6 +9,7 @@ import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.viewHolders.MoviesViewHolder
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.data.DataStorage
+import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
 
 //import ru.mrrobot1413.lesson8homework.data.DataStorage
 
@@ -19,6 +20,9 @@ class FavoriteListAdapter(
     RecyclerView.Adapter<MoviesViewHolder>() {
 
     private lateinit var moviesList: List<Movie>
+    private val favoriteListRepository by lazy {
+        FavoriteListRepository.getInstance()
+    }
 
     fun setMovies(moviesList: List<Movie>){
         this.moviesList = moviesList
@@ -50,10 +54,10 @@ class FavoriteListAdapter(
     }
 
     private fun showNoMoviesSign(){
-        if(DataStorage.favoriteList.isEmpty()){
-            noMoviesSign.visibility = View.VISIBLE
-        } else{
+        if(favoriteListRepository.getMoviesCount() != 0){
             noMoviesSign.visibility = View.GONE
+        } else{
+            noMoviesSign.visibility = View.VISIBLE
         }
     }
 }

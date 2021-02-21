@@ -38,9 +38,9 @@
 
     <style name="ToolbarTextStyle" parent="TextAppearance.AppCompat">
         <item name="android:shadowColor">#000</item>
-        <item name="android:shadowDx">5</item>
-        <item name="android:shadowDy">5</item>
-        <item name="android:shadowRadius">5</item>
+        <item name="android:shadowDx">15</item>
+        <item name="android:shadowDy">15</item>
+        <item name="android:shadowRadius">15</item>
         <item name="android:textSize">32sp</item>
         <item name="fontFamily">sans-serif-medium</item>
     </style>

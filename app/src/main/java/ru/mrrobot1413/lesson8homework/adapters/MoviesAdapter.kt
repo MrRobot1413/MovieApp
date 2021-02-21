@@ -3,16 +3,20 @@ package ru.mrrobot1413.lesson8homework.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import ru.mrrobot1413.lesson8homework.*
+import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.viewHolders.MoviesViewHolder
-
 
 class MoviesAdapter(
     private var movies: MutableList<Movie>,
     private val clickListener: (movie: Movie) -> Unit
 ) :
     RecyclerView.Adapter<MoviesViewHolder>() {
+
+    companion object {
+        const val VIEW_TYPE_LOADING = 0
+        const val VIEW_TYPE_NORMAL = 1
+    }
 
     fun appendMovies(movies: List<Movie>) {
         this.movies.addAll(movies)
@@ -25,9 +29,10 @@ class MoviesAdapter(
     override fun getItemCount() = movies.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoviesViewHolder {
-        val itemView =
-            LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false)
-        return MoviesViewHolder(itemView)
+        val layoutInflater = LayoutInflater.from(parent.context)
+        return MoviesViewHolder(
+            layoutInflater.inflate(R.layout.list_item, parent, false)
+        )
     }
 
     override fun onBindViewHolder(holder: MoviesViewHolder, position: Int) {
