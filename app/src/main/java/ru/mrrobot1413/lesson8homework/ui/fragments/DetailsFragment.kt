@@ -151,7 +151,9 @@ class DetailsFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.invite_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+        menu.clear()
+        toolbar.inflateMenu(R.menu.invite_menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -218,5 +220,6 @@ class DetailsFragment : Fragment() {
         txtDescr.text = movie.overview
         txtDate.text = movie.releaseDate
         txtLanguage.text = movie.language
+        inviteText = getString(R.string.invite_text) + movie.title
     }
 }

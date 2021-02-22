@@ -14,8 +14,11 @@
     <string name="undo">Отмена</string>
     <string name="time">Время:</string>
     <string name="no_connection">Нет соединения</string>
-    <string name="release_date">Дата выхода</string>
-    <string name="language">Язык</string>
-    <string name="rating">Рейтинг</string>
+    <string name="release_date">Дата выхода:</string>
+    <string name="language">Язык:</string>
+    <string name="rating">Рейтинг:</string>
     <string name="series">Сериалы</string>
+    <string name="top_rated">С высоким рейтингом</string>
+    <string name="popular">Популярные</string>
+    <string name="invite_text">Приглашаю тебя на просмотр фильма </string>
 </resources>

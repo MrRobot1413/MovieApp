@@ -3,6 +3,8 @@ package ru.mrrobot1413.lesson8homework.ui
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
@@ -17,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.fragment_details.*
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.MoviesAdapter
 import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
@@ -54,6 +57,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setSupportActionBar(findViewById(R.id.topAppBar))
         initFileds()
     }
 
@@ -84,7 +88,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
     }
 
     private fun getPopularMovies() {
-        moviesViewModel.getMovies(
+        moviesViewModel.getPopularMovies(
             moviesPage,
             {
                 recyclerView.visibility = View.VISIBLE
@@ -98,6 +102,22 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
             }
         )
         attachPopularMoviesOnScrollListener()
+    }
+
+    private fun getTopRatedMovies() {
+        moviesViewModel.getTopRatedMovies(
+            moviesPage,
+            {
+                recyclerView.visibility = View.VISIBLE
+                adapter.appendMovies(it)
+                deleteNoConnectionSign()
+                refreshLayout.isRefreshing = false
+            },
+            {
+                onError()
+                refreshLayout.isRefreshing = false
+            }
+        )
     }
 
     private fun onError() {
@@ -122,20 +142,13 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
                 val visibleItemCount = linearLayoutManager.childCount
                 val firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition()
 
-
-                if (firstVisibleItem + visibleItemCount >= totalItemCount / 1) {
+                if (firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
                     recyclerView.removeOnScrollListener(this)
                     moviesPage++
                     getPopularMovies()
                 }
             }
         })
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        getPopularMovies()
     }
 
     private fun initBottomNav() {
@@ -167,6 +180,9 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
 
     private fun backToHomeScreen() {
         isAddedFragment = false
+
+        supportFragmentManager
+            .popBackStack()
 
         refreshLayout.isEnabled = true
     }
@@ -203,6 +219,51 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
 //            R.id.relative_container
 //        )
 //    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d("onOptionsItemSelected", "onOptionsItemSelected")
+        val id = item.itemId
+        if(id == R.id.top_rated) {
+            Log.d("onOptionsItemSelected", "top rated")
+            moviesViewModel.getPopularMovies(
+                moviesPage,
+                {
+                    recyclerView.visibility = View.VISIBLE
+                    adapter.deleteAll(it)
+                    deleteNoConnectionSign()
+                    refreshLayout.isRefreshing = false
+                },
+                {
+                    onError()
+                    refreshLayout.isRefreshing = false
+                }
+            )
+            getTopRatedMovies()
+        } else{
+            Log.d("onOptionsItemSelected", "popular")
+            moviesViewModel.getTopRatedMovies(
+                moviesPage,
+                {
+                    recyclerView.visibility = View.VISIBLE
+                    adapter.deleteAll(it)
+                    deleteNoConnectionSign()
+                    refreshLayout.isRefreshing = false
+                },
+                {
+                    onError()
+                    refreshLayout.isRefreshing = false
+                }
+            )
+            getPopularMovies()
+        }
+
+        return true
+    }
 
     private fun openFavoriteListFragment() {
         isAddedFragment = true

@@ -16,7 +16,7 @@ interface Api {
 
     //russian - movie/popular?language=ru
     @GET("movie/popular")
-    fun getMovies(
+    fun getPopularMovies(
         @Query("api_key") apiKey: String = API_KEY,
         @Query("page") page: Int,
         @Query("language") language: String

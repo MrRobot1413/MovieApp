@@ -13,17 +13,16 @@ class MoviesAdapter(
 ) :
     RecyclerView.Adapter<MoviesViewHolder>() {
 
-    companion object {
-        const val VIEW_TYPE_LOADING = 0
-        const val VIEW_TYPE_NORMAL = 1
-    }
-
     fun appendMovies(movies: List<Movie>) {
         this.movies.addAll(movies)
         notifyItemRangeInserted(
             this.movies.size,
-            movies.size - 1
+            movies.size
         )
+    }
+
+    fun deleteAll(movies: List<Movie>){
+        this.movies.removeAll(movies)
     }
 
     override fun getItemCount() = movies.size

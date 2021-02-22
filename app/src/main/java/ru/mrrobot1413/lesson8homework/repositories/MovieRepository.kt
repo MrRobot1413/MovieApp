@@ -24,13 +24,13 @@ object MovieRepository {
         return instance
     }
 
-    fun getMovies(
+    fun getPopularMovies(
         page: Int = 1,
         onSuccess: ((movies: List<Movie>) -> Unit),
         onError: (() -> Unit)
     ) {
         when (Locale.getDefault().language) {
-            "en" -> app.api.getMovies(page = page, language = "en")
+            "en" -> app.api.getPopularMovies(page = page, language = "en")
                 .enqueue(object : Callback<MovieResponse> {
                     override fun onResponse(
                         call: Call<MovieResponse>,
@@ -53,7 +53,7 @@ object MovieRepository {
                         onError.invoke()
                     }
                 })
-            "ru" -> app.api.getMovies(page = page, language = "ru")
+            "ru" -> app.api.getPopularMovies(page = page, language = "ru")
                 .enqueue(object : Callback<MovieResponse> {
                     override fun onResponse(
                         call: Call<MovieResponse>,
@@ -76,7 +76,85 @@ object MovieRepository {
                         onError.invoke()
                     }
                 })
-            "ukr" -> app.api.getMovies(page = page, language = "ukr")
+            "ukr" -> app.api.getPopularMovies(page = page, language = "ukr")
+                .enqueue(object : Callback<MovieResponse> {
+                    override fun onResponse(
+                        call: Call<MovieResponse>,
+                        response: Response<MovieResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            val responseBody = response.body()
+
+                            if (responseBody != null) {
+                                onSuccess.invoke(responseBody.moviesList)
+                            } else {
+                                onError.invoke()
+                            }
+                        } else {
+                            onError.invoke()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+                        onError.invoke()
+                    }
+                })
+        }
+    }
+
+    fun getTopRatedMovies(
+        page: Int = 1,
+        onSuccess: ((movies: List<Movie>) -> Unit),
+        onError: (() -> Unit)
+    ) {
+        when (Locale.getDefault().language) {
+            "en" -> app.api.getTopRatedMovies(page = page, language = "en")
+                .enqueue(object : Callback<MovieResponse> {
+                    override fun onResponse(
+                        call: Call<MovieResponse>,
+                        response: Response<MovieResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            val responseBody = response.body()
+
+                            if (responseBody != null) {
+                                onSuccess.invoke(responseBody.moviesList)
+                            } else {
+                                onError.invoke()
+                            }
+                        } else {
+                            onError.invoke()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+                        onError.invoke()
+                    }
+                })
+            "ru" -> app.api.getTopRatedMovies(page = page, language = "ru")
+                .enqueue(object : Callback<MovieResponse> {
+                    override fun onResponse(
+                        call: Call<MovieResponse>,
+                        response: Response<MovieResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            val responseBody = response.body()
+
+                            if (responseBody != null) {
+                                onSuccess.invoke(responseBody.moviesList)
+                            } else {
+                                onError.invoke()
+                            }
+                        } else {
+                            onError.invoke()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+                        onError.invoke()
+                    }
+                })
+            "ukr" -> app.api.getTopRatedMovies(page = page, language = "ukr")
                 .enqueue(object : Callback<MovieResponse> {
                     override fun onResponse(
                         call: Call<MovieResponse>,

@@ -14,8 +14,11 @@
     <string name="undo">Undo</string>
     <string name="time">Time:</string>
     <string name="no_connection">No connection</string>
-    <string name="release_date">Release date</string>
-    <string name="language">Language</string>
-    <string name="rating">Rating</string>
+    <string name="release_date">Release date:</string>
+    <string name="language">Language:</string>
+    <string name="rating">Rating:</string>
     <string name="series">Series</string>
+    <string name="top_rated">Top rated</string>
+    <string name="popular">Popular</string>
+    <string name="invite_text">Invite you to watch the movie </string>
 </resources>
