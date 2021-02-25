@@ -18,23 +18,22 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.google.android.material.appbar.AppBarLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+<!--            <com.google.android.material.appbar.AppBarLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content">-->
 
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/topAppBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    style="@style/Widget.MaterialComponents.Toolbar.Primary" />
+<!--                <androidx.appcompat.widget.Toolbar-->
+<!--                    android:id="@+id/topAppBar"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="?attr/actionBarSize"-->
+<!--                    style="@style/Widget.MaterialComponents.Toolbar.Primary" />-->
 
-            </com.google.android.material.appbar.AppBarLayout>
+<!--            </com.google.android.material.appbar.AppBarLayout>-->
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="50dp"
                 android:layout_marginBottom="50dp"
                 android:background="@color/itemColor" />
 

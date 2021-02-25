@@ -15,14 +15,7 @@ class MoviesAdapter(
 
     fun appendMovies(movies: List<Movie>) {
         this.movies.addAll(movies)
-        notifyItemRangeInserted(
-            this.movies.size,
-            movies.size
-        )
-    }
-
-    fun deleteAll(movies: List<Movie>){
-        this.movies.removeAll(movies)
+        notifyDataSetChanged()
     }
 
     override fun getItemCount() = movies.size
