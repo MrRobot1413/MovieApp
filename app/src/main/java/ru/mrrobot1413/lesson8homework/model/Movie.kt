@@ -11,7 +11,7 @@ import kotlinx.android.parcel.Parcelize
 @Entity(tableName = "movies")
 @Parcelize
 data class Movie(
-    @PrimaryKey @SerializedName("id") val id: Long,
+    @PrimaryKey @SerializedName("id") val id: Int,
     @ColumnInfo(name = "title") @SerializedName("title") val title: String,
     @ColumnInfo(name = "overview") @SerializedName("overview") val overview: String,
     @ColumnInfo(name = "posterPath") @SerializedName("poster_path") val posterPath: String?,

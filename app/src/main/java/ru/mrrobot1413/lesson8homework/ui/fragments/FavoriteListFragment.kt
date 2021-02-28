@@ -6,16 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_favorite.*
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.FavoriteListAdapter
 import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
 import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
-import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
 
 class FavoriteListFragment : Fragment() {
 

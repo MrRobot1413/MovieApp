@@ -116,28 +116,28 @@
                     tools:ignore="RtlSymmetry" />
 
                 <TextView
-                    android:id="@+id/txt_language"
+                    android:id="@+id/txt_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/txt_rating"
-                    android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:layout_toEndOf="@id/txt_language_label"
+                    android:layout_marginStart="8dp"
+                    android:layout_toEndOf="@id/txt_time_label"
                     android:drawablePadding="2dp"
                     android:fontFamily="@font/basic"
                     android:textColor="@color/white"
                     android:textSize="20sp"
-                    app:drawableEndCompat="@drawable/ic_outline_info_24"
-                    tools:text="en" />
+                    app:drawableEndCompat="@drawable/ic_baseline_access_time_24"
+                    tools:text="99 min." />
 
                 <TextView
-                    android:id="@+id/txt_language_label"
+                    android:id="@+id/txt_time_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/txt_rating_label"
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/basic"
-                    android:text="@string/language"
+                    android:text="@string/time"
                     android:textColor="@color/white"
                     android:textSize="20sp" />
 
@@ -145,7 +145,7 @@
                     android:id="@+id/txt_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/txt_language_label"
+                    android:layout_below="@id/txt_time_label"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_toEndOf="@id/txt_date_label"
@@ -161,10 +161,66 @@
                     android:id="@+id/txt_date_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/txt_language_label"
+                    android:layout_below="@+id/txt_time_label"
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/basic"
                     android:text="@string/release_date"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    tools:ignore="RtlSymmetry" />
+
+                <TextView
+                    android:id="@+id/txt_revenue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/txt_language_label"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_toEndOf="@id/txt_revenue_label"
+                    android:drawablePadding="2dp"
+                    android:fontFamily="@font/basic"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    app:drawableEndCompat="@drawable/ic_outline_date_range_24"
+                    tools:ignore="RelativeOverlap"
+                    tools:text="2020-19-12" />
+
+                <TextView
+                    android:id="@+id/txt_revenue_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txt_language"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/basic"
+                    android:text="@string/revenue"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    tools:ignore="RtlSymmetry" />
+
+                <TextView
+                    android:id="@+id/txt_language"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/txt_date"
+                    android:layout_marginTop="8dp"
+                    android:layout_toEndOf="@id/txt_language_label"
+                    android:drawablePadding="2dp"
+                    android:layout_marginStart="8dp"
+                    android:fontFamily="@font/basic"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    app:drawableEndCompat="@drawable/ic_baseline_language_24"
+                    tools:ignore="RelativeOverlap"
+                    tools:text="en" />
+
+                <TextView
+                    android:id="@+id/txt_language_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txt_date"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/basic"
+                    android:text="@string/language"
                     android:textColor="@color/white"
                     android:textSize="20sp"
                     tools:ignore="RtlSymmetry" />

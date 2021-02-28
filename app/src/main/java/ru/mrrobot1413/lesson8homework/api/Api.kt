@@ -4,6 +4,7 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import ru.mrrobot1413.lesson8homework.model.MovieDetailResponse
 import ru.mrrobot1413.lesson8homework.model.MovieResponse
 import ru.mrrobot1413.lesson8homework.model.SeriesResponse
 import ru.mrrobot1413.lesson8homework.model.Video
@@ -28,6 +29,13 @@ interface Api {
         @Query("page") page: Int,
         @Query("language") language: String = "en-US"
     ): Call<MovieResponse>
+
+    @GET("movie/{id}")
+    fun getMovieDetails(
+        @Path("id") id: Int,
+        @Query("api_key") apiKey: String = API_KEY,
+        @Query("language") language: String = "en-US"
+    ): Call<MovieDetailResponse>
 
     @GET("movie/{id}/videos")
     fun getTrailers(

@@ -25,9 +25,11 @@ import kotlinx.android.synthetic.main.fragment_favorite.*
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.data.DataStorage
 import ru.mrrobot1413.lesson8homework.model.Movie
+import ru.mrrobot1413.lesson8homework.model.MovieDetailResponse
 import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
 import ru.mrrobot1413.lesson8homework.ui.MainActivity
 import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
+import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
 
 class DetailsFragment : Fragment() {
 
@@ -36,6 +38,8 @@ class DetailsFragment : Fragment() {
     private lateinit var txtRating: TextView
     private lateinit var txtDate: TextView
     private lateinit var txtLanguage: TextView
+    private lateinit var txtTime: TextView
+    private lateinit var txtRevenue: TextView
     private lateinit var inviteText: String
     private lateinit var collapsingToolbarLayout: CollapsingToolbarLayout
     private lateinit var toolbar: MaterialToolbar
@@ -44,18 +48,19 @@ class DetailsFragment : Fragment() {
     private val favoriteListRepository by lazy {
         FavoriteListRepository.getInstance()
     }
+    private val moviesViewModel by lazy {
+        ViewModelProvider(this).get(MoviesViewModel::class.java)
+    }
     private var isAddedToFavorite = false
 
     companion object {
 
         private const val MOVIE = "movie"
-        private const val WHERE_CAME_FROM = "WHERE_CAME_FROM"
 
 
-        fun newInstance(movie: Movie, whereCameFrom: String): DetailsFragment {
+        fun newInstance(movie: Movie): DetailsFragment {
             val args = Bundle()
             args.putParcelable(MOVIE, movie)
-            args.putString(WHERE_CAME_FROM, whereCameFrom)
 
             val fragment = DetailsFragment()
             fragment.arguments = args
@@ -80,10 +85,31 @@ class DetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initFields(view)
+
         val movie = arguments?.getParcelable<Movie>(MOVIE)
 
-        initFields(view)
-        movie?.let { setContent(it) }
+        val movieFromDb = favoriteListRepository.selectById(arguments?.getParcelable<Movie>(MOVIE)?.id!!)
+        if (movieFromDb != null) {
+            if(movieFromDb.liked){
+                setIconLiked()
+                isAddedToFavorite = true
+            } else{
+                setIconUnliked()
+                isAddedToFavorite = false
+            }
+        } else{
+            setIconUnliked()
+            isAddedToFavorite = false
+        }
+
+        if (movie != null) {
+            moviesViewModel.getMovieDetails(movie.id)
+        }
+
+        moviesViewModel.movieDetailResponse.observe(viewLifecycleOwner, {
+            setContent(it)
+        })
 
         (activity as MainActivity?)!!.setSupportActionBar(toolbar)
 
@@ -91,23 +117,9 @@ class DetailsFragment : Fragment() {
             activity?.onBackPressed()
         }
 
-        if (arguments?.getString(WHERE_CAME_FROM).equals(MainActivity.MAIN_ACTIVITY)) {
-            if (movie?.liked == true) {
-                setIconLiked()
-                isAddedToFavorite = true
-            }
-        } else {
-            fabAddToFavorite.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context!!,
-                    R.drawable.ic_favorite
-                )
-            )
-            isAddedToFavorite = true
-        }
-
         setOnFabClickListener(movie)
     }
+
 
     private fun setOnFabClickListener(movie: Movie?) {
         fabAddToFavorite.setOnClickListener {
@@ -176,13 +188,16 @@ class DetailsFragment : Fragment() {
         txtRating = view.findViewById(R.id.txt_rating)
         txtDate = view.findViewById(R.id.txt_date)
         txtLanguage = view.findViewById(R.id.txt_language)
+        txtTime = view.findViewById(R.id.txt_time)
+        txtRevenue = view.findViewById(R.id.txt_revenue)
         collapsingToolbarLayout = view.findViewById(R.id.collapsing_toolbar_layout)
         fabAddToFavorite = view.findViewById(R.id.fab_add_to_favorite)
         progressBar = view.findViewById(R.id.progress)
     }
 
     @SuppressLint("SetTextI18n")
-    private fun setContent(movie: Movie) {
+    private fun setContent(movie: MovieDetailResponse) {
+
         context?.let {
             Glide.with(it)
                 .load("https://image.tmdb.org/t/p/w342${movie.posterPath}")
@@ -214,12 +229,13 @@ class DetailsFragment : Fragment() {
                 .into(imageBackdrop)
         }
 
-        val movieName = movie.title
-        collapsingToolbarLayout.title = movieName
+        collapsingToolbarLayout.title = movie.title
         txtRating.text = movie.rating.toString()
         txtDescr.text = movie.overview
         txtDate.text = movie.releaseDate
         txtLanguage.text = movie.language
+        txtTime.text = movie.time.toString() + " " + getString(R.string.min)
+        txtRevenue.text = String.format("%.2fM", movie.revenue / 1000000.0) + " $"
         inviteText = getString(R.string.invite_text) + movie.title
     }
 }

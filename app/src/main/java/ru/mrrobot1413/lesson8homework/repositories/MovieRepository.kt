@@ -1,14 +1,10 @@
 package ru.mrrobot1413.lesson8homework.repositories
 
-import android.content.Context
-import android.widget.ListAdapter
-import android.widget.Toast
-import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import ru.mrrobot1413.lesson8homework.App
-import ru.mrrobot1413.lesson8homework.model.Movie
+import ru.mrrobot1413.lesson8homework.model.MovieDetailResponse
 import ru.mrrobot1413.lesson8homework.model.MovieResponse
 import ru.mrrobot1413.lesson8homework.model.Series
 import ru.mrrobot1413.lesson8homework.model.SeriesResponse
@@ -31,8 +27,14 @@ object MovieRepository {
         return app.api.getPopularMovies(page = page, language = Locale.getDefault().language)
     }
 
+    fun getMovieDetails(
+        id: Int
+    ): Call<MovieDetailResponse>{
+        return app.api.getMovieDetails(id = id, language = Locale.getDefault().language)
+    }
+
     fun getTopRatedMovies(
-        page: Int
+        page: Int = 1
     ): Call<MovieResponse>{
         return app.api.getTopRatedMovies(page = page, language = Locale.getDefault().language)
     }

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
@@ -45,6 +44,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
     private lateinit var refreshLayout: SwipeRefreshLayout
     private lateinit var txtNoConnection: TextView
     private lateinit var imageNoConnection: ImageView
+    private var moviesPage = 1
 
     companion object {
         const val MAIN_ACTIVITY = "MAIN_ACTIVITY"
@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         setContentView(R.layout.activity_main)
 
         moviesViewModel.getPopularMovies(
-            1
+            moviesPage
         )
         moviesViewModel.movies.observe(this, {
             recyclerView.visibility = View.VISIBLE
@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
             // повторить попытку подключения через 10сек
             Handler(Looper.getMainLooper()).postDelayed({
                 moviesViewModel.getPopularMovies(
-                    1
+                    moviesPage
                 )
             }, 10000)
             onError(it)
@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
 
         refreshLayout.setOnRefreshListener {
             moviesViewModel.getPopularMovies(
-                1
+                moviesPage
             )
             refreshLayout.isRefreshing = false
         }
@@ -102,9 +102,9 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
 
         recyclerView.layoutManager = linearLayoutManager
 
-        attachPopularMoviesOnScrollListener()
-
         recyclerView.adapter = adapter
+
+        attachPopularMoviesOnScrollListener()
     }
 
     private fun getTopRatedMovies() {
@@ -134,13 +134,15 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val totalItemCount = linearLayoutManager.itemCount
-                val visibleItemCount = linearLayoutManager.childCount
-                val firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition()
-                var moviesPage = 1
 
-                if (firstVisibleItem + visibleItemCount >= totalItemCount / 1) {
+                val visibleItemCount = linearLayoutManager.childCount
+
+                val firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition()
+
+
+                if (firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
                     recyclerView.removeOnScrollListener(this)
-                    moviesPage++
+                    moviesPage += 1
                     moviesViewModel.getPopularMovies(
                         moviesPage
                     )
@@ -191,7 +193,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         isAddedFragment = true
 
         replaceFragment(
-            DetailsFragment.newInstance(movie, MAIN_ACTIVITY),
+            DetailsFragment.newInstance(movie),
             R.id.container
         )
 
