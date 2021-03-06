@@ -4,7 +4,7 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
-import ru.mrrobot1413.lesson8homework.model.MovieDetailResponse
+import ru.mrrobot1413.lesson8homework.model.MovieDetailed
 import ru.mrrobot1413.lesson8homework.model.MovieResponse
 import ru.mrrobot1413.lesson8homework.model.SeriesResponse
 import ru.mrrobot1413.lesson8homework.model.Video
@@ -15,7 +15,6 @@ interface Api {
         const val API_KEY = "82f337a96c72f107c937a1fcf9d4072c"
     }
 
-    //russian - movie/popular?language=ru
     @GET("movie/popular")
     fun getPopularMovies(
         @Query("api_key") apiKey: String = API_KEY,
@@ -30,12 +29,19 @@ interface Api {
         @Query("language") language: String = "en-US"
     ): Call<MovieResponse>
 
+    @GET("movie/upcoming")
+    fun getUpComingMovies(
+        @Query("api_key") apiKey: String = API_KEY,
+        @Query("page") page: Int,
+        @Query("language") language: String = "en-US"
+    ): Call<MovieResponse>
+
     @GET("movie/{id}")
     fun getMovieDetails(
         @Path("id") id: Int,
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = "en-US"
-    ): Call<MovieDetailResponse>
+    ): Call<MovieDetailed>
 
     @GET("movie/{id}/videos")
     fun getTrailers(

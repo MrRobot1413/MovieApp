@@ -4,7 +4,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import ru.mrrobot1413.lesson8homework.App
-import ru.mrrobot1413.lesson8homework.model.MovieDetailResponse
+import ru.mrrobot1413.lesson8homework.model.MovieDetailed
 import ru.mrrobot1413.lesson8homework.model.MovieResponse
 import ru.mrrobot1413.lesson8homework.model.Series
 import ru.mrrobot1413.lesson8homework.model.SeriesResponse
@@ -29,7 +29,7 @@ object MovieRepository {
 
     fun getMovieDetails(
         id: Int
-    ): Call<MovieDetailResponse>{
+    ): Call<MovieDetailed>{
         return app.api.getMovieDetails(id = id, language = Locale.getDefault().language)
     }
 
@@ -37,6 +37,12 @@ object MovieRepository {
         page: Int = 1
     ): Call<MovieResponse>{
         return app.api.getTopRatedMovies(page = page, language = Locale.getDefault().language)
+    }
+
+    fun getUpComingMovies(
+        page: Int = 1
+    ): Call<MovieResponse>{
+        return app.api.getUpComingMovies(page = page, language = Locale.getDefault().language)
     }
 
     fun getSeries(

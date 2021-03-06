@@ -52,14 +52,13 @@ class FavoriteListFragment : Fragment() {
         initFields(view)
         initRecycler()
 
-        relative.setOnRefreshListener {
-            getMovies()
-            relative.isRefreshing = false
-        }
-    }
+        showNoMoviesSign()
 
-    private fun getMovies(){
-        adapter.setMovies(favoriteListRepository.selectAll())
+        relative.setOnRefreshListener {
+            adapter.setMovies(favoriteListRepository.selectAll())
+            relative.isRefreshing = false
+            showNoMoviesSign()
+        }
     }
 
     private fun initFields(view: View) {
@@ -71,8 +70,18 @@ class FavoriteListFragment : Fragment() {
     private fun initRecycler() {
         recyclerView.layoutManager = GridLayoutManager(context, 2)
 
-        getMovies()
+        adapter.setMovies(favoriteListRepository.selectAll())
 
         recyclerView.adapter = adapter
+    }
+
+
+
+    private fun showNoMoviesSign(){
+        if(favoriteListRepository.getMoviesCount() != 0){
+            noMoviesSign.visibility = View.GONE
+        } else{
+            noMoviesSign.visibility = View.VISIBLE
+        }
     }
 }

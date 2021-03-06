@@ -1,15 +1,15 @@
 package ru.mrrobot1413.lesson8homework.viewModels
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import ru.mrrobot1413.lesson8homework.model.Movie
-import ru.mrrobot1413.lesson8homework.model.MovieDetailResponse
+import ru.mrrobot1413.lesson8homework.model.MovieDetailed
 import ru.mrrobot1413.lesson8homework.model.MovieResponse
 import ru.mrrobot1413.lesson8homework.model.Series
+import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
 import ru.mrrobot1413.lesson8homework.repositories.MovieRepository
 
 class MoviesViewModel : ViewModel() {
@@ -17,50 +17,103 @@ class MoviesViewModel : ViewModel() {
     private var movieRepository: MovieRepository = MovieRepository.getInstance()
     var movies = MutableLiveData<List<Movie>>()
     var error = MutableLiveData<String>()
-    var movieDetailResponse = MutableLiveData<MovieDetailResponse>()
+    var movieDetailed = MutableLiveData<MovieDetailed>()
 
     fun getPopularMovies(
-        page: Int
+        page: Int,
     ) {
         movieRepository.getPopularMovies(page = page).enqueue(object : Callback<MovieResponse> {
-                override fun onResponse(
-                    call: Call<MovieResponse>,
-                    response: Response<MovieResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        val responseBody = response.body()
-
-                        if (responseBody != null) {
-                            movies.postValue(responseBody.moviesList)
-                            Log.d("moviesViewModel", page.toString())
-                        } else {
-                            error.postValue("Error loading movies")
-                        }
-                    } else {
-                        error.postValue("Error loading movies")
-                    }
-                }
-
-                override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                    error.postValue("No connection")
-                }
-        })
-    }
-
-    fun getMovieDetails(
-        id: Int
-    ){
-        movieRepository.getMovieDetails(id = id).enqueue(object : Callback<MovieDetailResponse> {
             override fun onResponse(
-                call: Call<MovieDetailResponse>,
-                response: Response<MovieDetailResponse>
+                call: Call<MovieResponse>,
+                response: Response<MovieResponse>,
             ) {
                 if (response.isSuccessful) {
                     val responseBody = response.body()
 
                     if (responseBody != null) {
-                        movieDetailResponse.postValue(
-                            MovieDetailResponse(
+                        movies.postValue(responseBody.moviesList)
+                    } else {
+                        error.postValue("Error loading movies")
+                    }
+                } else {
+                    error.postValue("Error loading movies")
+                }
+            }
+
+            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+                error.postValue("No connection")
+            }
+        })
+    }
+
+    fun getTopRatedMovies(
+        page: Int,
+    ) {
+        movieRepository.getTopRatedMovies(page).enqueue(object : Callback<MovieResponse> {
+            override fun onResponse(
+                call: Call<MovieResponse>,
+                response: Response<MovieResponse>,
+            ) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+
+                    if (responseBody != null) {
+                        movies.postValue(responseBody.moviesList)
+                    } else {
+                        error.postValue("Error loading movies")
+                    }
+                } else {
+                    error.postValue("Error loading movies")
+                }
+            }
+
+            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+                error.postValue("No connection")
+            }
+        })
+    }
+
+    fun getUpComingMovies(
+        page: Int,
+    ) {
+        movieRepository.getUpComingMovies(page).enqueue(object : Callback<MovieResponse> {
+            override fun onResponse(
+                call: Call<MovieResponse>,
+                response: Response<MovieResponse>,
+            ) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+
+                    if (responseBody != null) {
+                        movies.postValue(responseBody.moviesList)
+                    } else {
+                        error.postValue("Error loading movies")
+                    }
+                } else {
+                    error.postValue("Error loading movies")
+                }
+            }
+
+            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+                error.postValue("No connection")
+            }
+        })
+    }
+
+    fun getMovieDetails(
+        id: Int,
+    ) {
+        movieRepository.getMovieDetails(id = id).enqueue(object : Callback<MovieDetailed> {
+            override fun onResponse(
+                call: Call<MovieDetailed>,
+                response: Response<MovieDetailed>,
+            ) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+
+                    if (responseBody != null) {
+                        movieDetailed.postValue(
+                            MovieDetailed(
                                 responseBody.id,
                                 responseBody.title,
                                 responseBody.overview,
@@ -80,36 +133,8 @@ class MoviesViewModel : ViewModel() {
                 }
             }
 
-            override fun onFailure(call: Call<MovieDetailResponse>, t: Throwable) {
+            override fun onFailure(call: Call<MovieDetailed>, t: Throwable) {
                 error.postValue("No connection")
-            }
-        })
-    }
-
-    fun getTopRatedMovies(
-        page: Int
-    ) {
-        movieRepository.getTopRatedMovies(page).enqueue(object : Callback<MovieResponse> {
-            override fun onResponse(
-                call: Call<MovieResponse>,
-                response: Response<MovieResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-
-                    if (responseBody != null) {
-                        movies.postValue(responseBody.moviesList)
-                    } else {
-                        error.postValue("Error loading movies")
-                    }
-                } else {
-//                        onError.invoke()
-                }
-            }
-
-            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-//                    onError.invoke()
-                error.postValue("Error loading movies")
             }
         })
     }
@@ -117,7 +142,7 @@ class MoviesViewModel : ViewModel() {
     fun getSeries(
         page: Int = 1,
         onSuccess: ((movies: List<Series>) -> Unit),
-        onError: (() -> Unit)
+        onError: (() -> Unit),
     ) {
         movieRepository.getSeries(page, onSuccess, onError)
     }

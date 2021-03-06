@@ -1,20 +1,26 @@
 package ru.mrrobot1413.lesson8homework.ui
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import ru.mrrobot1413.lesson8homework.R
@@ -35,7 +41,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
             openDetailsActivity(it)
         }
     }
-    private var linearLayoutManager = GridLayoutManager(this, 2)
+    private lateinit var linearLayoutManager: GridLayoutManager
     private val moviesViewModel by lazy {
         ViewModelProvider(this).get(MoviesViewModel::class.java)
     }
@@ -44,6 +50,8 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
     private lateinit var refreshLayout: SwipeRefreshLayout
     private lateinit var txtNoConnection: TextView
     private lateinit var imageNoConnection: ImageView
+    private lateinit var toolbar: Toolbar
+    private lateinit var appBarLayout: AppBarLayout
     private var moviesPage = 1
 
     companion object {
@@ -65,25 +73,35 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         })
 
         moviesViewModel.error.observe(this, {
-            // повторить попытку подключения через 10сек
+            // повторить попытку подключения через 5 сек
             Handler(Looper.getMainLooper()).postDelayed({
                 moviesViewModel.getPopularMovies(
                     moviesPage
                 )
-            }, 10000)
+            }, 5000)
             onError(it)
             refreshLayout.isRefreshing = false
         })
 
-        initFileds()
+        initFields()
+        setSupportActionBar(toolbar)
     }
 
-    private fun initFileds() {
+    private fun initFields() {
+        linearLayoutManager =
+            if (this.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                GridLayoutManager(this, 3)
+            } else {
+                GridLayoutManager(this, 2)
+            }
+
         initRecycler()
         initBottomNav()
         refreshLayout = findViewById(R.id.refresh_layout)
         txtNoConnection = findViewById(R.id.txt_no_connection)
         imageNoConnection = findViewById(R.id.image_no_connection)
+        toolbar = findViewById(R.id.toolbar)
+        appBarLayout = findViewById(R.id.app_bar_layout)
 
         deleteNoConnectionSign()
 
@@ -93,6 +111,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
             )
             refreshLayout.isRefreshing = false
         }
+
 
         refreshLayout.isEnabled = true
     }
@@ -104,13 +123,6 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
 
         recyclerView.adapter = adapter
 
-        attachPopularMoviesOnScrollListener()
-    }
-
-    private fun getTopRatedMovies() {
-        moviesViewModel.getTopRatedMovies(
-            1
-        )
         attachPopularMoviesOnScrollListener()
     }
 
@@ -134,18 +146,14 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val totalItemCount = linearLayoutManager.itemCount
-
                 val visibleItemCount = linearLayoutManager.childCount
-
                 val firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition()
-
 
                 if (firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
                     recyclerView.removeOnScrollListener(this)
-                    moviesPage += 1
-                    moviesViewModel.getPopularMovies(
-                        moviesPage
-                    )
+                    moviesPage++
+                    moviesViewModel.getPopularMovies(moviesPage)
+                    attachPopularMoviesOnScrollListener()
                 }
             }
         })
@@ -159,7 +167,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
                     if (!isAddedFragment) {
                         recyclerView.scrollToPosition(0)
                         moviesViewModel.getPopularMovies(
-                            1
+                            moviesPage
                         )
                     }
                     changeFocusOnBottomNav(R.id.page_1)
@@ -186,29 +194,30 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         supportFragmentManager
             .popBackStack()
 
+        appBarLayout.visibility = View.VISIBLE
+
         refreshLayout.isEnabled = true
+
     }
 
     private fun openDetailsActivity(movie: Movie) {
         isAddedFragment = true
-
         replaceFragment(
             DetailsFragment.newInstance(movie),
             R.id.container
         )
-
         refreshLayout.isEnabled = false
     }
 
     private fun openSeriesDetailsActivity(series: Series) {
-        isAddedFragment = true
-
-        replaceFragment(
-            SeriesDetailsFragment.newInstance(series, MAIN_ACTIVITY),
-            R.id.container
-        )
-
-        refreshLayout.isEnabled = false
+        if (!isAddedFragment) {
+            isAddedFragment = true
+            replaceFragment(
+                SeriesDetailsFragment.newInstance(series, MAIN_ACTIVITY),
+                R.id.container
+            )
+            refreshLayout.isEnabled = false
+        }
     }
 
 //    private fun openSeriesFragment() {
@@ -222,34 +231,42 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
 //        )
 //    }
 
-//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-//        menuInflater.inflate(R.menu.main_menu, menu)
-//        return super.onCreateOptionsMenu(menu)
-//    }
-//
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        Log.d("onOptionsItemSelected", "onOptionsItemSelected")
-//        val id = item.itemId
-//        if(id == R.id.top_rated) {
-//            Log.d("onOptionsItemSelected", "top rated")
-//
-//        } else{
-//            Log.d("onOptionsItemSelected", "popular")
-//
-//        }
-//
-//        return true
-//    }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun showTopRatedMovies(){
+        adapter.appendMoviesFromMenu(mutableListOf())
+        moviesViewModel.getTopRatedMovies(1)
+    }
+
+    private fun showPopularMovies(){
+        adapter.appendMoviesFromMenu(mutableListOf())
+        moviesViewModel.getPopularMovies(1)
+    }
+
+    private fun showUpComingMovies(){
+        adapter.appendMoviesFromMenu(mutableListOf())
+        moviesViewModel.getUpComingMovies(1)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.top_rated -> showTopRatedMovies()
+            R.id.popular -> showPopularMovies()
+            R.id.upcoming -> showUpComingMovies()
+        }
+        return true
+    }
 
     private fun openFavoriteListFragment() {
         isAddedFragment = true
-
-        val fragment = FavoriteListFragment.newInstance()
-
         replaceFragment(
-            fragment,
-            R.id.relative_container
+            FavoriteListFragment.newInstance(),
+            R.id.relative_layout
         )
+        appBarLayout.visibility = View.GONE
     }
 
     private fun replaceFragment(
@@ -262,6 +279,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
             .add(container, fragment, fragment.tag)
             .addToBackStack(null)
             .commit()
+        refreshLayout.isRefreshing = false
     }
 
     override fun onClick(movie: Movie) {
@@ -274,12 +292,13 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
 
     override fun onBackPressed() {
         if (supportFragmentManager.backStackEntryCount > 0) {
-            isAddedFragment = false
-
             supportFragmentManager
-                .popBackStackImmediate()
+                .popBackStack()
 
             refreshLayout.isEnabled = true
+        } else if (supportFragmentManager.backStackEntryCount == 0) {
+            isAddedFragment = false
+            appBarLayout.visibility = View.VISIBLE
         } else {
             showExitDialog()
         }

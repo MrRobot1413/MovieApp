@@ -11,8 +11,6 @@ import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.data.DataStorage
 import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
 
-//import ru.mrrobot1413.lesson8homework.data.DataStorage
-
 class FavoriteListAdapter(
     private val noMoviesSign: TextView,
     private val clickListener: (movie: Movie) -> Unit
@@ -41,7 +39,6 @@ class FavoriteListAdapter(
 
         holder.bind(moviesList[position])
         setOnDetailsClickListener(holder, moviesList[position])
-        showNoMoviesSign()
     }
 
     private fun setOnDetailsClickListener(holder: MoviesViewHolder, movie: Movie) {
@@ -50,14 +47,6 @@ class FavoriteListAdapter(
             notifyDataSetChanged()
 
             clickListener(movie)
-        }
-    }
-
-    private fun showNoMoviesSign(){
-        if(favoriteListRepository.getMoviesCount() != 0){
-            noMoviesSign.visibility = View.GONE
-        } else{
-            noMoviesSign.visibility = View.VISIBLE
         }
     }
 }

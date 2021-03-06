@@ -18,6 +18,12 @@ class MoviesAdapter(
         notifyDataSetChanged()
     }
 
+    fun appendMoviesFromMenu(movies: List<Movie>) {
+        this.movies.clear()
+        this.movies.addAll(movies)
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount() = movies.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoviesViewHolder {

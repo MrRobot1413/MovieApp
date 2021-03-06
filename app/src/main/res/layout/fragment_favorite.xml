@@ -30,6 +30,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:fontFamily="sans-serif-black"
+                android:maxWidth="300dp"
                 android:gravity="center"
                 android:text="@string/no_movies_sign"
                 android:textColor="@color/white"

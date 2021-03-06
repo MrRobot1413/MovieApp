@@ -2,7 +2,7 @@ package ru.mrrobot1413.lesson8homework.model
 
 import com.google.gson.annotations.SerializedName
 
-data class MovieDetailResponse(
+data class MovieDetailed(
     @SerializedName("id") val id: Int,
     @SerializedName("title") val title: String,
     @SerializedName("overview") val overview: String,
