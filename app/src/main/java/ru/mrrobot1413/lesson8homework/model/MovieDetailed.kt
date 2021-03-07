@@ -1,15 +1,27 @@
 package ru.mrrobot1413.lesson8homework.model
 
+import android.os.Parcelable
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.IgnoredOnParcel
+import kotlinx.android.parcel.Parcelize
 
+@Entity(tableName = "movies")
+@Parcelize
 data class MovieDetailed(
-    @SerializedName("id") val id: Int,
-    @SerializedName("title") val title: String,
-    @SerializedName("overview") val overview: String,
-    @SerializedName("poster_path") val posterPath: String?,
-    @SerializedName("vote_average") val rating: Float,
-    @SerializedName("release_date") val releaseDate: String,
-    @SerializedName("revenue") val revenue: Int,
-    @SerializedName("runtime") val time: Int,
-    @SerializedName("original_language") val language: String
-)
+    @PrimaryKey @SerializedName("id") val id: Int,
+    @ColumnInfo(name = "title") @SerializedName("title") val title: String,
+    @ColumnInfo(name = "overview") @SerializedName("overview") val overview: String,
+    @ColumnInfo(name = "posterPath") @SerializedName("poster_path") val posterPath: String?,
+    @ColumnInfo(name = "rating") @SerializedName("vote_average") val rating: Float,
+    @ColumnInfo(name = "release_date") @SerializedName("release_date") val releaseDate: String,
+    @ColumnInfo(name = "time") @SerializedName("runtime") val time: Int,
+    @ColumnInfo(name = "original_language") @SerializedName("original_language") val language: String
+) :
+    Parcelable {
+    @ColumnInfo(name = "isLiked")
+    @IgnoredOnParcel
+    var liked = false
+}

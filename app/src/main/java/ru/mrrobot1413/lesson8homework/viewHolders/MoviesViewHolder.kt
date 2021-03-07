@@ -16,6 +16,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.model.Movie
+import ru.mrrobot1413.lesson8homework.model.MovieDetailed
 import ru.mrrobot1413.lesson8homework.model.Series
 
 
@@ -26,7 +27,7 @@ class MoviesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     var progressBar: ProgressBar = itemView.findViewById(R.id.progress)
 
     @SuppressLint("SetTextI18n")
-    fun bind(movie: Movie) {
+    fun bind(movie: MovieDetailed) {
         title.text = movie.title
         Glide.with(itemView)
             .load("https://image.tmdb.org/t/p/w342${movie.posterPath}")

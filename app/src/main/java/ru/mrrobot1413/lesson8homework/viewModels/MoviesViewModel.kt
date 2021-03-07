@@ -1,5 +1,6 @@
 package ru.mrrobot1413.lesson8homework.viewModels
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import retrofit2.Call
@@ -15,7 +16,7 @@ import ru.mrrobot1413.lesson8homework.repositories.MovieRepository
 class MoviesViewModel : ViewModel() {
 
     private var movieRepository: MovieRepository = MovieRepository.getInstance()
-    var movies = MutableLiveData<List<Movie>>()
+    var movies = MutableLiveData<List<MovieDetailed>>()
     var error = MutableLiveData<String>()
     var movieDetailed = MutableLiveData<MovieDetailed>()
 
@@ -104,27 +105,44 @@ class MoviesViewModel : ViewModel() {
         id: Int,
     ) {
         movieRepository.getMovieDetails(id = id).enqueue(object : Callback<MovieDetailed> {
+            val repository = FavoriteListRepository.getInstance()
+            val movie = repository.selectById(id)
+
             override fun onResponse(
                 call: Call<MovieDetailed>,
                 response: Response<MovieDetailed>,
             ) {
                 if (response.isSuccessful) {
                     val responseBody = response.body()
-
                     if (responseBody != null) {
-                        movieDetailed.postValue(
-                            MovieDetailed(
-                                responseBody.id,
-                                responseBody.title,
-                                responseBody.overview,
-                                responseBody.posterPath,
-                                responseBody.rating,
-                                responseBody.releaseDate,
-                                responseBody.revenue,
-                                responseBody.time,
-                                responseBody.language
+                        Log.d("repos", movie.toString())
+                        if (movie != null) {
+                            movieDetailed.postValue(
+                                MovieDetailed(
+                                    movie.id,
+                                    movie.title,
+                                    movie.overview,
+                                    movie.posterPath,
+                                    movie.rating,
+                                    movie.releaseDate,
+                                    movie.time,
+                                    movie.language
+                                )
                             )
-                        )
+                        } else {
+                            movieDetailed.postValue(
+                                MovieDetailed(
+                                    responseBody.id,
+                                    responseBody.title,
+                                    responseBody.overview,
+                                    responseBody.posterPath,
+                                    responseBody.rating,
+                                    responseBody.releaseDate,
+                                    responseBody.time,
+                                    responseBody.language
+                                )
+                            )
+                        }
                     } else {
                         error.postValue("Error loading movies")
                     }
@@ -135,6 +153,20 @@ class MoviesViewModel : ViewModel() {
 
             override fun onFailure(call: Call<MovieDetailed>, t: Throwable) {
                 error.postValue("No connection")
+                if (movie != null) {
+                    movieDetailed.postValue(
+                        MovieDetailed(
+                            movie.id,
+                            movie.title,
+                            movie.overview,
+                            movie.posterPath,
+                            movie.rating,
+                            movie.releaseDate,
+                            movie.time,
+                            movie.language
+                        )
+                    )
+                }
             }
         })
     }

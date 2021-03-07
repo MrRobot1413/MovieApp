@@ -21,6 +21,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.databinding.FragmentDetailsBinding
 import ru.mrrobot1413.lesson8homework.model.Movie
+import ru.mrrobot1413.lesson8homework.model.MovieDetailed
 import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
 import ru.mrrobot1413.lesson8homework.ui.MainActivity
 import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
@@ -48,7 +49,7 @@ class DetailsFragment : Fragment() {
         private const val MOVIE = "movie"
 
 
-        fun newInstance(movie: Movie): DetailsFragment {
+        fun newInstance(movie: MovieDetailed): DetailsFragment {
             val args = Bundle()
             args.putParcelable(MOVIE, movie)
 
@@ -79,10 +80,10 @@ class DetailsFragment : Fragment() {
 
         initFields(view)
 
-        val movie = arguments?.getParcelable<Movie>(MOVIE)
+        val movie = arguments?.getParcelable<MovieDetailed>(MOVIE)
 
-        val movieFromDb =
-            favoriteListRepository.selectById(arguments?.getParcelable<Movie>(MOVIE)?.id!!)
+        val movieFromDb = favoriteListRepository.selectById(movie!!.id)
+
         isAddedToFavorite = if (movieFromDb != null) {
             if (movieFromDb.liked) {
                 setIconLiked()
@@ -96,16 +97,13 @@ class DetailsFragment : Fragment() {
             false
         }
 
-        if (movie != null) {
-            moviesViewModel.getMovieDetails(movie.id)
-        }
+        moviesViewModel.getMovieDetails(movie.id)
 
-
-
-        setImage(imageBackdrop, "https://image.tmdb.org/t/p/w342" + movie!!.posterPath)
+        setImage(imageBackdrop, "https://image.tmdb.org/t/p/w342" + movie.posterPath)
 
         binding.viewModel = moviesViewModel
         binding.lifecycleOwner = viewLifecycleOwner
+        toolbar = binding.toolbar
 
         (activity as MainActivity?)!!.setSupportActionBar(toolbar)
 
@@ -116,8 +114,7 @@ class DetailsFragment : Fragment() {
         setOnFabClickListener(movie)
     }
 
-
-    private fun setOnFabClickListener(movie: Movie?) {
+    private fun setOnFabClickListener(movie: MovieDetailed?) {
         fabAddToFavorite.setOnClickListener {
             if (movie != null) {
                 if (isAddedToFavorite) {
@@ -127,7 +124,6 @@ class DetailsFragment : Fragment() {
                     favoriteListRepository.delete(movie)
 
                     setIconUnliked()
-
                 } else {
                     isAddedToFavorite = true
 
@@ -202,7 +198,7 @@ class DetailsFragment : Fragment() {
         if (item.itemId == R.id.invite_friend) {
             val sendIntent = Intent()
             sendIntent.action = Intent.ACTION_SEND
-            sendIntent.putExtra(Intent.EXTRA_SUBJECT, "The movie ${collapsingToolbarLayout.title}")
+            sendIntent.putExtra(Intent.EXTRA_SUBJECT, collapsingToolbarLayout.title)
             sendIntent.putExtra(Intent.EXTRA_TEXT, inviteText)
             sendIntent.type = "text/plain"
             startActivity(sendIntent)
@@ -211,7 +207,6 @@ class DetailsFragment : Fragment() {
     }
 
     private fun initFields(view: View) {
-        toolbar = view.findViewById(R.id.toolbar)
         imageBackdrop = view.findViewById(R.id.image_backdrop)
         collapsingToolbarLayout = view.findViewById(R.id.collapsing_toolbar_layout)
         fabAddToFavorite = view.findViewById(R.id.fab_add_to_favorite)

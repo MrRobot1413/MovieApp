@@ -10,16 +10,16 @@ import ru.mrrobot1413.lesson8homework.model.MovieDetailed
 @Dao
 interface MovieDao {
     @Query("SELECT * FROM movies")
-    fun selectAll(): List<Movie>
+    fun selectAll(): List<MovieDetailed>
 
     @Query("SELECT * FROM movies WHERE id=:id")
-    fun selectById(id: Int): Movie?
+    fun selectById(id: Int): MovieDetailed?
 
     @Delete
-    fun deleteMovie(movie: Movie)
+    fun deleteMovie(movie: MovieDetailed)
 
     @Insert
-    fun insertMovie(movie: Movie)
+    fun insertMovie(movie: MovieDetailed)
 
     @Query("SELECT count(*) FROM movies")
     fun getMoviesCount(): Int

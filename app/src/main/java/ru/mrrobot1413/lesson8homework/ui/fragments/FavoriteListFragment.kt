@@ -19,7 +19,7 @@ class FavoriteListFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var noMoviesSign: TextView
     private val adapter by lazy {
-        FavoriteListAdapter(noMoviesSign) {
+        FavoriteListAdapter {
             (activity as? MovieClickListener)?.onClick(it)
         }
     }

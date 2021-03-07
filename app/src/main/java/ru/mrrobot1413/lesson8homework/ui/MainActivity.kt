@@ -27,6 +27,7 @@ import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.MoviesAdapter
 import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
 import ru.mrrobot1413.lesson8homework.model.Movie
+import ru.mrrobot1413.lesson8homework.model.MovieDetailed
 import ru.mrrobot1413.lesson8homework.model.Series
 import ru.mrrobot1413.lesson8homework.ui.fragments.DetailsFragment
 import ru.mrrobot1413.lesson8homework.ui.fragments.FavoriteListFragment
@@ -200,7 +201,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
 
     }
 
-    private fun openDetailsActivity(movie: Movie) {
+    private fun openDetailsActivity(movie: MovieDetailed) {
         isAddedFragment = true
         replaceFragment(
             DetailsFragment.newInstance(movie),
@@ -282,7 +283,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         refreshLayout.isRefreshing = false
     }
 
-    override fun onClick(movie: Movie) {
+    override fun onClick(movie: MovieDetailed) {
         openDetailsActivity(movie)
     }
 

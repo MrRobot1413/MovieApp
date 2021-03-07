@@ -3,6 +3,7 @@ package ru.mrrobot1413.lesson8homework.repositories
 import ru.mrrobot1413.lesson8homework.App
 import ru.mrrobot1413.lesson8homework.dao.MovieDao
 import ru.mrrobot1413.lesson8homework.model.Movie
+import ru.mrrobot1413.lesson8homework.model.MovieDetailed
 
 object FavoriteListRepository {
 
@@ -22,19 +23,19 @@ object FavoriteListRepository {
         return instance
     }
 
-    fun selectAll(): List<Movie> {
+    fun selectAll(): List<MovieDetailed> {
         return movieDao.selectAll()
     }
 
-    fun selectById(id: Int): Movie? {
+    fun selectById(id: Int): MovieDetailed? {
         return movieDao.selectById(id)
     }
 
-    fun likeMovie(movie: Movie){
+    fun likeMovie(movie: MovieDetailed){
         movieDao.insertMovie(movie)
     }
 
-    fun delete(movie: Movie) {
+    fun delete(movie: MovieDetailed) {
         movieDao.deleteMovie(movie)
     }
 

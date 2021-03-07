@@ -7,7 +7,7 @@ import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.model.MovieDetailed
 import ru.mrrobot1413.lesson8homework.model.Series
 
-@Database(entities = [Movie::class], version = 10)
+@Database(entities = [MovieDetailed::class], version = 11)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun movieDao(): MovieDao
 }

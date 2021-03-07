@@ -9,20 +9,20 @@ import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.viewHolders.MoviesViewHolder
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.data.DataStorage
+import ru.mrrobot1413.lesson8homework.model.MovieDetailed
 import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
 
 class FavoriteListAdapter(
-    private val noMoviesSign: TextView,
-    private val clickListener: (movie: Movie) -> Unit
+    private val clickListener: (movie: MovieDetailed) -> Unit
 ) :
     RecyclerView.Adapter<MoviesViewHolder>() {
 
-    private lateinit var moviesList: List<Movie>
+    private lateinit var moviesList: List<MovieDetailed>
     private val favoriteListRepository by lazy {
         FavoriteListRepository.getInstance()
     }
 
-    fun setMovies(moviesList: List<Movie>){
+    fun setMovies(moviesList: List<MovieDetailed>){
         this.moviesList = moviesList
         notifyDataSetChanged()
     }
@@ -41,7 +41,7 @@ class FavoriteListAdapter(
         setOnDetailsClickListener(holder, moviesList[position])
     }
 
-    private fun setOnDetailsClickListener(holder: MoviesViewHolder, movie: Movie) {
+    private fun setOnDetailsClickListener(holder: MoviesViewHolder, movie: MovieDetailed) {
         holder.holder.setOnClickListener {
 
             notifyDataSetChanged()
