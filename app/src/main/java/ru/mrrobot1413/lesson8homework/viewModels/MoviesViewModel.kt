@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.model.MovieDetailed
 import ru.mrrobot1413.lesson8homework.model.MovieResponse
 import ru.mrrobot1413.lesson8homework.model.Series
@@ -21,7 +20,7 @@ class MoviesViewModel : ViewModel() {
     var movieDetailed = MutableLiveData<MovieDetailed>()
 
     fun getPopularMovies(
-        page: Int,
+        page: Int
     ) {
         movieRepository.getPopularMovies(page = page).enqueue(object : Callback<MovieResponse> {
             override fun onResponse(
@@ -74,33 +73,6 @@ class MoviesViewModel : ViewModel() {
         })
     }
 
-    fun getUpComingMovies(
-        page: Int,
-    ) {
-        movieRepository.getUpComingMovies(page).enqueue(object : Callback<MovieResponse> {
-            override fun onResponse(
-                call: Call<MovieResponse>,
-                response: Response<MovieResponse>,
-            ) {
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-
-                    if (responseBody != null) {
-                        movies.postValue(responseBody.moviesList)
-                    } else {
-                        error.postValue("Error loading movies")
-                    }
-                } else {
-                    error.postValue("Error loading movies")
-                }
-            }
-
-            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                error.postValue("No connection")
-            }
-        })
-    }
-
     fun getMovieDetails(
         id: Int,
     ) {
@@ -116,56 +88,42 @@ class MoviesViewModel : ViewModel() {
                     val responseBody = response.body()
                     if (responseBody != null) {
                         Log.d("repos", movie.toString())
-                        if (movie != null) {
-                            movieDetailed.postValue(
-                                MovieDetailed(
-                                    movie.id,
-                                    movie.title,
-                                    movie.overview,
-                                    movie.posterPath,
-                                    movie.rating,
-                                    movie.releaseDate,
-                                    movie.time,
-                                    movie.language
-                                )
+                        movieDetailed.postValue(
+                            MovieDetailed(
+                                responseBody.id,
+                                responseBody.title,
+                                responseBody.overview,
+                                responseBody.posterPath,
+                                responseBody.rating,
+                                responseBody.releaseDate,
+                                responseBody.time,
+                                responseBody.language
                             )
-                        } else {
-                            movieDetailed.postValue(
-                                MovieDetailed(
-                                    responseBody.id,
-                                    responseBody.title,
-                                    responseBody.overview,
-                                    responseBody.posterPath,
-                                    responseBody.rating,
-                                    responseBody.releaseDate,
-                                    responseBody.time,
-                                    responseBody.language
-                                )
-                            )
-                        }
+                        )
                     } else {
                         error.postValue("Error loading movies")
+                        Log.d("movieees1", movie.toString())
+                        movieDetailed.postValue(
+                            movie
+                        )
                     }
                 } else {
                     error.postValue("Error loading movies")
+                    Log.d("movieees2", movie.toString())
+                    movieDetailed.postValue(
+                        movie
+                    )
                 }
             }
 
             override fun onFailure(call: Call<MovieDetailed>, t: Throwable) {
-                error.postValue("No connection")
                 if (movie != null) {
+                    Log.d("movieees3", movie.toString())
                     movieDetailed.postValue(
-                        MovieDetailed(
-                            movie.id,
-                            movie.title,
-                            movie.overview,
-                            movie.posterPath,
-                            movie.rating,
-                            movie.releaseDate,
-                            movie.time,
-                            movie.language
-                        )
+                        movie
                     )
+                } else{
+                    error.postValue("No connection")
                 }
             }
         })

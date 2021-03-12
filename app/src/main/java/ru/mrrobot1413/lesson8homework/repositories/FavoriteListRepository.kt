@@ -1,8 +1,8 @@
 package ru.mrrobot1413.lesson8homework.repositories
 
+import androidx.lifecycle.LiveData
 import ru.mrrobot1413.lesson8homework.App
 import ru.mrrobot1413.lesson8homework.dao.MovieDao
-import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.model.MovieDetailed
 
 object FavoriteListRepository {
@@ -23,7 +23,7 @@ object FavoriteListRepository {
         return instance
     }
 
-    fun selectAll(): List<MovieDetailed> {
+    fun selectAll(): LiveData<List<MovieDetailed>> {
         return movieDao.selectAll()
     }
 

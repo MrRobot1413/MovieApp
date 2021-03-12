@@ -20,13 +20,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.MoviesAdapter
 import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
-import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.model.MovieDetailed
 import ru.mrrobot1413.lesson8homework.model.Series
 import ru.mrrobot1413.lesson8homework.ui.fragments.DetailsFragment
@@ -63,9 +61,6 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        moviesViewModel.getPopularMovies(
-            moviesPage
-        )
         moviesViewModel.movies.observe(this, {
             recyclerView.visibility = View.VISIBLE
             adapter.appendMovies(it)
@@ -86,6 +81,13 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
 
         initFields()
         setSupportActionBar(toolbar)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        moviesViewModel.getPopularMovies(
+            moviesPage
+        )
     }
 
     private fun initFields() {
@@ -238,25 +240,18 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
     }
 
     private fun showTopRatedMovies(){
-        adapter.appendMoviesFromMenu(mutableListOf())
         moviesViewModel.getTopRatedMovies(1)
     }
 
     private fun showPopularMovies(){
-        adapter.appendMoviesFromMenu(mutableListOf())
         moviesViewModel.getPopularMovies(1)
     }
 
-    private fun showUpComingMovies(){
-        adapter.appendMoviesFromMenu(mutableListOf())
-        moviesViewModel.getUpComingMovies(1)
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        adapter.appendMoviesFromMenu(mutableListOf())
         when (item.itemId) {
             R.id.top_rated -> showTopRatedMovies()
             R.id.popular -> showPopularMovies()
-            R.id.upcoming -> showUpComingMovies()
         }
         return true
     }
@@ -297,8 +292,10 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
                 .popBackStack()
 
             refreshLayout.isEnabled = true
-        } else if (supportFragmentManager.backStackEntryCount == 0) {
+        } else if (supportFragmentManager.backStackEntryCount == 1) {
             isAddedFragment = false
+            appBarLayout.visibility = View.VISIBLE
+        } else if (supportFragmentManager.backStackEntryCount == 0) {
             appBarLayout.visibility = View.VISIBLE
         } else {
             showExitDialog()

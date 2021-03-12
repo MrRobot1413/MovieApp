@@ -1,16 +1,16 @@
 package ru.mrrobot1413.lesson8homework.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.model.MovieDetailed
 
 @Dao
 interface MovieDao {
     @Query("SELECT * FROM movies")
-    fun selectAll(): List<MovieDetailed>
+    fun selectAll(): LiveData<List<MovieDetailed>>
 
     @Query("SELECT * FROM movies WHERE id=:id")
     fun selectById(id: Int): MovieDetailed?

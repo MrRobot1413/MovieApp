@@ -39,12 +39,6 @@ object MovieRepository {
         return app.api.getTopRatedMovies(page = page, language = Locale.getDefault().language)
     }
 
-    fun getUpComingMovies(
-        page: Int = 1
-    ): Call<MovieResponse>{
-        return app.api.getUpComingMovies(page = page, language = Locale.getDefault().language)
-    }
-
     fun getSeries(
         page: Int = 1,
         onSuccess: (movies: List<Series>) -> Unit,

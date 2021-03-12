@@ -3,11 +3,11 @@ package ru.mrrobot1413.lesson8homework.ui.fragments
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
-import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
@@ -20,10 +20,9 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.databinding.FragmentDetailsBinding
-import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.model.MovieDetailed
-import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
 import ru.mrrobot1413.lesson8homework.ui.MainActivity
+import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
 import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
 
 class DetailsFragment : Fragment() {
@@ -34,8 +33,8 @@ class DetailsFragment : Fragment() {
     private lateinit var toolbar: MaterialToolbar
     private lateinit var fabAddToFavorite: FloatingActionButton
     private lateinit var progressBar: ProgressBar
-    private val favoriteListRepository by lazy {
-        FavoriteListRepository.getInstance()
+    private val favoriteListViewModel by lazy {
+        ViewModelProvider(this).get(FavoriteListViewModel::class.java)
     }
     private val moviesViewModel by lazy {
         ViewModelProvider(this).get(MoviesViewModel::class.java)
@@ -82,7 +81,7 @@ class DetailsFragment : Fragment() {
 
         val movie = arguments?.getParcelable<MovieDetailed>(MOVIE)
 
-        val movieFromDb = favoriteListRepository.selectById(movie!!.id)
+        val movieFromDb = favoriteListViewModel.selectById(movie!!.id)
 
         isAddedToFavorite = if (movieFromDb != null) {
             if (movieFromDb.liked) {
@@ -121,14 +120,16 @@ class DetailsFragment : Fragment() {
                     isAddedToFavorite = false
 
                     movie.liked = false
-                    favoriteListRepository.delete(movie)
+                    favoriteListViewModel.delete(movie)
 
                     setIconUnliked()
                 } else {
                     isAddedToFavorite = true
 
                     movie.liked = true
-                    favoriteListRepository.likeMovie(movie)
+                    Log.d("moviies", movie.toString())
+                    movie.time = moviesViewModel.movieDetailed.value?.time ?: 0
+                    favoriteListViewModel.likeMovie(movie)
 
                     setIconLiked()
                 }
@@ -136,7 +137,7 @@ class DetailsFragment : Fragment() {
         }
     }
 
-    fun setImage(view: ImageView, url: String) {
+    private fun setImage(view: ImageView, url: String) {
         context?.let {
             Glide.with(it)
                 .load(url)
@@ -190,7 +191,7 @@ class DetailsFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         menu.clear()
-        toolbar.inflateMenu(R.menu.invite_menu)
+        binding.toolbar.inflateMenu(R.menu.invite_menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

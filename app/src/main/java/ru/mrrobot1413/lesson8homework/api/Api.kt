@@ -29,13 +29,6 @@ interface Api {
         @Query("language") language: String = "en-US"
     ): Call<MovieResponse>
 
-    @GET("movie/upcoming")
-    fun getUpComingMovies(
-        @Query("api_key") apiKey: String = API_KEY,
-        @Query("page") page: Int,
-        @Query("language") language: String = "en-US"
-    ): Call<MovieResponse>
-
     @GET("movie/{id}")
     fun getMovieDetails(
         @Path("id") id: Int,

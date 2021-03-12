@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_favorite.*
@@ -13,6 +14,7 @@ import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.FavoriteListAdapter
 import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
 import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
+import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
 
 class FavoriteListFragment : Fragment() {
 
@@ -23,8 +25,8 @@ class FavoriteListFragment : Fragment() {
             (activity as? MovieClickListener)?.onClick(it)
         }
     }
-    private val favoriteListRepository by lazy {
-        FavoriteListRepository.getInstance()
+    private val favoriteListViewModel by lazy {
+        ViewModelProvider(this).get(FavoriteListViewModel::class.java)
     }
 
     companion object {
@@ -50,15 +52,16 @@ class FavoriteListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initFields(view)
+
+        favoriteListViewModel.getMovies().observe(viewLifecycleOwner, {
+            adapter.setMovies(it)
+            showNoMoviesSign()
+        })
         initRecycler()
 
-        showNoMoviesSign()
+        adapter.setMovies(mutableListOf())
 
-        relative.setOnRefreshListener {
-            adapter.setMovies(favoriteListRepository.selectAll())
-            relative.isRefreshing = false
-            showNoMoviesSign()
-        }
+        showNoMoviesSign()
     }
 
     private fun initFields(view: View) {
@@ -70,15 +73,11 @@ class FavoriteListFragment : Fragment() {
     private fun initRecycler() {
         recyclerView.layoutManager = GridLayoutManager(context, 2)
 
-        adapter.setMovies(favoriteListRepository.selectAll())
-
         recyclerView.adapter = adapter
     }
 
-
-
     private fun showNoMoviesSign(){
-        if(favoriteListRepository.getMoviesCount() != 0){
+        if(favoriteListViewModel.getMoviesCount() != 0){
             noMoviesSign.visibility = View.GONE
         } else{
             noMoviesSign.visibility = View.VISIBLE

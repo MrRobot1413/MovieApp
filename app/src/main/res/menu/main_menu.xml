@@ -10,9 +10,4 @@
         android:id="@+id/popular"
         android:title="@string/popular"
         app:showAsAction="collapseActionView" />
-
-    <item
-        android:id="@+id/upcoming"
-        android:title="@string/upcoming"
-        app:showAsAction="collapseActionView" />
 </menu>
