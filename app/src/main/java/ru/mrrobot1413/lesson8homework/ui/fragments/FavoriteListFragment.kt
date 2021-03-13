@@ -57,6 +57,7 @@ class FavoriteListFragment : Fragment() {
             adapter.setMovies(it)
             showNoMoviesSign()
         })
+
         initRecycler()
 
         adapter.setMovies(mutableListOf())

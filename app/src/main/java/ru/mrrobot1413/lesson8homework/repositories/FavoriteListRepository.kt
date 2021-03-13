@@ -3,7 +3,7 @@ package ru.mrrobot1413.lesson8homework.repositories
 import androidx.lifecycle.LiveData
 import ru.mrrobot1413.lesson8homework.App
 import ru.mrrobot1413.lesson8homework.dao.MovieDao
-import ru.mrrobot1413.lesson8homework.model.MovieDetailed
+import ru.mrrobot1413.lesson8homework.model.Movie
 
 object FavoriteListRepository {
 
@@ -23,19 +23,19 @@ object FavoriteListRepository {
         return instance
     }
 
-    fun selectAll(): LiveData<List<MovieDetailed>> {
+    fun selectAll(): LiveData<List<Movie>> {
         return movieDao.selectAll()
     }
 
-    fun selectById(id: Int): MovieDetailed? {
+    fun selectById(id: Int): Movie? {
         return movieDao.selectById(id)
     }
 
-    fun likeMovie(movie: MovieDetailed){
+    fun likeMovie(movie: Movie){
         movieDao.insertMovie(movie)
     }
 
-    fun delete(movie: MovieDetailed) {
+    fun delete(movie: Movie) {
         movieDao.deleteMovie(movie)
     }
 

@@ -13,7 +13,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import ru.mrrobot1413.lesson8homework.R
-import ru.mrrobot1413.lesson8homework.model.MovieDetailed
+import ru.mrrobot1413.lesson8homework.model.Movie
 
 
 class MoviesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -23,7 +23,7 @@ class MoviesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     var progressBar: ProgressBar = itemView.findViewById(R.id.progress)
 
     @SuppressLint("SetTextI18n")
-    fun bind(movie: MovieDetailed) {
+    fun bind(movie: Movie) {
         title.text = movie.title
         Glide.with(itemView)
             .load("https://image.tmdb.org/t/p/w342${movie.posterPath}")

@@ -1,18 +1,18 @@
 package ru.mrrobot1413.lesson8homework.ui
 
+import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
-import android.widget.RelativeLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
@@ -22,17 +22,18 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.oshi.libsearchtoolbar.SearchAnimationToolbar
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.MoviesAdapter
 import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
-import ru.mrrobot1413.lesson8homework.model.MovieDetailed
+import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.model.Series
 import ru.mrrobot1413.lesson8homework.ui.fragments.DetailsFragment
 import ru.mrrobot1413.lesson8homework.ui.fragments.FavoriteListFragment
 import ru.mrrobot1413.lesson8homework.ui.fragments.SeriesDetailsFragment
 import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
 
-class MainActivity : AppCompatActivity(), MovieClickListener {
+class MainActivity : AppCompatActivity(), MovieClickListener, SearchAnimationToolbar.OnSearchQueryChangedListener {
 
     private lateinit var recyclerView: RecyclerView
     private val adapter by lazy {
@@ -49,7 +50,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
     private lateinit var refreshLayout: SwipeRefreshLayout
     private lateinit var txtNoConnection: TextView
     private lateinit var imageNoConnection: ImageView
-    private lateinit var toolbar: Toolbar
+    private lateinit var toolbar: SearchAnimationToolbar
     private lateinit var appBarLayout: AppBarLayout
     private var moviesPage = 1
 
@@ -80,7 +81,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         })
 
         initFields()
-        setSupportActionBar(toolbar)
+        toolbar.setSupportActionBar(this)
     }
 
     override fun onResume() {
@@ -107,6 +108,8 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         appBarLayout = findViewById(R.id.app_bar_layout)
 
         deleteNoConnectionSign()
+
+        toolbar.setOnSearchQueryChangedListener(this)
 
         refreshLayout.setOnRefreshListener {
             moviesViewModel.getPopularMovies(
@@ -203,7 +206,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
 
     }
 
-    private fun openDetailsActivity(movie: MovieDetailed) {
+    private fun openDetailsActivity(movie: Movie) {
         isAddedFragment = true
         replaceFragment(
             DetailsFragment.newInstance(movie),
@@ -240,18 +243,24 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
     }
 
     private fun showTopRatedMovies(){
+        adapter.appendMoviesFromMenu(mutableListOf())
         moviesViewModel.getTopRatedMovies(1)
     }
 
     private fun showPopularMovies(){
+        adapter.appendMoviesFromMenu(mutableListOf())
         moviesViewModel.getPopularMovies(1)
     }
 
+    private fun showSearchView(){
+        toolbar.onSearchIconClick()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        adapter.appendMoviesFromMenu(mutableListOf())
         when (item.itemId) {
             R.id.top_rated -> showTopRatedMovies()
             R.id.popular -> showPopularMovies()
+            R.id.search -> showSearchView()
         }
         return true
     }
@@ -267,7 +276,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
 
     private fun replaceFragment(
         fragment: Fragment,
-        container: Int
+        container: Int,
     ) {
         supportFragmentManager
             .beginTransaction()
@@ -278,7 +287,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         refreshLayout.isRefreshing = false
     }
 
-    override fun onClick(movie: MovieDetailed) {
+    override fun onClick(movie: Movie) {
         openDetailsActivity(movie)
     }
 
@@ -313,6 +322,27 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
                 dialog.dismiss()
             }
         builder.show()
+    }
+
+    override fun onSearchCollapsed() {
+
+    }
+
+    override fun onSearchQueryChanged(query: String?) {
+        adapter.appendMovies(mutableListOf())
+        moviesViewModel.searchMovie(1, query!!)
+    }
+
+    override fun onSearchExpanded() {
+
+    }
+
+    override fun onSearchSubmitted(query: String?) {
+        val view = this.currentFocus
+        if(view != null){
+            val im: InputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            im.hideSoftInputFromWindow(view.windowToken, 0)
+        }
     }
 
 }

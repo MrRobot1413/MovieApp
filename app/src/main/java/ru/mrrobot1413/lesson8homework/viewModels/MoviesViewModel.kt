@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import ru.mrrobot1413.lesson8homework.model.MovieDetailed
+import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.model.MovieResponse
 import ru.mrrobot1413.lesson8homework.model.Series
 import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
@@ -15,9 +15,9 @@ import ru.mrrobot1413.lesson8homework.repositories.MovieRepository
 class MoviesViewModel : ViewModel() {
 
     private var movieRepository: MovieRepository = MovieRepository.getInstance()
-    var movies = MutableLiveData<List<MovieDetailed>>()
+    var movies = MutableLiveData<List<Movie>>()
     var error = MutableLiveData<String>()
-    var movieDetailed = MutableLiveData<MovieDetailed>()
+    var movieDetailed = MutableLiveData<Movie>()
 
     fun getPopularMovies(
         page: Int
@@ -76,20 +76,20 @@ class MoviesViewModel : ViewModel() {
     fun getMovieDetails(
         id: Int,
     ) {
-        movieRepository.getMovieDetails(id = id).enqueue(object : Callback<MovieDetailed> {
+        movieRepository.getMovieDetails(id = id).enqueue(object : Callback<Movie> {
             val repository = FavoriteListRepository.getInstance()
             val movie = repository.selectById(id)
 
             override fun onResponse(
-                call: Call<MovieDetailed>,
-                response: Response<MovieDetailed>,
+                call: Call<Movie>,
+                response: Response<Movie>,
             ) {
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     if (responseBody != null) {
                         Log.d("repos", movie.toString())
                         movieDetailed.postValue(
-                            MovieDetailed(
+                            Movie(
                                 responseBody.id,
                                 responseBody.title,
                                 responseBody.overview,
@@ -116,7 +116,7 @@ class MoviesViewModel : ViewModel() {
                 }
             }
 
-            override fun onFailure(call: Call<MovieDetailed>, t: Throwable) {
+            override fun onFailure(call: Call<Movie>, t: Throwable) {
                 if (movie != null) {
                     Log.d("movieees3", movie.toString())
                     movieDetailed.postValue(
@@ -125,6 +125,35 @@ class MoviesViewModel : ViewModel() {
                 } else{
                     error.postValue("No connection")
                 }
+            }
+        })
+    }
+
+    fun searchMovie(
+        page: Int,
+        query: String
+    ) {
+        movieRepository.searchMovie(page = page, query = query).enqueue(object : Callback<MovieResponse> {
+            override fun onResponse(
+                call: Call<MovieResponse>,
+                response: Response<MovieResponse>,
+            ) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+
+                    if (responseBody != null) {
+                        Log.d("success", "success")
+                        movies.postValue(responseBody.moviesList)
+                    } else {
+                        error.postValue("Error loading movies")
+                    }
+                } else {
+                    error.postValue("Error loading movies")
+                }
+            }
+
+            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+                error.postValue("No connection")
             }
         })
     }

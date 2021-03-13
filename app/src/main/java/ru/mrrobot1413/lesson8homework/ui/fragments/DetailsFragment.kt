@@ -20,7 +20,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.databinding.FragmentDetailsBinding
-import ru.mrrobot1413.lesson8homework.model.MovieDetailed
+import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.ui.MainActivity
 import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
 import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
@@ -48,7 +48,7 @@ class DetailsFragment : Fragment() {
         private const val MOVIE = "movie"
 
 
-        fun newInstance(movie: MovieDetailed): DetailsFragment {
+        fun newInstance(movie: Movie): DetailsFragment {
             val args = Bundle()
             args.putParcelable(MOVIE, movie)
 
@@ -79,7 +79,7 @@ class DetailsFragment : Fragment() {
 
         initFields(view)
 
-        val movie = arguments?.getParcelable<MovieDetailed>(MOVIE)
+        val movie = arguments?.getParcelable<Movie>(MOVIE)
 
         val movieFromDb = favoriteListViewModel.selectById(movie!!.id)
 
@@ -113,7 +113,7 @@ class DetailsFragment : Fragment() {
         setOnFabClickListener(movie)
     }
 
-    private fun setOnFabClickListener(movie: MovieDetailed?) {
+    private fun setOnFabClickListener(movie: Movie?) {
         fabAddToFavorite.setOnClickListener {
             if (movie != null) {
                 if (isAddedToFavorite) {

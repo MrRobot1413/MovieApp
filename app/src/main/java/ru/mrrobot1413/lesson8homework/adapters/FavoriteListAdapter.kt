@@ -5,16 +5,16 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ru.mrrobot1413.lesson8homework.viewHolders.MoviesViewHolder
 import ru.mrrobot1413.lesson8homework.R
-import ru.mrrobot1413.lesson8homework.model.MovieDetailed
+import ru.mrrobot1413.lesson8homework.model.Movie
 
 class FavoriteListAdapter(
-    private val clickListener: (movie: MovieDetailed) -> Unit
+    private val clickListener: (movie: Movie) -> Unit
 ) :
     RecyclerView.Adapter<MoviesViewHolder>() {
 
-    private lateinit var moviesList: List<MovieDetailed>
+    private lateinit var moviesList: List<Movie>
 
-    fun setMovies(moviesList: List<MovieDetailed>){
+    fun setMovies(moviesList: List<Movie>){
         this.moviesList = moviesList
         notifyDataSetChanged()
     }
@@ -33,7 +33,7 @@ class FavoriteListAdapter(
         setOnDetailsClickListener(holder, moviesList[position])
     }
 
-    private fun setOnDetailsClickListener(holder: MoviesViewHolder, movie: MovieDetailed) {
+    private fun setOnDetailsClickListener(holder: MoviesViewHolder, movie: Movie) {
         holder.holder.setOnClickListener {
 
             notifyDataSetChanged()

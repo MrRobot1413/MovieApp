@@ -4,21 +4,21 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ru.mrrobot1413.lesson8homework.R
-import ru.mrrobot1413.lesson8homework.model.MovieDetailed
+import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.viewHolders.MoviesViewHolder
 
 class MoviesAdapter(
-    private var movies: MutableList<MovieDetailed>,
-    private val clickListener: (movie: MovieDetailed) -> Unit
+    private var movies: MutableList<Movie>,
+    private val clickListener: (movie: Movie) -> Unit
 ) :
     RecyclerView.Adapter<MoviesViewHolder>() {
 
-    fun appendMovies(movies: List<MovieDetailed>) {
+    fun appendMovies(movies: List<Movie>) {
         this.movies.addAll(movies)
         notifyDataSetChanged()
     }
 
-    fun appendMoviesFromMenu(movies: List<MovieDetailed>) {
+    fun appendMoviesFromMenu(movies: List<Movie>) {
         this.movies.clear()
         this.movies.addAll(movies)
         notifyDataSetChanged()
@@ -39,7 +39,7 @@ class MoviesAdapter(
         setOnDetailsClickListener(holder, movies[position])
     }
 
-    private fun setOnDetailsClickListener(holder: MoviesViewHolder, movie: MovieDetailed) {
+    private fun setOnDetailsClickListener(holder: MoviesViewHolder, movie: Movie) {
         holder.holder.setOnClickListener {
             notifyDataSetChanged()
 
