@@ -40,23 +40,7 @@ class DetailsFragment : Fragment() {
         ViewModelProvider(this).get(MoviesViewModel::class.java)
     }
     lateinit var binding: FragmentDetailsBinding
-
     private var isAddedToFavorite = false
-
-    companion object {
-
-        private const val MOVIE = "movie"
-
-
-        fun newInstance(movie: Movie): DetailsFragment {
-            val args = Bundle()
-            args.putParcelable(MOVIE, movie)
-
-            val fragment = DetailsFragment()
-            fragment.arguments = args
-            return fragment
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +63,7 @@ class DetailsFragment : Fragment() {
 
         initFields(view)
 
-        val movie = arguments?.getParcelable<Movie>(MOVIE)
+        val movie = arguments?.getParcelable<Movie>(MainActivity.MOVIE)
 
         val movieFromDb = favoriteListViewModel.selectById(movie!!.id)
 
@@ -142,7 +126,7 @@ class DetailsFragment : Fragment() {
             Glide.with(it)
                 .load(url)
                 .transform(CenterCrop())
-                .error(ContextCompat.getDrawable(context!!, R.drawable.ic_round_error_24))
+                .error(ContextCompat.getDrawable(requireContext(), R.drawable.ic_round_error_24))
                 .listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
                         e: GlideException?,
@@ -173,7 +157,7 @@ class DetailsFragment : Fragment() {
     private fun setIconLiked() {
         fabAddToFavorite.setImageDrawable(
             ContextCompat.getDrawable(
-                context!!,
+                requireContext(),
                 R.drawable.ic_favorite
             )
         )
@@ -182,7 +166,7 @@ class DetailsFragment : Fragment() {
     private fun setIconUnliked() {
         fabAddToFavorite.setImageDrawable(
             ContextCompat.getDrawable(
-                context!!,
+                requireContext(),
                 R.drawable.ic_favorite_border
             )
         )

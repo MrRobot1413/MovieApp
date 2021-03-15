@@ -1,6 +1,7 @@
 package ru.mrrobot1413.lesson8homework.viewModels
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import retrofit2.Call
@@ -68,7 +69,7 @@ class MoviesViewModel : ViewModel() {
             }
 
             override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                error.postValue("No connection")
+                error.postValue(t.message)
             }
         })
     }
@@ -87,7 +88,6 @@ class MoviesViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     if (responseBody != null) {
-                        Log.d("repos", movie.toString())
                         movieDetailed.postValue(
                             Movie(
                                 responseBody.id,
@@ -102,14 +102,12 @@ class MoviesViewModel : ViewModel() {
                         )
                     } else {
                         error.postValue("Error loading movies")
-                        Log.d("movieees1", movie.toString())
                         movieDetailed.postValue(
                             movie
                         )
                     }
                 } else {
                     error.postValue("Error loading movies")
-                    Log.d("movieees2", movie.toString())
                     movieDetailed.postValue(
                         movie
                     )
@@ -118,12 +116,11 @@ class MoviesViewModel : ViewModel() {
 
             override fun onFailure(call: Call<Movie>, t: Throwable) {
                 if (movie != null) {
-                    Log.d("movieees3", movie.toString())
                     movieDetailed.postValue(
                         movie
                     )
                 } else{
-                    error.postValue("No connection")
+                    error.postValue(t.message)
                 }
             }
         })

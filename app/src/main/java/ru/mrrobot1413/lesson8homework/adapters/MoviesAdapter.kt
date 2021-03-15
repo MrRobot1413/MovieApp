@@ -13,12 +13,12 @@ class MoviesAdapter(
 ) :
     RecyclerView.Adapter<MoviesViewHolder>() {
 
-    fun appendMovies(movies: List<Movie>) {
+    fun setMovies(movies: List<Movie>) {
         this.movies.addAll(movies)
         notifyDataSetChanged()
     }
 
-    fun appendMoviesFromMenu(movies: List<Movie>) {
+    fun setMoviesFromMenu(movies: List<Movie>) {
         this.movies.clear()
         this.movies.addAll(movies)
         notifyDataSetChanged()

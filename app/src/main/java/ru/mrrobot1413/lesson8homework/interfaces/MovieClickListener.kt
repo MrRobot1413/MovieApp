@@ -5,6 +5,4 @@ import ru.mrrobot1413.lesson8homework.model.Series
 
 interface MovieClickListener {
     fun onClick(movie: Movie)
-
-    fun onClick(series: Series)
 }

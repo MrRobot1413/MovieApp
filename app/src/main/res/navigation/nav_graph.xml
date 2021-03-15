@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/favoriteListFragment"
+        android:name="ru.mrrobot1413.lesson8homework.ui.fragments.FavoriteListFragment" />
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="ru.mrrobot1413.lesson8homework.ui.fragments.HomeFragment" />
+    <fragment
+        android:id="@+id/detailsFragment"
+        android:name="ru.mrrobot1413.lesson8homework.ui.fragments.DetailsFragment"
+        android:label="DetailsFragment" >
+        <argument
+            android:name="movie"
+            app:argType="ru.mrrobot1413.lesson8homework.model.Movie" />
+    </fragment>
+</navigation>

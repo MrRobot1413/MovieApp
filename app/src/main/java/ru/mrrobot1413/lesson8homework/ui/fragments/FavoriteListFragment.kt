@@ -5,13 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_favorite.*
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.FavoriteListAdapter
+import ru.mrrobot1413.lesson8homework.databinding.FragmentFavoriteBinding
 import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
 import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
 import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
@@ -19,39 +22,38 @@ import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
 class FavoriteListFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var noMoviesSign: TextView
+    private lateinit var txtNoMovie: TextView
     private val adapter by lazy {
         FavoriteListAdapter {
             (activity as? MovieClickListener)?.onClick(it)
+//            val navController = findNavController()
+//            val bundle = Bundle()
+//            bundle.putParcelable(MOVIE, it)
+//            navController.navigate(R.id.detailsFragment, bundle)
         }
     }
     private val favoriteListViewModel by lazy {
         ViewModelProvider(this).get(FavoriteListViewModel::class.java)
     }
+    private lateinit var binding: FragmentFavoriteBinding
 
     companion object {
-
-        fun newInstance(): FavoriteListFragment {
-            val args = Bundle()
-
-            val fragment = FavoriteListFragment()
-            fragment.arguments = args
-            return fragment
-        }
+        private const val MOVIE = "movie"
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_favorite, container, false)
+    ): View {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_favorite, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initFields(view)
+        initFields()
 
         favoriteListViewModel.getMovies().observe(viewLifecycleOwner, {
             adapter.setMovies(it)
@@ -59,29 +61,27 @@ class FavoriteListFragment : Fragment() {
         })
 
         initRecycler()
-
-        adapter.setMovies(mutableListOf())
-
-        showNoMoviesSign()
     }
 
-    private fun initFields(view: View) {
-        noMoviesSign = view.findViewById(R.id.txt_no_movie)
-        noMoviesSign.visibility = View.VISIBLE
-        recyclerView = view.findViewById(R.id.recycler_view)
+    private fun initFields() {
+        txtNoMovie = binding.txtNoMovie
+        binding.txtNoMovie.visibility = View.VISIBLE
+        recyclerView = binding.recyclerView
     }
 
     private fun initRecycler() {
-        recyclerView.layoutManager = GridLayoutManager(context, 2)
+        binding.recyclerView.layoutManager = GridLayoutManager(context, 2)
 
-        recyclerView.adapter = adapter
+        adapter.setMovies(mutableListOf())
+
+        binding.recyclerView.adapter = adapter
     }
 
     private fun showNoMoviesSign(){
         if(favoriteListViewModel.getMoviesCount() != 0){
-            noMoviesSign.visibility = View.GONE
+            binding.txtNoMovie.visibility = View.GONE
         } else{
-            noMoviesSign.visibility = View.VISIBLE
+            binding.txtNoMovie.visibility = View.VISIBLE
         }
     }
 }
