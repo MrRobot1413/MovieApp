@@ -34,15 +34,13 @@ class MoviesAdapter(
     }
 
     override fun onBindViewHolder(holder: MoviesViewHolder, position: Int) {
-
         holder.bind(movies[position])
-        setOnDetailsClickListener(holder, movies[position])
+        setOnMovieClickListener(holder, movies[position])
     }
 
-    private fun setOnDetailsClickListener(holder: MoviesViewHolder, movie: Movie) {
+    private fun setOnMovieClickListener(holder: MoviesViewHolder, movie: Movie) {
         holder.holder.setOnClickListener {
             notifyDataSetChanged()
-
             clickListener(movie)
         }
     }

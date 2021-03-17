@@ -39,6 +39,7 @@
                         android:id="@+id/toolbar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:theme="@style/ThemeOverlay.MaterialComponents.Toolbar.Primary"
                         app:subtitleTextColor="@color/colorAccent"
                         app:title="@string/app_name" />
                 </com.google.android.material.appbar.AppBarLayout>

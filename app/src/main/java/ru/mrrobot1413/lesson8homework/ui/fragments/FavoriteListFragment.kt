@@ -37,10 +37,6 @@ class FavoriteListFragment : Fragment() {
     }
     private lateinit var binding: FragmentFavoriteBinding
 
-    companion object {
-        private const val MOVIE = "movie"
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,6 +57,12 @@ class FavoriteListFragment : Fragment() {
         })
 
         initRecycler()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        (activity as MovieClickListener).restoreBottomNav()
     }
 
     private fun initFields() {

@@ -9,7 +9,15 @@
         android:name="ru.mrrobot1413.lesson8homework.ui.fragments.FavoriteListFragment" />
     <fragment
         android:id="@+id/homeFragment"
-        android:name="ru.mrrobot1413.lesson8homework.ui.fragments.HomeFragment" />
+        android:name="ru.mrrobot1413.lesson8homework.ui.fragments.HomeFragment" >
+        <action
+            android:id="@+id/action_homeFragment_to_detailsFragment"
+            app:destination="@id/detailsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_close_exit"/>
+    </fragment>
     <fragment
         android:id="@+id/detailsFragment"
         android:name="ru.mrrobot1413.lesson8homework.ui.fragments.DetailsFragment"

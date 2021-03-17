@@ -27,12 +27,7 @@ import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
 
 class DetailsFragment : Fragment() {
 
-    private lateinit var imageBackdrop: ImageView
     private lateinit var inviteText: String
-    private lateinit var collapsingToolbarLayout: CollapsingToolbarLayout
-    private lateinit var toolbar: MaterialToolbar
-    private lateinit var fabAddToFavorite: FloatingActionButton
-    private lateinit var progressBar: ProgressBar
     private val favoriteListViewModel by lazy {
         ViewModelProvider(this).get(FavoriteListViewModel::class.java)
     }
@@ -41,12 +36,6 @@ class DetailsFragment : Fragment() {
     }
     lateinit var binding: FragmentDetailsBinding
     private var isAddedToFavorite = false
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setHasOptionsMenu(true)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,12 +49,11 @@ class DetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        initFields(view)
+        setHasOptionsMenu(true)
 
         val movie = arguments?.getParcelable<Movie>(MainActivity.MOVIE)
 
-        val movieFromDb = favoriteListViewModel.selectById(movie!!.id)
+        val movieFromDb = movie?.id?.let { favoriteListViewModel.selectById(it) }
 
         isAddedToFavorite = if (movieFromDb != null) {
             if (movieFromDb.liked) {
@@ -80,17 +68,17 @@ class DetailsFragment : Fragment() {
             false
         }
 
-        moviesViewModel.getMovieDetails(movie.id)
-
-        setImage(imageBackdrop, "https://image.tmdb.org/t/p/w342" + movie.posterPath)
+        if (movie != null) {
+            moviesViewModel.getMovieDetails(movie.id)
+            setImage(binding.imageBackdrop, "https://image.tmdb.org/t/p/w342" + movie.posterPath)
+        }
 
         binding.viewModel = moviesViewModel
         binding.lifecycleOwner = viewLifecycleOwner
-        toolbar = binding.toolbar
 
-        (activity as MainActivity?)!!.setSupportActionBar(toolbar)
+        (activity as MainActivity?)!!.setSupportActionBar(binding.toolbar)
 
-        toolbar.setNavigationOnClickListener {
+        binding.toolbar.setNavigationOnClickListener {
             activity?.onBackPressed()
         }
 
@@ -98,7 +86,7 @@ class DetailsFragment : Fragment() {
     }
 
     private fun setOnFabClickListener(movie: Movie?) {
-        fabAddToFavorite.setOnClickListener {
+        binding.fabAddToFavorite.setOnClickListener {
             if (movie != null) {
                 if (isAddedToFavorite) {
                     isAddedToFavorite = false
@@ -111,7 +99,6 @@ class DetailsFragment : Fragment() {
                     isAddedToFavorite = true
 
                     movie.liked = true
-                    Log.d("moviies", movie.toString())
                     movie.time = moviesViewModel.movieDetailed.value?.time ?: 0
                     favoriteListViewModel.likeMovie(movie)
 
@@ -134,7 +121,7 @@ class DetailsFragment : Fragment() {
                         target: com.bumptech.glide.request.target.Target<Drawable>?,
                         isFirstResource: Boolean,
                     ): Boolean {
-                        progressBar.visibility = View.GONE
+                        binding.progress.visibility = View.GONE
                         return false
                     }
 
@@ -145,7 +132,7 @@ class DetailsFragment : Fragment() {
                         dataSource: DataSource?,
                         isFirstResource: Boolean,
                     ): Boolean {
-                        progressBar.visibility = View.GONE
+                        binding.progress.visibility = View.GONE
                         return false
                     }
 
@@ -155,7 +142,7 @@ class DetailsFragment : Fragment() {
     }
 
     private fun setIconLiked() {
-        fabAddToFavorite.setImageDrawable(
+        binding.fabAddToFavorite.setImageDrawable(
             ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.ic_favorite
@@ -164,7 +151,7 @@ class DetailsFragment : Fragment() {
     }
 
     private fun setIconUnliked() {
-        fabAddToFavorite.setImageDrawable(
+        binding.fabAddToFavorite.setImageDrawable(
             ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.ic_favorite_border
@@ -183,18 +170,11 @@ class DetailsFragment : Fragment() {
         if (item.itemId == R.id.invite_friend) {
             val sendIntent = Intent()
             sendIntent.action = Intent.ACTION_SEND
-            sendIntent.putExtra(Intent.EXTRA_SUBJECT, collapsingToolbarLayout.title)
+            sendIntent.putExtra(Intent.EXTRA_SUBJECT, binding.collapsingToolbarLayout.title)
             sendIntent.putExtra(Intent.EXTRA_TEXT, inviteText)
             sendIntent.type = "text/plain"
             startActivity(sendIntent)
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun initFields(view: View) {
-        imageBackdrop = view.findViewById(R.id.image_backdrop)
-        collapsingToolbarLayout = view.findViewById(R.id.collapsing_toolbar_layout)
-        fabAddToFavorite = view.findViewById(R.id.fab_add_to_favorite)
-        progressBar = view.findViewById(R.id.progress)
     }
 }

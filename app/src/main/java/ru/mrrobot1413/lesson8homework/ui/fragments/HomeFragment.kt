@@ -5,43 +5,39 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Parcelable
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navGraphViewModels
-import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.oshi.libsearchtoolbar.SearchAnimationToolbar
 import kotlinx.android.synthetic.main.fragment_home.*
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.MoviesAdapter
-import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
-import ru.mrrobot1413.lesson8homework.databinding.FragmentHomeBinding;
+import ru.mrrobot1413.lesson8homework.databinding.FragmentHomeBinding
 import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
+import ru.mrrobot1413.lesson8homework.model.Movie
+import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
 
-class HomeFragment: Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListener  {
+class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListener {
 
     private val adapter by lazy {
-        MoviesAdapter(mutableListOf()){
+        MoviesAdapter(mutableListOf()) {
             (activity as? MovieClickListener)?.onClick(it)
         }
     }
     private lateinit var linearLayoutManager: GridLayoutManager
-    private val moviesViewModel: MoviesViewModel by navGraphViewModels(R.id.nav_graph) {
-//        ViewModelProvider(this).get(MoviesViewModel::class.java)
-        SavedStateViewModelFactory(requireActivity().application, requireParentFragment())
+    private val moviesViewModel by lazy{
+        ViewModelProvider(this).get(MoviesViewModel::class.java)
     }
     private var moviesPage = 1
     lateinit var binding: FragmentHomeBinding
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -64,15 +60,15 @@ class HomeFragment: Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListe
             binding.refreshLayout.isRefreshing = false
         })
 
-        initFields()
         binding.toolbar.setSupportActionBar(activity as AppCompatActivity)
         setHasOptionsMenu(true)
+
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
         return binding.root
@@ -80,10 +76,10 @@ class HomeFragment: Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListe
 
     override fun onResume() {
         super.onResume()
-
-        moviesViewModel.getPopularMovies(
-            moviesPage
-        )
+        initFields()
+        moviesViewModel.getPopularMovies(moviesPage)
+        (activity as MovieClickListener).restoreBottomNav()
+        binding.recyclerView.scrollToPosition(moviesViewModel.recyclerViewPosition)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -91,22 +87,22 @@ class HomeFragment: Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListe
         inflater.inflate(R.menu.main_menu, menu)
     }
 
-    private fun showTopRatedMovies(){
+    private fun showTopRatedMovies() {
         adapter.setMoviesFromMenu(mutableListOf())
         moviesViewModel.getTopRatedMovies(1)
     }
 
-    private fun showPopularMovies(){
+    private fun showPopularMovies() {
         adapter.setMoviesFromMenu(mutableListOf())
         moviesViewModel.getPopularMovies(1)
     }
 
-    private fun showSearchView(){
+    private fun showSearchView() {
         toolbar.onSearchIconClick()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             R.id.search -> showSearchView()
             R.id.popular -> showPopularMovies()
             R.id.top_rated -> showTopRatedMovies()
@@ -162,6 +158,8 @@ class HomeFragment: Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListe
                 val visibleItemCount = linearLayoutManager.childCount
                 val firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition()
 
+                moviesViewModel.recyclerViewPosition = linearLayoutManager.findLastVisibleItemPosition()
+
                 if (firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
                     recyclerView.removeOnScrollListener(this)
                     moviesPage++
@@ -195,8 +193,9 @@ class HomeFragment: Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListe
 
     override fun onSearchSubmitted(query: String?) {
         val view = activity?.currentFocus
-        if(view != null){
-            val im: InputMethodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        if (view != null) {
+            val im: InputMethodManager =
+                activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             im.hideSoftInputFromWindow(view.windowToken, 0)
         }
     }

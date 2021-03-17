@@ -42,7 +42,6 @@ class App : Application() {
                     chain
                         .request()
                         .newBuilder()
-                        .addHeader("Authorization", "Bearer")
                         .build()
                 )
             }

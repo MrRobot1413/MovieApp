@@ -1,7 +1,7 @@
 package ru.mrrobot1413.lesson8homework.viewModels
 
+import android.os.Bundle
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import retrofit2.Call
@@ -19,6 +19,7 @@ class MoviesViewModel : ViewModel() {
     var movies = MutableLiveData<List<Movie>>()
     var error = MutableLiveData<String>()
     var movieDetailed = MutableLiveData<Movie>()
+    var recyclerViewPosition = 0
 
     fun getPopularMovies(
         page: Int

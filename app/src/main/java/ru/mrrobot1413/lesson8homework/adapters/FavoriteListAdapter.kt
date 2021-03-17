@@ -35,9 +35,7 @@ class FavoriteListAdapter(
 
     private fun setOnDetailsClickListener(holder: MoviesViewHolder, movie: Movie) {
         holder.holder.setOnClickListener {
-
             notifyDataSetChanged()
-
             clickListener(movie)
         }
     }
