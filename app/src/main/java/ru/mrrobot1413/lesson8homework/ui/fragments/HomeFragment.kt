@@ -38,6 +38,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
     private var moviesPage = 1
     lateinit var binding: FragmentHomeBinding
+    private var state: Int = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -47,6 +48,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
             adapter.setMovies(it)
             deleteNoConnectionSign()
             binding.refreshLayout.isRefreshing = false
+            binding.recyclerView.scrollToPosition(state)
         })
 
         moviesViewModel.error.observe(viewLifecycleOwner, {
@@ -63,6 +65,14 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         binding.toolbar.setSupportActionBar(activity as AppCompatActivity)
         setHasOptionsMenu(true)
 
+        savedInstanceState?.let {
+            state = (it.getInt("key"))
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("key", state)
     }
 
     override fun onCreateView(
@@ -79,7 +89,6 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         initFields()
         moviesViewModel.getPopularMovies(moviesPage)
         (activity as MovieClickListener).restoreBottomNav()
-        binding.recyclerView.scrollToPosition(moviesViewModel.recyclerViewPosition)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -158,7 +167,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
                 val visibleItemCount = linearLayoutManager.childCount
                 val firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition()
 
-                moviesViewModel.recyclerViewPosition = linearLayoutManager.findLastVisibleItemPosition()
+                state = dy
 
                 if (firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
                     recyclerView.removeOnScrollListener(this)
