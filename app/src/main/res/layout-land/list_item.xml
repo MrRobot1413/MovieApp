@@ -31,7 +31,7 @@
                 android:id="@+id/image_main"
                 android:layout_width="match_parent"
                 android:scaleType="centerCrop"
-                android:transitionName="image_small"
+                android:transitionName="image_big"
                 android:layout_height="250dp" />
         </androidx.cardview.widget.CardView>
     </RelativeLayout>
@@ -46,6 +46,7 @@
         android:fontFamily="sans-serif-black"
         android:padding="16dp"
         android:singleLine="false"
+        android:transitionName="title_start"
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceHeadline6"
         android:textColor="@color/white"
