@@ -10,6 +10,7 @@ import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.transition.ChangeBounds
 import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -39,19 +40,11 @@ class DetailsFragment : Fragment() {
     lateinit var binding: FragmentDetailsBinding
     private var isAddedToFavorite = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-
-        sharedElementReturnTransition = null
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-
         binding = FragmentDetailsBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -60,8 +53,9 @@ class DetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
 
-        sharedElementEnterTransition = TransitionInflater.from(context)
-            .inflateTransition(R.transition.shared_element_in)
+        val transition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+        sharedElementEnterTransition = transition
+        sharedElementReturnTransition = transition
 
         val movie = arguments?.getParcelable<Movie>(MainActivity.MOVIE)
 

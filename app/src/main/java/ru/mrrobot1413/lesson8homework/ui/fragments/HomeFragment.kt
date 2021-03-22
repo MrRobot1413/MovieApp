@@ -10,38 +10,37 @@ import android.os.Looper
 import android.os.Parcelable
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.resource.bitmap.CenterInside
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.oshi.libsearchtoolbar.SearchAnimationToolbar
 import kotlinx.android.synthetic.main.fragment_home.*
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.MoviesAdapter
 import ru.mrrobot1413.lesson8homework.databinding.FragmentHomeBinding
 import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
+import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
 
 class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListener {
 
     private val adapter by lazy {
-        MoviesAdapter(mutableListOf()){
-
-            val extras = FragmentNavigatorExtras(image to "image_big")
-            (activity as MovieClickListener).openDetailsFragment(it, extras)
+        MoviesAdapter(mutableListOf()){ movie: Movie, imageView: ImageView ->
+            val bundle = Bundle()
+            bundle.putParcelable("movie", movie)
+            val extras = FragmentNavigatorExtras(imageView to "image_big")
+            (activity as MovieClickListener).openDetailsFragment(movie, extras)
         }
     }
+
     private lateinit var linearLayoutManager: GridLayoutManager
     private val moviesViewModel by lazy{
         ViewModelProvider(this).get(MoviesViewModel::class.java)
