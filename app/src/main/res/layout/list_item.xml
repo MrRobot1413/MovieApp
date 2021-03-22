@@ -46,6 +46,7 @@
         android:fontFamily="sans-serif-black"
         android:padding="16dp"
         android:singleLine="false"
+        android:transitionName="title_start"
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceHeadline6"
         android:textColor="@color/white"

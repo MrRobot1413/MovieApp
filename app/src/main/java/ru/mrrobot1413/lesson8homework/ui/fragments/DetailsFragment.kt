@@ -1,4 +1,4 @@
-package ru.mrrobot1413.lesson8homework.ui.fragments
+ package ru.mrrobot1413.lesson8homework.ui.fragments
 
 import android.content.Intent
 import android.graphics.drawable.Drawable
@@ -40,6 +40,13 @@ class DetailsFragment : Fragment() {
     lateinit var binding: FragmentDetailsBinding
     private var isAddedToFavorite = false
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        sharedElementEnterTransition = TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
+        sharedElementReturnTransition = TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -53,11 +60,9 @@ class DetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
 
-        val transition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
-        sharedElementEnterTransition = transition
-        sharedElementReturnTransition = transition
-
         val movie = arguments?.getParcelable<Movie>(MainActivity.MOVIE)
+
+        setImage(binding.imageBackdrop, "https://image.tmdb.org/t/p/w342" + movie!!.posterPath)
 
         val movieFromDb = movie?.id?.let { favoriteListViewModel.selectById(it) }
 
@@ -76,7 +81,6 @@ class DetailsFragment : Fragment() {
 
         if (movie != null) {
             moviesViewModel.getMovieDetails(movie.id)
-            setImage(binding.imageBackdrop, "https://image.tmdb.org/t/p/w342" + movie.posterPath)
         }
 
         binding.viewModel = moviesViewModel

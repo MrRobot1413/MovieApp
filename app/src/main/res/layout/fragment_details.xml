@@ -30,6 +30,7 @@
                 android:layout_height="match_parent"
                 android:background="@color/itemColor"
                 android:fitsSystemWindows="true"
+                android:transitionName="title_end"
                 app:contentScrim="?attr/colorPrimary"
                 app:expandedTitleTextAppearance="@style/ToolbarTextStyle"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"

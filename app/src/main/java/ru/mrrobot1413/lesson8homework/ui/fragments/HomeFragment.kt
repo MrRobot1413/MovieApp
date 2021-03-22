@@ -11,6 +11,7 @@ import android.os.Parcelable
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -33,7 +34,7 @@ import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
 class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListener {
 
     private val adapter by lazy {
-        MoviesAdapter(mutableListOf()){ movie: Movie, imageView: ImageView ->
+        MoviesAdapter(mutableListOf()){ movie: Movie, imageView: ImageView, title: TextView ->
             val bundle = Bundle()
             bundle.putParcelable("movie", movie)
             val extras = FragmentNavigatorExtras(imageView to "image_big")
@@ -76,6 +77,11 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         binding.toolbar.setSupportActionBar(activity as AppCompatActivity)
         setHasOptionsMenu(true)
 
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+
         if(savedInstanceState?.getParcelable<Parcelable>("key") != null){
             parcelable = savedInstanceState.getParcelable("key")!!
         }
@@ -89,9 +95,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     override fun onResume() {
         super.onResume()
         (activity as MovieClickListener).showBottomNav()
-        if(parcelable != null){
-            linearLayoutManager.onRestoreInstanceState(parcelable)
-        }
+
     }
 
     override fun onCreateView(

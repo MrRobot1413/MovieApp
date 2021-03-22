@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         bottomNavigationView.setupWithNavController(navController)
     }
 
-    override fun openDetailsFragment(movie: Movie, extras: FragmentNavigator.Extras) {
+    override fun openDetailsFragment(movie: Movie, extras: FragmentNavigator.Extras?) {
         val bundle = Bundle()
         bundle.putParcelable(MOVIE, movie)
         val navOptions = NavOptions.Builder()
