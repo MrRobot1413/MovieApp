@@ -11,7 +11,7 @@ import ru.mrrobot1413.lesson8homework.viewHolders.MoviesViewHolder
 
 class MoviesAdapter(
     private var movies: MutableList<Movie>,
-    private val clickListener: (movie: Movie, image: ImageView, title: TextView) -> Unit
+    private val clickListener: (movie: Movie, image: ImageView) -> Unit
 ) :
     RecyclerView.Adapter<MoviesViewHolder>() {
 
@@ -50,7 +50,7 @@ class MoviesAdapter(
     private fun setOnMovieClickListener(holder: MoviesViewHolder, movie: Movie) {
         holder.holder.setOnClickListener {
             notifyDataSetChanged()
-            clickListener(movie, holder.image, holder.title)
+            clickListener(movie, holder.image)
         }
     }
 }

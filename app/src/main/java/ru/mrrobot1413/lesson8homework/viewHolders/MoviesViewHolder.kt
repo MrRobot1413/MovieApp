@@ -1,6 +1,5 @@
 package ru.mrrobot1413.lesson8homework.viewHolders
 
-import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.*
@@ -9,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.CenterInside
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target

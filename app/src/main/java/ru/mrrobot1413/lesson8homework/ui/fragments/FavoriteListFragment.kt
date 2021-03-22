@@ -27,7 +27,7 @@ class FavoriteListFragment : Fragment() {
     private val adapter by lazy {
         FavoriteListAdapter {
             val extras = FragmentNavigatorExtras(binding.recyclerView to "image_big")
-            (activity as? MovieClickListener)?.openDetailsFragment(it, extras)
+//            (activity as? MovieClickListener)?.openDetailsFragment(it, )
         }
     }
     private val favoriteListViewModel by lazy {

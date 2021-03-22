@@ -13,6 +13,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -34,11 +35,8 @@ import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
 class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListener {
 
     private val adapter by lazy {
-        MoviesAdapter(mutableListOf()){ movie: Movie, imageView: ImageView, title: TextView ->
-            val bundle = Bundle()
-            bundle.putParcelable("movie", movie)
-            val extras = FragmentNavigatorExtras(imageView to "image_big")
-            (activity as MovieClickListener).openDetailsFragment(movie, extras)
+        MoviesAdapter(mutableListOf()){ movie: Movie, holder: ImageView ->
+            (activity as MovieClickListener).openDetailsFragment(movie, holder)
         }
     }
 

@@ -2,11 +2,13 @@ package ru.mrrobot1413.lesson8homework.ui
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigator
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -32,7 +34,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         bottomNavigationView.setupWithNavController(navController)
     }
 
-    override fun openDetailsFragment(movie: Movie, extras: FragmentNavigator.Extras?) {
+    override fun openDetailsFragment(movie: Movie, imageView: ImageView) {
         val bundle = Bundle()
         bundle.putParcelable(MOVIE, movie)
         val navOptions = NavOptions.Builder()
@@ -41,6 +43,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
             .setPopEnterAnim(R.anim.fragment_fade_enter)
             .setPopExitAnim(R.anim.fragment_fade_exit)
             .build()
+        val extras = FragmentNavigatorExtras(imageView to "image_big")
         navController.navigate(R.id.detailsFragment, bundle, navOptions, extras)
         hideBottomNav()
     }
