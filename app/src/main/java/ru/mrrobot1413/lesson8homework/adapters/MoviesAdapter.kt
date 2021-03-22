@@ -2,6 +2,7 @@ package ru.mrrobot1413.lesson8homework.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.model.Movie
@@ -13,9 +14,15 @@ class MoviesAdapter(
 ) :
     RecyclerView.Adapter<MoviesViewHolder>() {
 
+    private lateinit var image: ImageView
+
     fun setMovies(movies: List<Movie>) {
         this.movies.addAll(movies)
         notifyDataSetChanged()
+    }
+
+    fun getImage(): ImageView{
+        return image
     }
 
     fun setMoviesFromMenu(movies: List<Movie>) {
@@ -34,6 +41,7 @@ class MoviesAdapter(
     }
 
     override fun onBindViewHolder(holder: MoviesViewHolder, position: Int) {
+        image = holder.image
         holder.bind(movies[position])
         setOnMovieClickListener(holder, movies[position])
     }

@@ -10,6 +10,7 @@ import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -20,6 +21,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.databinding.FragmentDetailsBinding
+import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
 import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.ui.MainActivity
 import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
@@ -37,6 +39,13 @@ class DetailsFragment : Fragment() {
     lateinit var binding: FragmentDetailsBinding
     private var isAddedToFavorite = false
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+
+        sharedElementReturnTransition = null
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -50,6 +59,9 @@ class DetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
+
+        sharedElementEnterTransition = TransitionInflater.from(context)
+            .inflateTransition(R.transition.shared_element_in)
 
         val movie = arguments?.getParcelable<Movie>(MainActivity.MOVIE)
 

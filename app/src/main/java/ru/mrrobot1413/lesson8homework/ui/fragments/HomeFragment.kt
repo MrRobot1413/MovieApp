@@ -2,34 +2,44 @@ package ru.mrrobot1413.lesson8homework.ui.fragments
 
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Parcelable
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.bitmap.CenterInside
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.oshi.libsearchtoolbar.SearchAnimationToolbar
 import kotlinx.android.synthetic.main.fragment_home.*
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.MoviesAdapter
 import ru.mrrobot1413.lesson8homework.databinding.FragmentHomeBinding
 import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
-import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
 
 class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListener {
 
     private val adapter by lazy {
-        MoviesAdapter(mutableListOf()) {
-            (activity as? MovieClickListener)?.onClick(it)
+        MoviesAdapter(mutableListOf()){
+
+            val extras = FragmentNavigatorExtras(image to "image_big")
+            (activity as MovieClickListener).openDetailsFragment(it, extras)
         }
     }
     private lateinit var linearLayoutManager: GridLayoutManager
@@ -38,17 +48,18 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
     private var moviesPage = 1
     lateinit var binding: FragmentHomeBinding
-    private var state: Int = 0
+    var parcelable: Parcelable? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initFields()
 
         moviesViewModel.movies.observe(viewLifecycleOwner, {
             binding.recyclerView.visibility = View.VISIBLE
             adapter.setMovies(it)
             deleteNoConnectionSign()
             binding.refreshLayout.isRefreshing = false
-            binding.recyclerView.scrollToPosition(state)
         })
 
         moviesViewModel.error.observe(viewLifecycleOwner, {
@@ -61,18 +72,27 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
             onError(it)
             binding.refreshLayout.isRefreshing = false
         })
+        moviesViewModel.getPopularMovies(moviesPage)
 
         binding.toolbar.setSupportActionBar(activity as AppCompatActivity)
         setHasOptionsMenu(true)
 
-        savedInstanceState?.let {
-            state = (it.getInt("key"))
+        if(savedInstanceState?.getParcelable<Parcelable>("key") != null){
+            parcelable = savedInstanceState.getParcelable("key")!!
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putInt("key", state)
+        outState.putParcelable("key", linearLayoutManager.onSaveInstanceState())
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as MovieClickListener).showBottomNav()
+        if(parcelable != null){
+            linearLayoutManager.onRestoreInstanceState(parcelable)
+        }
     }
 
     override fun onCreateView(
@@ -82,13 +102,6 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
         return binding.root
-    }
-
-    override fun onResume() {
-        super.onResume()
-        initFields()
-        moviesViewModel.getPopularMovies(moviesPage)
-        (activity as MovieClickListener).restoreBottomNav()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -166,8 +179,6 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
                 val totalItemCount = linearLayoutManager.itemCount
                 val visibleItemCount = linearLayoutManager.childCount
                 val firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition()
-
-                state = dy
 
                 if (firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
                     recyclerView.removeOnScrollListener(this)

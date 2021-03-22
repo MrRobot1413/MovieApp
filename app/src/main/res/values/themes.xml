@@ -24,12 +24,13 @@
         <item name="android:textSize">20sp</item>
     </style>
     <style name="BodyTextStyle" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
+        <item name="backgroundTint">@color/itemColor</item>
         <item name="android:textColor">#c7c7c7</item>
         <item name="android:textSize">14sp</item>
     </style>
     <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/colorPrimaryDark</item>
-        <item name="rippleColor">#ad1457</item>
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="rippleColor">#FD0904</item>
     </style>
     <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">#757575</item>

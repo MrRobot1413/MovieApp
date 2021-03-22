@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,11 +26,8 @@ class FavoriteListFragment : Fragment() {
     private lateinit var txtNoMovie: TextView
     private val adapter by lazy {
         FavoriteListAdapter {
-            (activity as? MovieClickListener)?.onClick(it)
-//            val navController = findNavController()
-//            val bundle = Bundle()
-//            bundle.putParcelable(MOVIE, it)
-//            navController.navigate(R.id.detailsFragment, bundle)
+            val extras = FragmentNavigatorExtras(binding.recyclerView to "image_big")
+            (activity as? MovieClickListener)?.openDetailsFragment(it, extras)
         }
     }
     private val favoriteListViewModel by lazy {
@@ -62,7 +60,7 @@ class FavoriteListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        (activity as MovieClickListener).restoreBottomNav()
+        (activity as MovieClickListener).showBottomNav()
     }
 
     private fun initFields() {

@@ -1,9 +1,10 @@
 package ru.mrrobot1413.lesson8homework.viewModels
 
-import android.os.Bundle
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.recyclerview.widget.GridLayoutManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -19,10 +20,9 @@ class MoviesViewModel : ViewModel() {
     var movies = MutableLiveData<List<Movie>>()
     var error = MutableLiveData<String>()
     var movieDetailed = MutableLiveData<Movie>()
-    var recyclerViewPosition = 0
 
     fun getPopularMovies(
-        page: Int
+        page: Int,
     ) {
         movieRepository.getPopularMovies(page = page).enqueue(object : Callback<MovieResponse> {
             override fun onResponse(
@@ -120,7 +120,7 @@ class MoviesViewModel : ViewModel() {
                     movieDetailed.postValue(
                         movie
                     )
-                } else{
+                } else {
                     error.postValue(t.message)
                 }
             }
@@ -129,31 +129,32 @@ class MoviesViewModel : ViewModel() {
 
     fun searchMovie(
         page: Int,
-        query: String
+        query: String,
     ) {
-        movieRepository.searchMovie(page = page, query = query).enqueue(object : Callback<MovieResponse> {
-            override fun onResponse(
-                call: Call<MovieResponse>,
-                response: Response<MovieResponse>,
-            ) {
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
+        movieRepository.searchMovie(page = page, query = query)
+            .enqueue(object : Callback<MovieResponse> {
+                override fun onResponse(
+                    call: Call<MovieResponse>,
+                    response: Response<MovieResponse>,
+                ) {
+                    if (response.isSuccessful) {
+                        val responseBody = response.body()
 
-                    if (responseBody != null) {
-                        Log.d("success", "success")
-                        movies.postValue(responseBody.moviesList)
+                        if (responseBody != null) {
+                            Log.d("success", "success")
+                            movies.postValue(responseBody.moviesList)
+                        } else {
+                            error.postValue("Error loading movies")
+                        }
                     } else {
                         error.postValue("Error loading movies")
                     }
-                } else {
-                    error.postValue("Error loading movies")
                 }
-            }
 
-            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                error.postValue("No connection")
-            }
-        })
+                override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+                    error.postValue("No connection")
+                }
+            })
     }
 
     fun getSeries(

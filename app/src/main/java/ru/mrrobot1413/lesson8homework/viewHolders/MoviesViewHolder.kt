@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.CenterInside
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import ru.mrrobot1413.lesson8homework.R
@@ -22,12 +23,12 @@ class MoviesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     var holder: RelativeLayout = itemView.findViewById(R.id.holder)
     var progressBar: ProgressBar = itemView.findViewById(R.id.progress)
 
-    @SuppressLint("SetTextI18n")
     fun bind(movie: Movie) {
+        image.clipToOutline = true
         title.text = movie.title
         Glide.with(itemView)
             .load("https://image.tmdb.org/t/p/w342${movie.posterPath}")
-            .transform(CenterCrop())
+            .transform(CenterInside())
             .error(ContextCompat.getDrawable(itemView.context, R.drawable.ic_round_error_24))
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
