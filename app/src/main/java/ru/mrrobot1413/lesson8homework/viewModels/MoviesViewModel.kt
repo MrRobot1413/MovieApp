@@ -1,10 +1,8 @@
 package ru.mrrobot1413.lesson8homework.viewModels
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.recyclerview.widget.GridLayoutManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

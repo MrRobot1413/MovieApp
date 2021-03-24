@@ -11,6 +11,7 @@ import android.os.Parcelable
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -35,7 +36,7 @@ import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
 class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListener {
 
     private val adapter by lazy {
-        MoviesAdapter(mutableListOf()){ movie: Movie, holder: ImageView ->
+        MoviesAdapter(mutableListOf()){ movie: Movie, holder: RelativeLayout ->
             (activity as MovieClickListener).openDetailsFragment(movie, holder)
         }
     }
@@ -200,16 +201,24 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
 
     override fun onSearchCollapsed() {
-
+        Handler(Looper.getMainLooper()).postDelayed({
+            binding.refreshLayout.isRefreshing = true
+            moviesViewModel.getPopularMovies(
+                moviesPage
+            )
+        }, 2000)
     }
 
     override fun onSearchQueryChanged(query: String?) {
-        adapter.setMovies(mutableListOf())
-        moviesViewModel.searchMovie(1, query!!)
+        if(query!!.length >= 2){
+            Handler(Looper.getMainLooper()).postDelayed({
+                adapter.setMoviesFromMenu(mutableListOf())
+                moviesViewModel.searchMovie(1, query)
+            }, 500)
+        }
     }
 
     override fun onSearchExpanded() {
-
     }
 
     override fun onSearchSubmitted(query: String?) {

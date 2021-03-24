@@ -3,6 +3,7 @@ package ru.mrrobot1413.lesson8homework.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ru.mrrobot1413.lesson8homework.R
@@ -11,7 +12,7 @@ import ru.mrrobot1413.lesson8homework.viewHolders.MoviesViewHolder
 
 class MoviesAdapter(
     private var movies: MutableList<Movie>,
-    private val clickListener: (movie: Movie, image: ImageView) -> Unit
+    private val clickListener: (movie: Movie, holder: RelativeLayout) -> Unit
 ) :
     RecyclerView.Adapter<MoviesViewHolder>() {
 
@@ -20,10 +21,6 @@ class MoviesAdapter(
     fun setMovies(movies: List<Movie>) {
         this.movies.addAll(movies)
         notifyDataSetChanged()
-    }
-
-    fun getImage(): ImageView{
-        return image
     }
 
     fun setMoviesFromMenu(movies: List<Movie>) {
@@ -50,7 +47,7 @@ class MoviesAdapter(
     private fun setOnMovieClickListener(holder: MoviesViewHolder, movie: Movie) {
         holder.holder.setOnClickListener {
             notifyDataSetChanged()
-            clickListener(movie, holder.image)
+            clickListener(movie, holder.relative)
         }
     }
 }
