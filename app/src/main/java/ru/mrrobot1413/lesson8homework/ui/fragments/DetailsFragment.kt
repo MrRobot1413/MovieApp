@@ -39,6 +39,7 @@ class DetailsFragment : Fragment() {
     }
     lateinit var binding: FragmentDetailsBinding
     private var isAddedToFavorite = false
+    private var time: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,7 +65,7 @@ class DetailsFragment : Fragment() {
 
         setImage(binding.imageBackdrop, "https://image.tmdb.org/t/p/w342" + movie!!.posterPath)
 
-        val movieFromDb = movie?.id?.let { favoriteListViewModel.selectById(it) }
+        val movieFromDb = movie.id.let { favoriteListViewModel.selectById(it) }
 
         isAddedToFavorite = if (movieFromDb != null) {
             if (movieFromDb.liked) {
@@ -78,6 +79,8 @@ class DetailsFragment : Fragment() {
             setIconUnliked()
             false
         }
+
+        time = movie.time
 
         moviesViewModel.getMovieDetails(movie.id)
 
@@ -107,7 +110,7 @@ class DetailsFragment : Fragment() {
                     isAddedToFavorite = true
 
                     movie.liked = true
-                    movie.time = moviesViewModel.movieDetailed.value?.time ?: 0
+                    movie.time = moviesViewModel.movieDetailed.value?.time!!
                     favoriteListViewModel.likeMovie(movie)
 
                     setIconLiked()

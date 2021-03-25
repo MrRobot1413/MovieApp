@@ -1,10 +1,7 @@
 package ru.mrrobot1413.lesson8homework.dao
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import ru.mrrobot1413.lesson8homework.model.Movie
 
 @Dao
@@ -13,9 +10,9 @@ interface MovieDao {
     fun selectAllFavorite(): LiveData<List<Movie>>
 
     @Query("SELECT * FROM movies")
-    fun selectAll(): LiveData<List<Movie>>
+    fun selectAll(): List<Movie>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveAll(movie: List<Movie>)
 
     @Query("SELECT * FROM movies WHERE id=:id")
@@ -24,7 +21,7 @@ interface MovieDao {
     @Delete
     fun deleteMovie(movie: Movie)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertMovie(movie: Movie)
 
     @Query("SELECT count(*) FROM movies")

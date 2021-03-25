@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Parcelable
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
@@ -59,13 +60,13 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
             binding.recyclerView.visibility = View.VISIBLE
             adapter.setMovies(it)
             deleteNoConnectionSign()
-            moviesViewModel.saveAll(it)
             binding.refreshLayout.isRefreshing = false
         })
 
         moviesViewModel.error.observe(viewLifecycleOwner, {
             showSnackbar(it)
-            moviesViewModel.selectAll()
+            Log.d("HomeFragment", moviesViewModel.selectAll().toString())
+            moviesViewModel.selectAll().let { it1 -> adapter.setMovies(it1) }
             binding.refreshLayout.isRefreshing = false
         })
 

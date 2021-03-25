@@ -27,7 +27,7 @@ object DbListRepository {
         return movieDao.selectAllFavorite()
     }
 
-    fun selectAll(): LiveData<List<Movie>> {
+    fun selectAll(): List<Movie> {
         return movieDao.selectAll()
     }
 

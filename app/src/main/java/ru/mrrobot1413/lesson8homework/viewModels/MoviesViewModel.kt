@@ -1,6 +1,5 @@
 package ru.mrrobot1413.lesson8homework.viewModels
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -34,6 +33,14 @@ class MoviesViewModel : ViewModel() {
 
                     if (responseBody != null) {
                         movies.postValue(responseBody.moviesList)
+                        val list = ArrayList<Movie>()
+                        if (movies.value?.iterator()?.hasNext() == true){
+                            val next = movies.value?.iterator()!!.next()
+                            if(!next.liked){
+                                list.add(next)
+                            }
+                        }
+                        saveAll(list)
                     } else {
                         error.postValue("Error loading movies")
                     }
@@ -131,7 +138,7 @@ class MoviesViewModel : ViewModel() {
         dbRepository.saveAll(movies)
     }
 
-    fun selectAll(): LiveData<List<Movie>>{
+    fun selectAll(): List<Movie>{
         return dbRepository.selectAll()
     }
 
