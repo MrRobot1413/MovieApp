@@ -24,6 +24,7 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.oshi.libsearchtoolbar.SearchAnimationToolbar
 import kotlinx.android.synthetic.main.fragment_home.*
 import ru.mrrobot1413.lesson8homework.R
@@ -36,13 +37,13 @@ import ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel
 class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListener {
 
     private val adapter by lazy {
-        MoviesAdapter(mutableListOf()){ movie: Movie, holder: RelativeLayout ->
+        MoviesAdapter(mutableListOf()) { movie: Movie, holder: RelativeLayout ->
             (activity as MovieClickListener).openDetailsFragment(movie, holder)
         }
     }
 
     private lateinit var linearLayoutManager: GridLayoutManager
-    private val moviesViewModel by lazy{
+    private val moviesViewModel by lazy {
         ViewModelProvider(this).get(MoviesViewModel::class.java)
     }
     private var moviesPage = 1
@@ -58,30 +59,26 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
             binding.recyclerView.visibility = View.VISIBLE
             adapter.setMovies(it)
             deleteNoConnectionSign()
+            moviesViewModel.saveAll(it)
             binding.refreshLayout.isRefreshing = false
         })
 
         moviesViewModel.error.observe(viewLifecycleOwner, {
-            // повторить попытку подключения через 5 сек
-            Handler(Looper.getMainLooper()).postDelayed({
-                moviesViewModel.getPopularMovies(
-                    moviesPage
-                )
-            }, 5000)
-            onError(it)
+            showSnackbar(it)
+            moviesViewModel.selectAll()
             binding.refreshLayout.isRefreshing = false
         })
+
         moviesViewModel.getPopularMovies(moviesPage)
 
         binding.toolbar.setSupportActionBar(activity as AppCompatActivity)
         setHasOptionsMenu(true)
-
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
 
-        if(savedInstanceState?.getParcelable<Parcelable>("key") != null){
+        if (savedInstanceState?.getParcelable<Parcelable>("key") != null) {
             parcelable = savedInstanceState.getParcelable("key")!!
         }
     }
@@ -125,6 +122,16 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         toolbar.onSearchIconClick()
     }
 
+    private fun showSnackbar(text: String) {
+        view?.let {
+            Snackbar.make(it, text, Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.retry)) {
+                moviesViewModel.getPopularMovies(
+                    moviesPage
+                )
+            }.setActionTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccent)).show()
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.search -> showSearchView()
@@ -159,20 +166,14 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         binding.refreshLayout.isEnabled = true
     }
 
-    private fun onError(text: String) {
-        binding.txtNoConnection.text = text
-        showNoConnectionSign()
-        binding.recyclerView.visibility = View.GONE
-    }
-
     private fun showNoConnectionSign() {
         binding.txtNoConnection.visibility = View.VISIBLE
-        binding.imageNoConnection.visibility = View.VISIBLE
+        binding.errorIcon.visibility = View.VISIBLE
     }
 
     private fun deleteNoConnectionSign() {
         binding.txtNoConnection.visibility = View.GONE
-        binding.imageNoConnection.visibility = View.GONE
+        binding.errorIcon.visibility = View.GONE
     }
 
     private fun attachPopularMoviesOnScrollListener() {
@@ -201,20 +202,17 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
 
     override fun onSearchCollapsed() {
-        Handler(Looper.getMainLooper()).postDelayed({
-            binding.refreshLayout.isRefreshing = true
-            moviesViewModel.getPopularMovies(
-                moviesPage
-            )
-        }, 2000)
+
     }
 
     override fun onSearchQueryChanged(query: String?) {
-        if(query!!.length >= 2){
-            Handler(Looper.getMainLooper()).postDelayed({
-                adapter.setMoviesFromMenu(mutableListOf())
-                moviesViewModel.searchMovie(1, query)
-            }, 500)
+        if (query != null) {
+            if (query.length >= 2) {
+                Handler(Looper.getMainLooper()).postDelayed({
+                    adapter.setMoviesFromMenu(mutableListOf())
+                    moviesViewModel.searchMovie(1, query)
+                }, 1000)
+            }
         }
     }
 

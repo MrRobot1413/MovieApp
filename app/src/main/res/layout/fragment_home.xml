@@ -65,7 +65,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
-                    android:id="@+id/image_no_connection"
+                    android:id="@+id/error_icon"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:src="@drawable/ic_baseline_signal_wifi_off_24"

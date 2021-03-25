@@ -24,4 +24,5 @@
     <string name="invite_text">Invite you to watch the movie </string>
     <string name="revenue">Revenue:</string>
     <string name="min">min</string>
+    <string name="retry">Retry</string>
 </resources>

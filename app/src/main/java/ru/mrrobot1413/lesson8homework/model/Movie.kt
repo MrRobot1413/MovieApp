@@ -18,10 +18,7 @@ data class Movie(
     @ColumnInfo(name = "rating") @SerializedName("vote_average") val rating: Float,
     @ColumnInfo(name = "release_date") @SerializedName("release_date") val releaseDate: String,
     @ColumnInfo(name = "time") @SerializedName("runtime") var time: Int,
-    @ColumnInfo(name = "original_language") @SerializedName("original_language") val language: String
+    @ColumnInfo(name = "original_language") @SerializedName("original_language") val language: String,
+    @ColumnInfo(name = "isLiked") var liked: Boolean = false
 ) :
-    Parcelable {
-    @ColumnInfo(name = "isLiked")
-    @IgnoredOnParcel
-    var liked = false
-}
+    Parcelable

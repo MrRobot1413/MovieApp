@@ -4,20 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.FragmentNavigatorExtras
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.fragment_favorite.*
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.adapters.FavoriteListAdapter
 import ru.mrrobot1413.lesson8homework.databinding.FragmentFavoriteBinding
 import ru.mrrobot1413.lesson8homework.interfaces.MovieClickListener
-import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
+import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.viewModels.FavoriteListViewModel
 
 class FavoriteListFragment : Fragment() {
@@ -25,9 +23,8 @@ class FavoriteListFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var txtNoMovie: TextView
     private val adapter by lazy {
-        FavoriteListAdapter {
-            val extras = FragmentNavigatorExtras(binding.recyclerView to "image_big")
-//            (activity as? MovieClickListener)?.openDetailsFragment(it, )
+        FavoriteListAdapter { movie: Movie, holder: RelativeLayout ->
+            (activity as? MovieClickListener)?.openDetailsFragment(movie, holder)
         }
     }
     private val favoriteListViewModel by lazy {
@@ -49,7 +46,7 @@ class FavoriteListFragment : Fragment() {
 
         initFields()
 
-        favoriteListViewModel.getMovies().observe(viewLifecycleOwner, {
+        favoriteListViewModel.getFavoriteMovies().observe(viewLifecycleOwner, {
             adapter.setMovies(it)
             showNoMoviesSign()
         })

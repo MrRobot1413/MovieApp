@@ -5,9 +5,9 @@ import ru.mrrobot1413.lesson8homework.App
 import ru.mrrobot1413.lesson8homework.dao.MovieDao
 import ru.mrrobot1413.lesson8homework.model.Movie
 
-object FavoriteListRepository {
+object DbListRepository {
 
-    private lateinit var instance: FavoriteListRepository
+    private lateinit var instance: DbListRepository
 
     private val db by lazy {
         App().getInstance().getDatabase()
@@ -15,7 +15,7 @@ object FavoriteListRepository {
 
     lateinit var movieDao: MovieDao
 
-    fun getInstance(): FavoriteListRepository {
+    fun getInstance(): DbListRepository {
         instance = this
 
         movieDao = db.movieDao()
@@ -23,8 +23,16 @@ object FavoriteListRepository {
         return instance
     }
 
+    fun selectAllFavorite(): LiveData<List<Movie>> {
+        return movieDao.selectAllFavorite()
+    }
+
     fun selectAll(): LiveData<List<Movie>> {
         return movieDao.selectAll()
+    }
+
+    fun saveAll(movies: List<Movie>){
+        movieDao.saveAll(movies)
     }
 
     fun selectById(id: Int): Movie? {

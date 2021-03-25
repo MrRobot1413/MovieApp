@@ -1,6 +1,7 @@
 package ru.mrrobot1413.lesson8homework.viewModels
 
-import android.util.Log
+import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import retrofit2.Call
@@ -9,12 +10,13 @@ import retrofit2.Response
 import ru.mrrobot1413.lesson8homework.model.Movie
 import ru.mrrobot1413.lesson8homework.model.MovieResponse
 import ru.mrrobot1413.lesson8homework.model.Series
-import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
+import ru.mrrobot1413.lesson8homework.repositories.DbListRepository
 import ru.mrrobot1413.lesson8homework.repositories.MovieRepository
 
 class MoviesViewModel : ViewModel() {
 
     private var movieRepository: MovieRepository = MovieRepository.getInstance()
+    private var dbRepository: DbListRepository = DbListRepository.getInstance()
     var movies = MutableLiveData<List<Movie>>()
     var error = MutableLiveData<String>()
     var movieDetailed = MutableLiveData<Movie>()
@@ -68,7 +70,7 @@ class MoviesViewModel : ViewModel() {
             }
 
             override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                error.postValue(t.message)
+                error.postValue("No connection")
             }
         })
     }
@@ -77,7 +79,7 @@ class MoviesViewModel : ViewModel() {
         id: Int,
     ) {
         movieRepository.getMovieDetails(id = id).enqueue(object : Callback<Movie> {
-            val repository = FavoriteListRepository.getInstance()
+            val repository = DbListRepository.getInstance()
             val movie = repository.selectById(id)
 
             override fun onResponse(
@@ -100,13 +102,11 @@ class MoviesViewModel : ViewModel() {
                             )
                         )
                     } else {
-                        error.postValue("Error loading movies")
                         movieDetailed.postValue(
                             movie
                         )
                     }
                 } else {
-                    error.postValue("Error loading movies")
                     movieDetailed.postValue(
                         movie
                     )
@@ -119,15 +119,25 @@ class MoviesViewModel : ViewModel() {
                         movie
                     )
                 } else {
-                    error.postValue(t.message)
+                    error.postValue("No connection")
                 }
             }
         })
     }
 
+    fun saveAll(
+        movies: List<Movie>
+    ){
+        dbRepository.saveAll(movies)
+    }
+
+    fun selectAll(): LiveData<List<Movie>>{
+        return dbRepository.selectAll()
+    }
+
     fun searchMovie(
         page: Int,
-        query: String,
+        query: String
     ) {
         movieRepository.searchMovie(page = page, query = query)
             .enqueue(object : Callback<MovieResponse> {
@@ -139,8 +149,11 @@ class MoviesViewModel : ViewModel() {
                         val responseBody = response.body()
 
                         if (responseBody != null) {
-                            Log.d("success", "success")
-                            movies.postValue(responseBody.moviesList)
+                            if (responseBody.moviesList.isEmpty()){
+                                error.postValue("Nothing was found")
+                            } else{
+                                movies.postValue(responseBody.moviesList)
+                            }
                         } else {
                             error.postValue("Error loading movies")
                         }

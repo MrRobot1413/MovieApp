@@ -2,13 +2,14 @@ package ru.mrrobot1413.lesson8homework.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import androidx.recyclerview.widget.RecyclerView
 import ru.mrrobot1413.lesson8homework.viewHolders.MoviesViewHolder
 import ru.mrrobot1413.lesson8homework.R
 import ru.mrrobot1413.lesson8homework.model.Movie
 
 class FavoriteListAdapter(
-    private val clickListener: (movie: Movie) -> Unit
+    private val clickListener: (movie: Movie, holder: RelativeLayout) -> Unit
 ) :
     RecyclerView.Adapter<MoviesViewHolder>() {
 
@@ -36,7 +37,7 @@ class FavoriteListAdapter(
     private fun setOnDetailsClickListener(holder: MoviesViewHolder, movie: Movie) {
         holder.holder.setOnClickListener {
             notifyDataSetChanged()
-            clickListener(movie)
+            clickListener(movie, holder.relative)
         }
     }
 }

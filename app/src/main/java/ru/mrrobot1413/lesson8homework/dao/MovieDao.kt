@@ -9,8 +9,14 @@ import ru.mrrobot1413.lesson8homework.model.Movie
 
 @Dao
 interface MovieDao {
+    @Query("SELECT * FROM movies WHERE isLiked is 1")
+    fun selectAllFavorite(): LiveData<List<Movie>>
+
     @Query("SELECT * FROM movies")
     fun selectAll(): LiveData<List<Movie>>
+
+    @Insert
+    fun saveAll(movie: List<Movie>)
 
     @Query("SELECT * FROM movies WHERE id=:id")
     fun selectById(id: Int): Movie?

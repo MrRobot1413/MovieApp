@@ -79,9 +79,7 @@ class DetailsFragment : Fragment() {
             false
         }
 
-        if (movie != null) {
-            moviesViewModel.getMovieDetails(movie.id)
-        }
+        moviesViewModel.getMovieDetails(movie.id)
 
         binding.viewModel = moviesViewModel
         binding.lifecycleOwner = viewLifecycleOwner

@@ -4,17 +4,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.mrrobot1413.lesson8homework.model.Movie
-import ru.mrrobot1413.lesson8homework.repositories.FavoriteListRepository
+import ru.mrrobot1413.lesson8homework.repositories.DbListRepository
 
 class FavoriteListViewModel : ViewModel() {
 
-    private var favoriteListRepository: FavoriteListRepository = FavoriteListRepository.getInstance()
+    private var favoriteListRepository: DbListRepository = DbListRepository.getInstance()
     var movies = MutableLiveData<List<Movie>>()
-    var error = MutableLiveData<String>()
-    var movieDetailed = MutableLiveData<Movie>()
 
-    fun getMovies(): LiveData<List<Movie>>{
-        return favoriteListRepository.selectAll()
+    fun getFavoriteMovies(): LiveData<List<Movie>>{
+        return favoriteListRepository.selectAllFavorite()
     }
 
     fun selectById(id: Int): Movie? {
@@ -22,14 +20,14 @@ class FavoriteListViewModel : ViewModel() {
     }
 
     fun likeMovie(movie: Movie){
-        favoriteListRepository.movieDao.insertMovie(movie)
+        favoriteListRepository.likeMovie(movie)
     }
 
     fun delete(movie: Movie) {
-        favoriteListRepository.movieDao.deleteMovie(movie)
+        favoriteListRepository.delete(movie)
     }
 
     fun getMoviesCount(): Int {
-        return favoriteListRepository.movieDao.getMoviesCount()
+        return favoriteListRepository.getMoviesCount()
     }
 }
