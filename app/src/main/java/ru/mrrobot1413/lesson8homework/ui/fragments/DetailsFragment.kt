@@ -67,6 +67,8 @@ class DetailsFragment : Fragment() {
 
         val movieFromDb = movie.id.let { favoriteListViewModel.selectById(it) }
 
+        inviteText = getString(R.string.invite_text) + " " + movie.title
+
         isAddedToFavorite = if (movieFromDb != null) {
             if (movieFromDb.liked) {
                 setIconLiked()

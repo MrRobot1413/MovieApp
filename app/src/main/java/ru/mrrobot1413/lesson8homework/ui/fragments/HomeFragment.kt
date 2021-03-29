@@ -8,21 +8,14 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Parcelable
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
-import android.widget.ImageView
 import android.widget.RelativeLayout
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.FragmentNavigator
-import androidx.navigation.fragment.FragmentNavigatorExtras
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -59,13 +52,11 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         moviesViewModel.movies.observe(viewLifecycleOwner, {
             binding.recyclerView.visibility = View.VISIBLE
             adapter.setMovies(it)
-            deleteNoConnectionSign()
             binding.refreshLayout.isRefreshing = false
         })
 
         moviesViewModel.error.observe(viewLifecycleOwner, {
             showSnackbar(it)
-            Log.d("HomeFragment", moviesViewModel.selectAll().toString())
             moviesViewModel.selectAll().let { it1 -> adapter.setMovies(it1) }
             binding.refreshLayout.isRefreshing = false
         })
@@ -152,8 +143,6 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
         initRecycler()
 
-        deleteNoConnectionSign()
-
         binding.toolbar.setOnSearchQueryChangedListener(this)
 
         binding.refreshLayout.setOnRefreshListener {
@@ -165,16 +154,6 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
 
         binding.refreshLayout.isEnabled = true
-    }
-
-    private fun showNoConnectionSign() {
-        binding.txtNoConnection.visibility = View.VISIBLE
-        binding.errorIcon.visibility = View.VISIBLE
-    }
-
-    private fun deleteNoConnectionSign() {
-        binding.txtNoConnection.visibility = View.GONE
-        binding.errorIcon.visibility = View.GONE
     }
 
     private fun attachPopularMoviesOnScrollListener() {

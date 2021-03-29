@@ -16,8 +16,6 @@ class MoviesAdapter(
 ) :
     RecyclerView.Adapter<MoviesViewHolder>() {
 
-    private lateinit var image: ImageView
-
     fun setMovies(movies: List<Movie>) {
         this.movies.addAll(movies)
         notifyDataSetChanged()
@@ -39,7 +37,6 @@ class MoviesAdapter(
     }
 
     override fun onBindViewHolder(holder: MoviesViewHolder, position: Int) {
-        image = holder.image
         holder.bind(movies[position])
         setOnMovieClickListener(holder, movies[position])
     }

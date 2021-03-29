@@ -3,6 +3,7 @@ package ru.mrrobot1413.lesson8homework.model
 import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.IgnoredOnParcel
@@ -16,7 +17,7 @@ data class Movie(
     @ColumnInfo(name = "overview") @SerializedName("overview") val overview: String,
     @ColumnInfo(name = "posterPath") @SerializedName("poster_path") val posterPath: String?,
     @ColumnInfo(name = "rating") @SerializedName("vote_average") val rating: Float,
-    @ColumnInfo(name = "release_date") @SerializedName("release_date") val releaseDate: String,
+    @ColumnInfo(name = "release_date", defaultValue = "") @SerializedName("release_date") val releaseDate: String,
     @ColumnInfo(name = "time") @SerializedName("runtime") var time: Int,
     @ColumnInfo(name = "original_language") @SerializedName("original_language") val language: String,
     @ColumnInfo(name = "isLiked") var liked: Boolean = false
