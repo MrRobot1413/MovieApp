@@ -5,13 +5,13 @@
         android:icon="@drawable/ic_baseline_local_movies_24"
         android:title="@string/movies"/>
 
-<!--    <item-->
-<!--        android:id="@+id/page_2"-->
-<!--        android:icon="@drawable/ic_baseline_live_tv_24"-->
-<!--        android:title="@string/series"/>-->
-
     <item
         android:id="@+id/favoriteListFragment"
         android:icon="@drawable/ic_favorite"
         android:title="@string/favorite"/>
+
+<!--    <item-->
+<!--        android:id="@+id/watchLaterFragment"-->
+<!--        android:icon="@drawable/ic_baseline_watch_later_24"-->
+<!--        android:title="@string/watch_later"/>-->
 </menu>

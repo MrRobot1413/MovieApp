@@ -6,20 +6,23 @@
 
     <fragment
         android:id="@+id/favoriteListFragment"
-        android:name="ru.mrrobot1413.lesson8homework.ui.fragments.FavoriteListFragment" />
+        android:name="ru.mrrobot1413.movieapp.ui.fragments.FavoriteListFragment" />
+<!--    <fragment-->
+<!--        android:id="@+id/watchLaterFragment"-->
+<!--        android:name="ru.mrrobot1413.movieapp.ui.fragments.WatchLaterFragment" />-->
     <fragment
         android:id="@+id/homeFragment"
-        android:name="ru.mrrobot1413.lesson8homework.ui.fragments.HomeFragment" >
+        android:name="ru.mrrobot1413.movieapp.ui.fragments.HomeFragment" >
         <action
             android:id="@+id/action_homeFragment_to_detailsFragment"
             app:destination="@id/detailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/detailsFragment"
-        android:name="ru.mrrobot1413.lesson8homework.ui.fragments.DetailsFragment"
+        android:name="ru.mrrobot1413.movieapp.ui.fragments.DetailsFragment"
         android:label="DetailsFragment" >
         <argument
             android:name="movie"
-            app:argType="ru.mrrobot1413.lesson8homework.model.Movie" />
+            app:argType="ru.mrrobot1413.movieapp.model.Movie" />
     </fragment>
 </navigation>

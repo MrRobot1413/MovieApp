@@ -25,4 +25,9 @@
     <string name="revenue">Бюджет:</string>
     <string name="min">мин.</string>
     <string name="retry">Повторить</string>
+    <string name="select_date">Выберите дату напоминания</string>
+    <string name="select_time">Выберите время напоминания</string>
+    <string name="watch_later_invite">Напоминание о просмотре</string>
+    <string name="watch_the_movie">Посмотреть фильм </string>
+    <string name="watch_later">Смотреть позже</string>
 </resources>

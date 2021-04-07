@@ -3,10 +3,10 @@
     <data>
         <variable
             name="movie"
-            type="ru.mrrobot1413.lesson8homework.model.Movie" />
+            type="ru.mrrobot1413.movieapp.model.Movie" />
         <variable
             name="viewModel"
-            type="ru.mrrobot1413.lesson8homework.viewModels.MoviesViewModel" />
+            type="ru.mrrobot1413.movieapp.viewModels.MoviesViewModel" />
     </data>
     <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"

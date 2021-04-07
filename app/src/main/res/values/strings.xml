@@ -25,4 +25,9 @@
     <string name="revenue">Revenue:</string>
     <string name="min">min</string>
     <string name="retry">Retry</string>
+    <string name="select_date">Select date to remind</string>
+    <string name="select_time">Select time to remind</string>
+    <string name="watch_later_invite">Watch later reminder</string>
+    <string name="watch_the_movie">Watch the movie </string>
+    <string name="watch_later">Watch later</string>
 </resources>
