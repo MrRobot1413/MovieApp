@@ -42,6 +42,10 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     lateinit var binding: FragmentHomeBinding
     var parcelable: Parcelable? = null
 
+    companion object{
+        const val RECYCLER_VIEW = "rec_view"
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -68,14 +72,14 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
 
-        if (savedInstanceState?.getParcelable<Parcelable>("key") != null) {
-            parcelable = savedInstanceState.getParcelable("key")!!
+        if (savedInstanceState?.getParcelable<Parcelable>(RECYCLER_VIEW) != null) {
+            parcelable = savedInstanceState.getParcelable(RECYCLER_VIEW)!!
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable("key", linearLayoutManager.onSaveInstanceState())
+        outState.putParcelable(RECYCLER_VIEW, linearLayoutManager.onSaveInstanceState())
     }
 
     override fun onResume() {

@@ -1,5 +1,6 @@
 package ru.mrrobot1413.movieapp.api
 
+import io.reactivex.Single
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -18,21 +19,21 @@ interface Api {
         @Query("api_key") apiKey: String = API_KEY,
         @Query("page") page: Int,
         @Query("language") language: String
-    ): Call<MovieResponse>
+    ): Single<MovieResponse>
 
     @GET("movie/top_rated")
     fun getTopRatedMovies(
         @Query("api_key") apiKey: String = API_KEY,
         @Query("page") page: Int,
         @Query("language") language: String = "en-US"
-    ): Call<MovieResponse>
+    ): Single<MovieResponse>
 
     @GET("movie/{id}")
     fun getMovieDetails(
         @Path("id") id: Int,
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = "en-US"
-    ): Call<Movie>
+    ): Single<Movie>
 
     @GET("search/movie")
     fun searchMovie(
@@ -40,5 +41,5 @@ interface Api {
         @Query("page") page: Int,
         @Query("language") language: String,
         @Query("query") query: String
-    ): Call<MovieResponse>
+    ): Single<MovieResponse>
 }

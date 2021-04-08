@@ -39,7 +39,6 @@ class DetailsFragment : Fragment() {
     }
     lateinit var binding: FragmentDetailsBinding
     private var isAddedToFavorite = false
-    private var time: Int = 0
     private lateinit var calendar: Calendar
 
     override fun onCreateView(

@@ -1,5 +1,6 @@
 package ru.mrrobot1413.movieapp.repositories
 
+import io.reactivex.Single
 import retrofit2.Call
 import ru.mrrobot1413.movieapp.App
 import ru.mrrobot1413.movieapp.model.Movie
@@ -19,26 +20,26 @@ object MovieRepository {
 
     fun getPopularMovies(
         page: Int
-    ): Call<MovieResponse>{
+    ): Single<MovieResponse>{
         return app.api.getPopularMovies(page = page, language = Locale.getDefault().language)
     }
 
     fun getMovieDetails(
         id: Int
-    ): Call<Movie>{
+    ): Single<Movie>{
         return app.api.getMovieDetails(id = id, language = Locale.getDefault().language)
     }
 
     fun searchMovie(
         page: Int,
         query: String
-    ): Call<MovieResponse>{
+    ): Single<MovieResponse>{
         return app.api.searchMovie(page = page, language = Locale.getDefault().language, query = query)
     }
 
     fun getTopRatedMovies(
         page: Int = 1
-    ): Call<MovieResponse>{
+    ): Single<MovieResponse>{
         return app.api.getTopRatedMovies(page = page, language = Locale.getDefault().language)
     }
 }
