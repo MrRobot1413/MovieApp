@@ -1,6 +1,8 @@
 package ru.mrrobot1413.movieapp.ui.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +13,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.adapters.FavoriteListAdapter
 import ru.mrrobot1413.movieapp.databinding.FragmentFavoriteBinding
@@ -35,25 +39,40 @@ class FavoriteListFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_favorite, container, false)
         return binding.root
     }
 
+    @SuppressLint("CheckResult")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         initFields()
 
-        favoriteListViewModel.getFavoriteMovies().observe(viewLifecycleOwner, {
-            if (it.isEmpty()){
+        favoriteListViewModel.getFavoriteMovies().subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ result ->
+                if (result.isNullOrEmpty()) {
+                    binding.txtNoMovie.visibility = View.VISIBLE
+                } else {
+                    adapter.setMovies(result)
+                    binding.txtNoMovie.visibility = View.GONE
+
+                }
+            }, {
                 binding.txtNoMovie.visibility = View.VISIBLE
-            } else{
-                binding.txtNoMovie.visibility = View.GONE
-            }
-            adapter.setMovies(it)
-        })
+            })
+
+//        observe(viewLifecycleOwner, {
+//            if (it.isEmpty()){
+//                binding.txtNoMovie.visibility = View.VISIBLE
+//            } else{
+//                binding.txtNoMovie.visibility = View.GONE
+//            }
+//            adapter.setMovies(it)
+//        })
 
         initRecycler()
     }

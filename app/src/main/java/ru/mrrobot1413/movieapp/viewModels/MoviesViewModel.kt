@@ -9,6 +9,7 @@ import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -30,12 +31,16 @@ class MoviesViewModel : ViewModel() {
 
     private var movieRepository: MovieRepository = MovieRepository.getInstance()
     private var dbRepository: DbListRepository = DbListRepository.getInstance()
+
     private val _movies = MutableLiveData<List<Movie>>()
     val movies : LiveData<List<Movie>> = _movies
+
     private val _error = MutableLiveData<String>()
     val error : LiveData<String> = _error
+
     private val _movieDetailed = MutableLiveData<Movie>()
     val movieDetailed : LiveData<Movie> = _movieDetailed
+
     private val compositeDisposable = CompositeDisposable()
 
     companion object{
@@ -46,6 +51,7 @@ class MoviesViewModel : ViewModel() {
         page: Int,
     ) {
         val observable = movieRepository.getPopularMovies(page = page)
+
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe ({ result ->
@@ -68,36 +74,6 @@ class MoviesViewModel : ViewModel() {
             })
 
         compositeDisposable.add(observable)
-//        .enqueue(object : Callback<MovieResponse> {
-//            override fun onResponse(
-//                call: Call<MovieResponse>,
-//                response: Response<MovieResponse>,
-//            ) {
-//                if (response.isSuccessful) {
-//                    val responseBody = response.body()
-//
-//                    if (responseBody != null) {
-//                        _movies.postValue(responseBody.moviesList)
-//                        val list = ArrayList<Movie>()
-//                        if (_movies.value?.iterator()?.hasNext() == true) {
-//                            val next = _movies.value?.iterator()!!.next()
-//                            if (!next.liked) {
-//                                list.add(next)
-//                            }
-//                        }
-//                        saveAll(list)
-//                    } else {
-//                        _error.postValue("Error loading movies")
-//                    }
-//                } else {
-//                    _error.postValue("Error loading movies")
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-//                _error.postValue("No connection")
-//            }
-//        })
     }
 
     fun getTopRatedMovies(
@@ -118,28 +94,6 @@ class MoviesViewModel : ViewModel() {
                 })
 
         compositeDisposable.add(observable)
-//            .enqueue(object : Callback<MovieResponse> {
-//            override fun onResponse(
-//                call: Call<MovieResponse>,
-//                response: Response<MovieResponse>,
-//            ) {
-//                if (response.isSuccessful) {
-//                    val responseBody = response.body()
-//
-//                    if (responseBody != null) {
-//                        _movies.postValue(responseBody.moviesList)
-//                    } else {
-//                        _error.postValue("Error loading movies")
-//                    }
-//                } else {
-//                    _error.postValue("Error loading movies")
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-//                _error.postValue("No connection")
-//            }
-//        })
     }
 
     fun getMovieDetails(
@@ -160,52 +114,6 @@ class MoviesViewModel : ViewModel() {
                 })
 
         compositeDisposable.add(observable)
-//            .enqueue(object : Callback<Movie> {
-//            val repository = DbListRepository.getInstance()
-//            val movie = repository.selectById(id)
-//
-//            override fun onResponse(
-//                call: Call<Movie>,
-//                response: Response<Movie>,
-//            ) {
-//                if (response.isSuccessful) {
-//                    val responseBody = response.body()
-//                    if (responseBody != null) {
-//                        _movieDetailed.postValue(
-//                            Movie(
-//                                responseBody.id,
-//                                responseBody.title,
-//                                responseBody.overview,
-//                                responseBody.posterPath,
-//                                responseBody.rating,
-//                                responseBody.releaseDate,
-//                                responseBody.time,
-//                                responseBody.language
-//                            )
-//                        )
-//                        Log.d("MOVIEZ_", _movieDetailed.toString())
-//                    } else {
-//                        _movieDetailed.postValue(
-//                            movie
-//                        )
-//                    }
-//                } else {
-//                    _movieDetailed.postValue(
-//                        movie
-//                    )
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<Movie>, t: Throwable) {
-//                if (movie != null) {
-//                    _movieDetailed.postValue(
-//                        movie
-//                    )
-//                } else {
-//                    _error.postValue("No connection")
-//                }
-//            }
-//        })
     }
 
     fun scheduleNotification(
@@ -242,7 +150,7 @@ class MoviesViewModel : ViewModel() {
         dbRepository.saveAll(movies)
     }
 
-    fun selectAll(): List<Movie> {
+    fun selectAll(): Single<List<Movie>> {
         return dbRepository.selectAll()
     }
 
@@ -266,31 +174,5 @@ class MoviesViewModel : ViewModel() {
                 })
 
         compositeDisposable.add(observable)
-//            .enqueue(object : Callback<MovieResponse> {
-//                override fun onResponse(
-//                    call: Call<MovieResponse>,
-//                    response: Response<MovieResponse>,
-//                ) {
-//                    if (response.isSuccessful) {
-//                        val responseBody = response.body()
-//
-//                        if (responseBody != null) {
-//                            if (responseBody.moviesList.isEmpty()) {
-//                                _error.postValue("Nothing was found")
-//                            } else {
-//                                _movies.postValue(responseBody.moviesList)
-//                            }
-//                        } else {
-//                            _error.postValue("Error loading movies")
-//                        }
-//                    } else {
-//                        _error.postValue("Error loading movies")
-//                    }
-//                }
-//
-//                override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-//                    _error.postValue("No connection")
-//                }
-//            })
     }
 }

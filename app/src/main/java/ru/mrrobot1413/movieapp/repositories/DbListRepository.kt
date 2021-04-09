@@ -1,6 +1,7 @@
 package ru.mrrobot1413.movieapp.repositories
 
 import androidx.lifecycle.LiveData
+import io.reactivex.Single
 import ru.mrrobot1413.movieapp.App
 import ru.mrrobot1413.movieapp.dao.MovieDao
 import ru.mrrobot1413.movieapp.model.Movie
@@ -23,7 +24,7 @@ object DbListRepository {
         return instance
     }
 
-    fun selectAllFavorite(): LiveData<List<Movie>> {
+    fun selectAllFavorite(): Single<List<Movie>> {
         return movieDao.selectAllFavorite()
     }
 
@@ -31,7 +32,7 @@ object DbListRepository {
 //        return movieDao.selectWatchLaterList()
 //    }
 
-    fun selectAll(): List<Movie> {
+    fun selectAll(): Single<List<Movie>> {
         return movieDao.selectAll()
     }
 
@@ -39,7 +40,7 @@ object DbListRepository {
         movieDao.saveAll(movies)
     }
 
-    fun selectById(id: Int): Movie? {
+    fun selectById(id: Int): Single<Movie?> {
         return movieDao.selectById(id)
     }
 

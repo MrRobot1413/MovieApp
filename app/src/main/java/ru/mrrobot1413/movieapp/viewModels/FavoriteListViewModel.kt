@@ -1,7 +1,7 @@
 package ru.mrrobot1413.movieapp.viewModels
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import io.reactivex.Single
 import ru.mrrobot1413.movieapp.model.Movie
 import ru.mrrobot1413.movieapp.repositories.DbListRepository
 
@@ -9,7 +9,7 @@ class FavoriteListViewModel : ViewModel() {
 
     private var dbListRepository: DbListRepository = DbListRepository.getInstance()
 
-    fun getFavoriteMovies(): LiveData<List<Movie>>{
+    fun getFavoriteMovies(): Single<List<Movie>>{
         return dbListRepository.selectAllFavorite()
     }
 
@@ -17,8 +17,8 @@ class FavoriteListViewModel : ViewModel() {
 //        return dbListRepository.selectWatchLaterList()
 //    }
 
-    fun selectById(id: Int): Movie? {
-        return dbListRepository.movieDao.selectById(id)
+    fun selectById(id: Int): Single<Movie?> {
+        return dbListRepository.selectById(id)
     }
 
     fun insert(movie: Movie) {

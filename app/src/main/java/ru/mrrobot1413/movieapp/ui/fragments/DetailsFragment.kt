@@ -18,6 +18,8 @@ import com.bumptech.glide.request.RequestListener
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.databinding.FragmentDetailsBinding
 import ru.mrrobot1413.movieapp.interfaces.MovieClickListener
@@ -62,8 +64,6 @@ class DetailsFragment : Fragment() {
 
         calendar = Calendar.getInstance()
 
-        var movieFromDb: Movie?
-
         binding.viewModel = moviesViewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
@@ -72,22 +72,30 @@ class DetailsFragment : Fragment() {
 
             setOnFabClickListener(movie)
 
-            movieFromDb = movie!!.id.let { favoriteListViewModel.selectById(it)}
+            favoriteListViewModel.selectById(movie.id).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ result ->
+                    Log.d("RESUKLT", result.toString())
+                    isAddedToFavorite =
+                        if (result != null) {
+                            if (result.liked) {
+                                Log.d("RESUKLT", "true")
+                                setIconLiked()
+                                true
+                            } else {
+                                Log.d("RESUKLT", "false")
+                                setIconUnliked()
+                                false
+                            }
+                        } else {
+                            Log.d("RESUKLT", "false 2")
+                            setIconUnliked()
+                            false
+                        }
+                }, {})
+
 
             inviteText = getString(R.string.invite_text) + " " + movie.title
-
-            isAddedToFavorite = if (movieFromDb != null) {
-                if (movieFromDb!!.liked) {
-                    setIconLiked()
-                    true
-                } else {
-                    setIconUnliked()
-                    false
-                }
-            } else {
-                setIconUnliked()
-                false
-            }
         })
 
         arguments?.getInt(MainActivity.MOVIE)?.let { moviesViewModel.getMovieDetails(it) }
@@ -213,7 +221,7 @@ class DetailsFragment : Fragment() {
                         calendar,
                         requireContext(),
                         moviesViewModel.movieDetailed.value!!.id)
-//
+
 //                    val format = SimpleDateFormat("HH:mm dd MMM, yyyy")
 //                    val formatted = format.format(calendar.time)
 //

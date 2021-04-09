@@ -1,6 +1,5 @@
 package ru.mrrobot1413.movieapp.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import io.reactivex.Single
 import ru.mrrobot1413.movieapp.model.Movie
@@ -8,7 +7,7 @@ import ru.mrrobot1413.movieapp.model.Movie
 @Dao
 interface MovieDao {
     @Query("SELECT * FROM movies WHERE isLiked is 1")
-    fun selectAllFavorite(): Single<LiveData<List<Movie>>>
+    fun selectAllFavorite(): Single<List<Movie>>
 
 //    @Query("SELECT * FROM movies WHERE isToNotify is 1")
 //    fun selectWatchLaterList(): LiveData<List<Movie>>
@@ -20,7 +19,7 @@ interface MovieDao {
     fun saveAll(movie: List<Movie>)
 
     @Query("SELECT * FROM movies WHERE id=:id")
-    fun selectById(id: Int): Movie?
+    fun selectById(id: Int): Single<Movie?>
 
     @Delete
     fun deleteMovie(movie: Movie)

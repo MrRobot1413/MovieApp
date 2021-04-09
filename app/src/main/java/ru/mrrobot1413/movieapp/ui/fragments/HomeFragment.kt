@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.oshi.libsearchtoolbar.SearchAnimationToolbar
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_home.*
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.adapters.MoviesAdapter
@@ -59,7 +61,13 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
         moviesViewModel.error.observe(viewLifecycleOwner, {
             showSnackbar(it)
-            moviesViewModel.selectAll().let { it1 -> adapter.setMovies(it1) }
+            moviesViewModel.selectAll().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ result ->
+                    if (!result.isNullOrEmpty()) {
+                        adapter.setMovies(result)
+                    }
+                }, {})
             binding.refreshLayout.isRefreshing = false
         })
 
