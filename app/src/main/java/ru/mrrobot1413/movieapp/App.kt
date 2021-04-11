@@ -35,22 +35,7 @@ class App : Application() {
             "movies"
         )
             .allowMainThreadQueries()
-            .fallbackToDestructiveMigration()
             .build()
-
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w(ContentValues.TAG, "Fetching FCM registration token failed", task.exception)
-                return@OnCompleteListener
-            }
-
-            // Get new FCM registration token
-            val token = task.result
-
-            // Log and toast
-            val msg = "token is: $token"
-            Log.d("token", msg)
-        })
     }
 
     fun initRetrofit() {

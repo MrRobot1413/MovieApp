@@ -18,7 +18,7 @@ interface Api {
     fun getPopularMovies(
         @Query("api_key") apiKey: String = API_KEY,
         @Query("page") page: Int,
-        @Query("language") language: String
+        @Query("language") language: String = "en-US"
     ): Single<MovieResponse>
 
     @GET("movie/top_rated")

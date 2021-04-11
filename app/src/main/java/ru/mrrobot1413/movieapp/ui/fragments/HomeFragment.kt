@@ -42,11 +42,6 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
     private var moviesPage = 1
     lateinit var binding: FragmentHomeBinding
-    var parcelable: Parcelable? = null
-
-    companion object{
-        const val RECYCLER_VIEW = "rec_view"
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -71,23 +66,11 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
             binding.refreshLayout.isRefreshing = false
         })
 
-        moviesViewModel.getPopularMovies(moviesPage)
+        moviesViewModel.getPopularMovies(moviesPage, getString(R.string.no_connection),
+            getString(R.string.error_loading_movies))
 
         binding.toolbar.setSupportActionBar(activity as AppCompatActivity)
         setHasOptionsMenu(true)
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-
-        if (savedInstanceState?.getParcelable<Parcelable>(RECYCLER_VIEW) != null) {
-            parcelable = savedInstanceState.getParcelable(RECYCLER_VIEW)!!
-        }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putParcelable(RECYCLER_VIEW, linearLayoutManager.onSaveInstanceState())
     }
 
     override fun onResume() {
@@ -111,12 +94,14 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
     private fun showTopRatedMovies() {
         adapter.setMoviesFromMenu(mutableListOf())
-        moviesViewModel.getTopRatedMovies(1)
+        moviesViewModel.getTopRatedMovies(1, getString(R.string.no_connection),
+            getString(R.string.error_loading_movies))
     }
 
     private fun showPopularMovies() {
         adapter.setMoviesFromMenu(mutableListOf())
-        moviesViewModel.getPopularMovies(1)
+        moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
+            getString(R.string.error_loading_movies))
     }
 
     private fun showSearchView() {
@@ -125,11 +110,15 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
     private fun showSnackbar(text: String) {
         view?.let {
-            Snackbar.make(it, text, Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.retry)) {
-                moviesViewModel.getPopularMovies(
-                    moviesPage
-                )
-            }.setActionTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccent)).show()
+            Snackbar.make(it, text, Snackbar.LENGTH_INDEFINITE).setAnchorView(R.id.bottom)
+                .setAction(getString(R.string.retry)) {
+                    moviesViewModel.getPopularMovies(
+                        moviesPage,
+                        getString(R.string.no_connection),
+                        getString(R.string.error_loading_movies)
+                    )
+                }.setActionTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccent))
+                .show()
         }
     }
 
@@ -156,7 +145,9 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
         binding.refreshLayout.setOnRefreshListener {
             moviesViewModel.getPopularMovies(
-                moviesPage
+                moviesPage,
+                getString(R.string.no_connection),
+                getString(R.string.error_loading_movies)
             )
             binding.refreshLayout.isRefreshing = false
         }
@@ -175,7 +166,8 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
                 if (firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
                     recyclerView.removeOnScrollListener(this)
                     moviesPage++
-                    moviesViewModel.getPopularMovies(moviesPage)
+                    moviesViewModel.getPopularMovies(moviesPage, getString(R.string.no_connection),
+                        getString(R.string.error_loading_movies))
                     attachPopularMoviesOnScrollListener()
                 }
             }
@@ -199,7 +191,8 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
             if (query.length >= 2) {
                 Handler(Looper.getMainLooper()).postDelayed({
                     adapter.setMoviesFromMenu(mutableListOf())
-                    moviesViewModel.searchMovie(1, query)
+                    moviesViewModel.searchMovie(1, query, getString(R.string.no_connection),
+                        getString(R.string.error_loading_movies))
                 }, 1000)
             }
         }

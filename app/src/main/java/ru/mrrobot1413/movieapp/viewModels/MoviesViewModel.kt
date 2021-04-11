@@ -1,14 +1,12 @@
 package ru.mrrobot1413.movieapp.viewModels
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
+import androidx.work.*
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -33,64 +31,68 @@ class MoviesViewModel : ViewModel() {
     private var dbRepository: DbListRepository = DbListRepository.getInstance()
 
     private val _movies = MutableLiveData<List<Movie>>()
-    val movies : LiveData<List<Movie>> = _movies
+    val movies: LiveData<List<Movie>> = _movies
 
     private val _error = MutableLiveData<String>()
-    val error : LiveData<String> = _error
+    val error: LiveData<String> = _error
 
     private val _movieDetailed = MutableLiveData<Movie>()
-    val movieDetailed : LiveData<Movie> = _movieDetailed
+    val movieDetailed: LiveData<Movie> = _movieDetailed
 
     private val compositeDisposable = CompositeDisposable()
 
-    companion object{
+    companion object {
         const val WORK_TAG = "notificationTag"
     }
 
     fun getPopularMovies(
         page: Int,
+        noConnection: String,
+        errorLoading: String,
     ) {
         val observable = movieRepository.getPopularMovies(page = page)
 
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe ({ result ->
-                if(result != null){
+            .subscribe({ result ->
+                if (result != null) {
                     val list = ArrayList<Movie>()
                     _movies.postValue(result.moviesList)
                     if (_movies.value?.iterator()?.hasNext() == true) {
-                            val next = _movies.value?.iterator()!!.next()
-                            if (!next.liked) {
-                                list.add(next)
-                            }
+                        val next = _movies.value?.iterator()!!.next()
+                        if (!next.liked) {
+                            list.add(next)
                         }
+                    }
                     saveAll(list)
-                } else{
-                    _error.postValue("No connection")
+                } else {
+                    _error.postValue(noConnection)
                 }
             },
-            {
-                _error.postValue("Error loading movies")
-            })
+                {
+                    _error.postValue(errorLoading)
+                })
 
         compositeDisposable.add(observable)
     }
 
     fun getTopRatedMovies(
         page: Int,
+        noConnection: String,
+        errorLoading: String,
     ) {
         val observable = movieRepository.getTopRatedMovies(page = page)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe ({ result ->
-                if(result != null){
+            .subscribe({ result ->
+                if (result != null) {
                     _movies.postValue(result.moviesList)
-                } else{
-                    _error.postValue("No connection")
+                } else {
+                    _error.postValue(noConnection)
                 }
             },
                 {
-                    _error.postValue("Error loading movies")
+                    _error.postValue(errorLoading)
                 })
 
         compositeDisposable.add(observable)
@@ -98,19 +100,21 @@ class MoviesViewModel : ViewModel() {
 
     fun getMovieDetails(
         id: Int,
+        noConnection: String,
+        errorLoading: String,
     ) {
         val observable = movieRepository.getMovieDetails(id = id)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe ({ result ->
-                if(result != null){
+            .subscribe({ result ->
+                if (result != null) {
                     _movieDetailed.postValue(result)
-                } else{
-                    _error.postValue("No connection")
+                } else {
+                    _error.postValue(noConnection)
                 }
             },
                 {
-                    _error.postValue("Error loading movies")
+                    _error.postValue(errorLoading)
                 })
 
         compositeDisposable.add(observable)
@@ -120,28 +124,38 @@ class MoviesViewModel : ViewModel() {
         movieName: String,
         scheduledTime: Calendar,
         context: Context,
-        id: Int
+        id: Int,
     ) {
         val data = Data.Builder()
         data.putString(NotifyWorker.NAME, context.getString(R.string.watch_later_invite))
-        data.putString(NotifyWorker.BODY, context.getString(R.string.watch_the_movie) + " \"$movieName\"")
+        data.putString(NotifyWorker.BODY,
+            context.getString(R.string.watch_the_movie) + " \"$movieName\"")
         data.putInt(NotifyWorker.ICON, R.drawable.ic_baseline_movie_24)
         data.putInt(NotifyWorker.ID, id)
         data.putInt(NotifyWorker.GRAPH, R.navigation.nav_graph)
         data.putInt(NotifyWorker.DESTINATION, R.id.detailsFragment)
 
-        val currentTime = Calendar.getInstance()
+        Log.d("WIRJ",
+            scheduledTime.timeZone.toString())
 
-        val workRequest = OneTimeWorkRequest.Builder(NotifyWorker::class.java)
+        val workRequest = buildWorkRequest(data, scheduledTime)
+
+        WorkManager
+            .getInstance(context)
+            .enqueue(workRequest)
+    }
+
+    private fun buildWorkRequest(
+        data: Data.Builder,
+        scheduledTime: Calendar,
+    ): WorkRequest {
+        val currentTime = Calendar.getInstance()
+        return OneTimeWorkRequest.Builder(NotifyWorker::class.java)
             .addTag(WORK_TAG)
             .setInputData(data.build())
             .setInitialDelay(scheduledTime.timeInMillis - currentTime.timeInMillis,
                 TimeUnit.MILLISECONDS)
             .build()
-
-        WorkManager
-            .getInstance(context)
-            .enqueue(workRequest)
     }
 
     private fun saveAll(
@@ -157,20 +171,22 @@ class MoviesViewModel : ViewModel() {
     fun searchMovie(
         page: Int,
         query: String,
+        noConnection: String,
+        errorLoading: String,
     ) {
         movieRepository.searchMovie(page = page, query = query)
         val observable = movieRepository.searchMovie(page = page, query = query)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe ({ result ->
-                if(result != null){
+            .subscribe({ result ->
+                if (result != null) {
                     _movies.postValue(result.moviesList)
-                } else{
-                    _error.postValue("No connection")
+                } else {
+                    _error.postValue(noConnection)
                 }
             },
                 {
-                    _error.postValue("Error loading movies")
+                    _error.postValue(errorLoading)
                 })
 
         compositeDisposable.add(observable)

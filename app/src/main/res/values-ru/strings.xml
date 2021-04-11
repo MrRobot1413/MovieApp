@@ -14,6 +14,7 @@
     <string name="undo">Отмена</string>
     <string name="time">Время:</string>
     <string name="no_connection">Нет соединения</string>
+    <string name="error_loading_movies">Ошибка загрузки</string>
     <string name="release_date">Дата выхода:</string>
     <string name="language">Язык:</string>
     <string name="rating">Рейтинг:</string>

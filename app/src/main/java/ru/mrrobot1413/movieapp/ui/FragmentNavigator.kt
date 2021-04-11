@@ -13,14 +13,20 @@ class FragmentNavigator(
     containerId: Int
 ) : FragmentNavigator(context, fm, containerId) {
 
+    val context = context
+
     override fun navigate(
         destination: Destination,
         args: Bundle?,
         navOptions: NavOptions?,
         navigatorExtras: Navigator.Extras?
     ): NavDestination? {
-        val shouldSkip = navOptions?.run {
+        var shouldSkip = navOptions?.run {
             popUpTo == destination.id && !isPopUpToInclusive
+        }
+
+        if(destination.id == null){
+            shouldSkip = true
         }
 
         return if (shouldSkip == true) null

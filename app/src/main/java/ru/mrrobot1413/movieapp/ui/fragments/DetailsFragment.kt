@@ -62,8 +62,6 @@ class DetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
 
-        calendar = Calendar.getInstance()
-
         binding.viewModel = moviesViewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
@@ -75,20 +73,16 @@ class DetailsFragment : Fragment() {
             favoriteListViewModel.selectById(movie.id).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ result ->
-                    Log.d("RESUKLT", result.toString())
                     isAddedToFavorite =
                         if (result != null) {
                             if (result.liked) {
-                                Log.d("RESUKLT", "true")
                                 setIconLiked()
                                 true
                             } else {
-                                Log.d("RESUKLT", "false")
                                 setIconUnliked()
                                 false
                             }
                         } else {
-                            Log.d("RESUKLT", "false 2")
                             setIconUnliked()
                             false
                         }
@@ -98,7 +92,11 @@ class DetailsFragment : Fragment() {
             inviteText = getString(R.string.invite_text) + " " + movie.title
         })
 
-        arguments?.getInt(MainActivity.MOVIE)?.let { moviesViewModel.getMovieDetails(it) }
+        arguments?.getInt(MainActivity.MOVIE)?.let {
+            moviesViewModel.getMovieDetails(it,
+                getString(R.string.no_connection),
+                getString(R.string.error_loading_movies))
+        }
 
         (activity as MainActivity?)!!.setSupportActionBar(binding.toolbar)
 
@@ -196,13 +194,15 @@ class DetailsFragment : Fragment() {
             sendIntent.type = "text/plain"
             startActivity(sendIntent)
         } else if (item.itemId == R.id.watch_later) {
+            calendar = Calendar.getInstance()
+            calendar.timeZone = TimeZone.getDefault()
             val datePickerDialog = MaterialDatePicker.Builder
                 .datePicker()
                 .setTitleText(getString(R.string.select_date))
                 .build()
 
             val timePicker = MaterialTimePicker.Builder()
-                .setTimeFormat(TimeFormat.CLOCK_24H)
+                .setTimeFormat(TimeFormat.CLOCK_12H)
                 .setHour(calendar.get(Calendar.HOUR_OF_DAY))
                 .setMinute(calendar.get(Calendar.MINUTE))
                 .setTitleText(getString(R.string.select_time))
@@ -214,9 +214,9 @@ class DetailsFragment : Fragment() {
                 }
                 timePicker.addOnPositiveButtonClickListener {
                     calendar.timeInMillis = datePickerDialog.selection!!
-                    calendar.add(Calendar.HOUR_OF_DAY, timePicker.hour)
-                    calendar.add(Calendar.MINUTE, timePicker.minute)
-                    calendar.add(Calendar.SECOND, 0)
+                    calendar.set(Calendar.HOUR_OF_DAY, timePicker.hour)
+                    calendar.set(Calendar.MINUTE, timePicker.minute)
+                    calendar.set(Calendar.SECOND, 0)
                     moviesViewModel.scheduleNotification(moviesViewModel.movieDetailed.value?.title!!,
                         calendar,
                         requireContext(),

@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
 import androidx.work.Worker
@@ -30,6 +31,7 @@ class NotifyWorker(context: Context, params: WorkerParameters) : Worker(context,
     }
 
     override fun doWork(): Result {
+        Log.d("WORKERE", "worker")
         sendNotification(
             inputData.getString(NAME),
             inputData.getString(BODY),
