@@ -11,6 +11,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.schedulers.Schedulers.io
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -41,6 +42,11 @@ class MoviesViewModel : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()
 
+    private val repository by lazy {
+        DbListRepository.getInstance()
+    }
+
+
     companion object {
         const val WORK_TAG = "notificationTag"
     }
@@ -52,7 +58,7 @@ class MoviesViewModel : ViewModel() {
     ) {
         val observable = movieRepository.getPopularMovies(page = page)
 
-            .subscribeOn(Schedulers.io())
+            .subscribeOn(io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ result ->
                 if (result != null) {
@@ -82,7 +88,7 @@ class MoviesViewModel : ViewModel() {
         errorLoading: String,
     ) {
         val observable = movieRepository.getTopRatedMovies(page = page)
-            .subscribeOn(Schedulers.io())
+            .subscribeOn(io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ result ->
                 if (result != null) {
@@ -104,8 +110,27 @@ class MoviesViewModel : ViewModel() {
         errorLoading: String,
     ) {
         val observable = movieRepository.getMovieDetails(id = id)
-            .subscribeOn(Schedulers.io())
+            .subscribeOn(io())
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnError {
+                val movie = repository.selectById(id)
+                    movie
+                        .subscribeOn(io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({ movieFromDb ->
+                            if(movieFromDb != null) {
+                                _movieDetailed.postValue(movieFromDb)
+                            } else{
+                                _error.postValue(noConnection)
+                            }
+                        }, { _error.postValue(noConnection) })
+            }
+            .doOnSuccess {
+                val movie = repository.selectById(id)
+                if(movie != null){
+                       repository.insert(it)
+                }
+            }
             .subscribe({ result ->
                 if (result != null) {
                     _movieDetailed.postValue(result)
@@ -176,7 +201,7 @@ class MoviesViewModel : ViewModel() {
     ) {
         movieRepository.searchMovie(page = page, query = query)
         val observable = movieRepository.searchMovie(page = page, query = query)
-            .subscribeOn(Schedulers.io())
+            .subscribeOn(io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ result ->
                 if (result != null) {

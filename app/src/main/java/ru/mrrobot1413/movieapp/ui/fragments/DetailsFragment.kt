@@ -217,10 +217,12 @@ class DetailsFragment : Fragment() {
                     calendar.set(Calendar.HOUR_OF_DAY, timePicker.hour)
                     calendar.set(Calendar.MINUTE, timePicker.minute)
                     calendar.set(Calendar.SECOND, 0)
-                    moviesViewModel.scheduleNotification(moviesViewModel.movieDetailed.value?.title!!,
-                        calendar,
-                        requireContext(),
-                        moviesViewModel.movieDetailed.value!!.id)
+                    moviesViewModel.movieDetailed.value?.title?.let { it1 ->
+                        moviesViewModel.scheduleNotification(it1,
+                            calendar,
+                            requireContext(),
+                            moviesViewModel.movieDetailed.value!!.id)
+                    }
 
 //                    val format = SimpleDateFormat("HH:mm dd MMM, yyyy")
 //                    val formatted = format.format(calendar.time)
