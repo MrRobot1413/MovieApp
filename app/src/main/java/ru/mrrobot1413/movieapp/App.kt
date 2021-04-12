@@ -34,7 +34,6 @@ class App : Application() {
             AppDatabase::class.java,
             "movies"
         )
-            .allowMainThreadQueries()
             .build()
     }
 

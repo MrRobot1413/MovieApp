@@ -160,14 +160,9 @@ class MoviesViewModel : ViewModel() {
         data.putInt(NotifyWorker.GRAPH, R.navigation.nav_graph)
         data.putInt(NotifyWorker.DESTINATION, R.id.detailsFragment)
 
-        Log.d("WIRJ",
-            scheduledTime.timeZone.toString())
-
-        val workRequest = buildWorkRequest(data, scheduledTime)
-
         WorkManager
             .getInstance(context)
-            .enqueue(workRequest)
+            .enqueue(buildWorkRequest(data, scheduledTime))
     }
 
     private fun buildWorkRequest(
