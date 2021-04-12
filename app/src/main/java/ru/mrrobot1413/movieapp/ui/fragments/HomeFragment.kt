@@ -59,9 +59,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
             moviesViewModel.selectAll().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ result ->
-                    if (!result.isNullOrEmpty()) {
-                        adapter.setMovies(result)
-                    }
+                    adapter.setMovies(result)
                 }, {})
             binding.refreshLayout.isRefreshing = false
         })

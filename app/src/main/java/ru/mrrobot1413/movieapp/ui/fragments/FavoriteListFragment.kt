@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.schedulers.Schedulers.io
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.adapters.FavoriteListAdapter
 import ru.mrrobot1413.movieapp.databinding.FragmentFavoriteBinding
@@ -51,7 +51,7 @@ class FavoriteListFragment : Fragment() {
 
         initFields()
 
-        favoriteListViewModel.getFavoriteMovies().subscribeOn(Schedulers.io())
+        favoriteListViewModel.getFavoriteMovies().subscribeOn(io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ result ->
                 if (result.isNullOrEmpty()) {
@@ -64,15 +64,6 @@ class FavoriteListFragment : Fragment() {
             }, {
                 binding.txtNoMovie.visibility = View.VISIBLE
             })
-
-//        observe(viewLifecycleOwner, {
-//            if (it.isEmpty()){
-//                binding.txtNoMovie.visibility = View.VISIBLE
-//            } else{
-//                binding.txtNoMovie.visibility = View.GONE
-//            }
-//            adapter.setMovies(it)
-//        })
 
         initRecycler()
     }

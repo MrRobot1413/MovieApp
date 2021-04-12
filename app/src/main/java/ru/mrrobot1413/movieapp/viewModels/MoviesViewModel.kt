@@ -3,10 +3,12 @@ package ru.mrrobot1413.movieapp.viewModels
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.work.*
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -41,11 +43,6 @@ class MoviesViewModel : ViewModel() {
     val movieDetailed: LiveData<Movie> = _movieDetailed
 
     private val compositeDisposable = CompositeDisposable()
-
-    private val repository by lazy {
-        DbListRepository.getInstance()
-    }
-
 
     companion object {
         const val WORK_TAG = "notificationTag"
@@ -107,12 +104,13 @@ class MoviesViewModel : ViewModel() {
     fun getMovieDetails(
         id: Int,
         noConnection: String,
-        errorLoading: String,
+        errorLoading: String
     ) {
         val observable = movieRepository.getMovieDetails(id = id)
             .subscribeOn(io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnError {
+                val repository = DbListRepository.getInstance()
                 val movie = repository.selectById(id)
                     movie
                         .subscribeOn(io())
@@ -124,12 +122,6 @@ class MoviesViewModel : ViewModel() {
                                 _error.postValue(noConnection)
                             }
                         }, { _error.postValue(noConnection) })
-            }
-            .doOnSuccess {
-                val movie = repository.selectById(id)
-                if(movie != null){
-                       repository.insert(it)
-                }
             }
             .subscribe({ result ->
                 if (result != null) {
@@ -143,6 +135,35 @@ class MoviesViewModel : ViewModel() {
                 })
 
         compositeDisposable.add(observable)
+    }
+
+    fun searchMovie(
+        page: Int,
+        query: String,
+        noConnection: String,
+        errorLoading: String,
+    ) {
+        movieRepository.searchMovie(page = page, query = query)
+        val observable = movieRepository.searchMovie(page = page, query = query)
+            .subscribeOn(io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ result ->
+                if (result != null) {
+                    _movies.postValue(result.moviesList)
+                } else {
+                    _error.postValue(noConnection)
+                }
+            },
+                {
+                    _error.postValue(errorLoading)
+                })
+
+        compositeDisposable.add(observable)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        compositeDisposable.clear()
     }
 
     fun scheduleNotification(
@@ -178,37 +199,14 @@ class MoviesViewModel : ViewModel() {
             .build()
     }
 
-    private fun saveAll(
-        movies: List<Movie>,
-    ) {
-        dbRepository.saveAll(movies)
+    private fun saveAll( movies: List<Movie> ) {
+        Completable.fromRunnable { dbRepository.saveAll(movies) }
+            .subscribeOn(io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe()
     }
 
     fun selectAll(): Single<List<Movie>> {
         return dbRepository.selectAll()
-    }
-
-    fun searchMovie(
-        page: Int,
-        query: String,
-        noConnection: String,
-        errorLoading: String,
-    ) {
-        movieRepository.searchMovie(page = page, query = query)
-        val observable = movieRepository.searchMovie(page = page, query = query)
-            .subscribeOn(io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ result ->
-                if (result != null) {
-                    _movies.postValue(result.moviesList)
-                } else {
-                    _error.postValue(noConnection)
-                }
-            },
-                {
-                    _error.postValue(errorLoading)
-                })
-
-        compositeDisposable.add(observable)
     }
 }
