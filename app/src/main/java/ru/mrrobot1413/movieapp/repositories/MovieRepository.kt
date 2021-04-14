@@ -4,6 +4,7 @@ import io.reactivex.Single
 import retrofit2.Call
 import ru.mrrobot1413.movieapp.App
 import ru.mrrobot1413.movieapp.model.Movie
+import ru.mrrobot1413.movieapp.model.MovieNetwork
 import ru.mrrobot1413.movieapp.model.MovieResponse
 import java.util.*
 
@@ -26,7 +27,7 @@ object MovieRepository {
 
     fun getMovieDetails(
         id: Int
-    ): Single<Movie>{
+    ): Single<MovieNetwork>{
         return app.api.getMovieDetails(id = id, language = Locale.getDefault().language)
     }
 

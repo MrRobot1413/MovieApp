@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.transition.TransitionInflater
@@ -24,6 +25,7 @@ import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.databinding.FragmentDetailsBinding
 import ru.mrrobot1413.movieapp.interfaces.MovieClickListener
 import ru.mrrobot1413.movieapp.model.Movie
+import ru.mrrobot1413.movieapp.model.MovieNetwork
 import ru.mrrobot1413.movieapp.ui.MainActivity
 import ru.mrrobot1413.movieapp.viewModels.FavoriteListViewModel
 import ru.mrrobot1413.movieapp.viewModels.MoviesViewModel
@@ -88,7 +90,6 @@ class DetailsFragment : Fragment() {
                         }
                 }, {})
 
-
             inviteText = getString(R.string.invite_text) + " " + movie.title
         })
 
@@ -105,22 +106,44 @@ class DetailsFragment : Fragment() {
         }
     }
 
-    private fun setOnFabClickListener(movie: Movie?) {
+    private fun setOnFabClickListener(movie: MovieNetwork?) {
         binding.fabAddToFavorite.setOnClickListener {
             if (movie != null) {
                 if (isAddedToFavorite) {
                     isAddedToFavorite = false
 
-                    movie.liked = false
-                    favoriteListViewModel.delete(movie)
+                    val movieToDelete =
+                        Movie(
+                            movie.id,
+                            movie.title,
+                            movie.overview,
+                            movie.posterPath,
+                            movie.rating,
+                            movie.releaseDate,
+                            movie.time,
+                            movie.language
+                        )
+                    movieToDelete.liked = false
+                    favoriteListViewModel.delete(movieToDelete)
 
                     setIconUnliked()
                 } else {
                     isAddedToFavorite = true
 
-                    movie.liked = true
-                    movie.time = moviesViewModel.movieDetailed.value?.time!!
-                    favoriteListViewModel.insert(movie)
+                    val movieToInsert =
+                        Movie(
+                            movie.id,
+                            movie.title,
+                            movie.overview,
+                            movie.posterPath,
+                            movie.rating,
+                            movie.releaseDate,
+                            movie.time,
+                            movie.language
+                        )
+                    movieToInsert.liked = true
+                    movieToInsert.time = moviesViewModel.movieDetailed.value?.time!!
+                    favoriteListViewModel.insert(movieToInsert)
 
                     setIconLiked()
                 }

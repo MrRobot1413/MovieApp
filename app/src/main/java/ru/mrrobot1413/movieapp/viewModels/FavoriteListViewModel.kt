@@ -1,8 +1,14 @@
 package ru.mrrobot1413.movieapp.viewModels
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
+import androidx.work.impl.Schedulers
+import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers.io
 import ru.mrrobot1413.movieapp.model.Movie
+import ru.mrrobot1413.movieapp.model.MovieNetwork
 import ru.mrrobot1413.movieapp.repositories.DbListRepository
 
 class FavoriteListViewModel : ViewModel() {
@@ -21,11 +27,21 @@ class FavoriteListViewModel : ViewModel() {
         return dbListRepository.selectById(id)
     }
 
+    @SuppressLint("CheckResult")
     fun insert(movie: Movie) {
-        dbListRepository.insert(movie)
+        Completable.fromAction {
+            dbListRepository.insert(movie)
+        }
+            .subscribeOn(io())
+            .subscribe()
     }
 
+    @SuppressLint("CheckResult")
     fun delete(movie: Movie) {
-        dbListRepository.delete(movie)
+        Completable.fromAction {
+            dbListRepository.delete(movie)
+        }
+            .subscribeOn(io())
+            .subscribe()
     }
 }

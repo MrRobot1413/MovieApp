@@ -6,6 +6,6 @@ data class MovieResponse(
     @SerializedName("page")
     val page: Int,
     @SerializedName("results")
-    val moviesList: List<Movie>
+    val moviesList: List<MovieNetwork>
 )
 

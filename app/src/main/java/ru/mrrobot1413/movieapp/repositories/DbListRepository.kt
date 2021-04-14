@@ -1,6 +1,5 @@
 package ru.mrrobot1413.movieapp.repositories
 
-import androidx.lifecycle.LiveData
 import io.reactivex.Single
 import ru.mrrobot1413.movieapp.App
 import ru.mrrobot1413.movieapp.dao.MovieDao

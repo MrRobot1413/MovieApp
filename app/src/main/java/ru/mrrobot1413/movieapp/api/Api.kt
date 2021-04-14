@@ -6,6 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import ru.mrrobot1413.movieapp.model.Movie
+import ru.mrrobot1413.movieapp.model.MovieNetwork
 import ru.mrrobot1413.movieapp.model.MovieResponse
 
 interface Api {
@@ -33,7 +34,7 @@ interface Api {
         @Path("id") id: Int,
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = "en-US"
-    ): Single<Movie>
+    ): Single<MovieNetwork>
 
     @GET("search/movie")
     fun searchMovie(

@@ -33,14 +33,14 @@ class MoviesViewModel : ViewModel() {
     private var movieRepository: MovieRepository = MovieRepository.getInstance()
     private var dbRepository: DbListRepository = DbListRepository.getInstance()
 
-    private val _movies = MutableLiveData<List<Movie>>()
-    val movies: LiveData<List<Movie>> = _movies
+    private val _movies = MutableLiveData<List<MovieNetwork>>()
+    val movies: LiveData<List<MovieNetwork>> = _movies
 
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
 
-    private val _movieDetailed = MutableLiveData<Movie>()
-    val movieDetailed: LiveData<Movie> = _movieDetailed
+    private val _movieDetailed = MutableLiveData<MovieNetwork>()
+    val movieDetailed: LiveData<MovieNetwork> = _movieDetailed
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -54,7 +54,6 @@ class MoviesViewModel : ViewModel() {
         errorLoading: String,
     ) {
         val observable = movieRepository.getPopularMovies(page = page)
-
             .subscribeOn(io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ result ->
@@ -63,9 +62,16 @@ class MoviesViewModel : ViewModel() {
                     _movies.postValue(result.moviesList)
                     if (_movies.value?.iterator()?.hasNext() == true) {
                         val next = _movies.value?.iterator()!!.next()
-                        if (!next.liked) {
-                            list.add(next)
-                        }
+                        list.add(Movie(
+                            next.id,
+                            next.title,
+                            next.overview,
+                            next.overview,
+                            next.rating,
+                            next.releaseDate,
+                            next.time,
+                            next.language
+                        ))
                     }
                     saveAll(list)
                 } else {
@@ -104,7 +110,7 @@ class MoviesViewModel : ViewModel() {
     fun getMovieDetails(
         id: Int,
         noConnection: String,
-        errorLoading: String
+        errorLoading: String,
     ) {
         val observable = movieRepository.getMovieDetails(id = id)
             .subscribeOn(io())
@@ -112,16 +118,27 @@ class MoviesViewModel : ViewModel() {
             .doOnError {
                 val repository = DbListRepository.getInstance()
                 val movie = repository.selectById(id)
-                    movie
-                        .subscribeOn(io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({ movieFromDb ->
-                            if(movieFromDb != null) {
-                                _movieDetailed.postValue(movieFromDb)
-                            } else{
-                                _error.postValue(noConnection)
-                            }
-                        }, { _error.postValue(noConnection) })
+                movie
+                    .subscribeOn(io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ movieFromDb ->
+                        if (movieFromDb != null) {
+                            _movieDetailed.postValue(
+                                MovieNetwork(
+                                    movieFromDb.id,
+                                    movieFromDb.title,
+                                    movieFromDb.overview,
+                                    movieFromDb.posterPath,
+                                    movieFromDb.rating,
+                                    movieFromDb.releaseDate,
+                                    movieFromDb.time,
+                                    movieFromDb.language
+                                )
+                            )
+                        } else {
+                            _error.postValue(noConnection)
+                        }
+                    }, { _error.postValue(noConnection) })
             }
             .subscribe({ result ->
                 if (result != null) {
@@ -143,7 +160,6 @@ class MoviesViewModel : ViewModel() {
         noConnection: String,
         errorLoading: String,
     ) {
-        movieRepository.searchMovie(page = page, query = query)
         val observable = movieRepository.searchMovie(page = page, query = query)
             .subscribeOn(io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -199,7 +215,7 @@ class MoviesViewModel : ViewModel() {
             .build()
     }
 
-    private fun saveAll( movies: List<Movie> ) {
+    private fun saveAll(movies: List<Movie>) {
         Completable.fromRunnable { dbRepository.saveAll(movies) }
             .subscribeOn(io())
             .observeOn(AndroidSchedulers.mainThread())

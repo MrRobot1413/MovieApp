@@ -23,6 +23,6 @@
         android:label="DetailsFragment" >
         <argument
             android:name="movie"
-            app:argType="ru.mrrobot1413.movieapp.model.Movie" />
+            app:argType="ru.mrrobot1413.movieapp.model.MovieNetwork" />
     </fragment>
 </navigation>

@@ -26,6 +26,7 @@ import ru.mrrobot1413.movieapp.adapters.MoviesAdapter
 import ru.mrrobot1413.movieapp.databinding.FragmentHomeBinding
 import ru.mrrobot1413.movieapp.interfaces.MovieClickListener
 import ru.mrrobot1413.movieapp.model.Movie
+import ru.mrrobot1413.movieapp.model.MovieNetwork
 import ru.mrrobot1413.movieapp.viewModels.MoviesViewModel
 
 class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListener {
@@ -59,7 +60,21 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
             moviesViewModel.selectAll().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ result ->
-                    adapter.setMovies(result)
+                    showSnackbar(it)
+                    val movies = mutableListOf<MovieNetwork>()
+                    for(i in 0..result.size){
+                        movies[i] = MovieNetwork(
+                            result[i].id,
+                            result[i].title,
+                            result[i].overview,
+                            result[i].posterPath,
+                            result[i].rating,
+                            result[i].releaseDate,
+                            result[i].time,
+                            result[i].language
+                        )
+                    }
+                    adapter.setMovies(movies)
                 }, {})
             binding.refreshLayout.isRefreshing = false
         })
