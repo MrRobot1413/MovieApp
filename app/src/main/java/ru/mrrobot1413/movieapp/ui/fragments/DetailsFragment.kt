@@ -105,7 +105,7 @@ class DetailsFragment : Fragment() {
             activity?.onBackPressed()
         }
     }
-
+ 
     private fun setOnFabClickListener(movie: MovieNetwork?) {
         binding.fabAddToFavorite.setOnClickListener {
             if (movie != null) {
