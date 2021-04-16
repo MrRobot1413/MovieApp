@@ -58,22 +58,22 @@ class MoviesViewModel : ViewModel() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ result ->
                 if (result != null) {
-                    val list = ArrayList<Movie>()
+//                    val list = ArrayList<Movie>()
                     _movies.postValue(result.moviesList)
-                    if (_movies.value?.iterator()?.hasNext() == true) {
-                        val next = _movies.value?.iterator()!!.next()
-                        list.add(Movie(
-                            next.id,
-                            next.title,
-                            next.overview,
-                            next.overview,
-                            next.rating,
-                            next.releaseDate,
-                            next.time,
-                            next.language
-                        ))
-                    }
-                    saveAll(list)
+//                    if (_movies.value?.iterator()?.hasNext() == true) {
+//                        val next = _movies.value?.iterator()!!.next()
+//                        list.add(Movie(
+//                            next.id,
+//                            next.title,
+//                            next.overview,
+//                            next.overview,
+//                            next.rating,
+//                            next.releaseDate,
+//                            next.time,
+//                            next.language
+//                        ))
+//                    }
+//                    saveAll(list)
                 } else {
                     _error.postValue(noConnection)
                 }
@@ -160,21 +160,26 @@ class MoviesViewModel : ViewModel() {
         noConnection: String,
         errorLoading: String,
     ) {
-        val observable = movieRepository.searchMovie(page = page, query = query)
-            .subscribeOn(io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ result ->
-                if (result != null) {
-                    _movies.postValue(result.moviesList)
-                } else {
-                    _error.postValue(noConnection)
-                }
-            },
-                {
-                    _error.postValue(errorLoading)
-                })
+        if (query != null) {
+            if (query.length >= 2) {
+                val observable = movieRepository.searchMovie(page = page, query = query)
+                    .subscribeOn(io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .delay(500, TimeUnit.MILLISECONDS)
+                    .subscribe({ result ->
+                        if (result != null) {
+                            _movies.postValue(result.moviesList)
+                        } else {
+                            _error.postValue(errorLoading)
+                        }
+                    },
+                        {
+                            _error.postValue(noConnection)
+                        })
 
-        compositeDisposable.add(observable)
+                compositeDisposable.add(observable)
+            }
+        }
     }
 
     override fun onCleared() {

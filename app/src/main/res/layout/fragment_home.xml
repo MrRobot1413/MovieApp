@@ -30,6 +30,8 @@
                     android:layout_marginTop="50dp"
                     android:layout_marginBottom="50dp"
                     android:background="@color/itemColor"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                    android:layoutAnimation="@anim/layout_animation"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 

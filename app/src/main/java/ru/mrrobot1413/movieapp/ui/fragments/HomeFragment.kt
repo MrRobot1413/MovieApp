@@ -5,8 +5,9 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.os.Parcelable
 import android.view.*
+import android.view.animation.AnimationUtils
+import android.view.animation.LayoutAnimationController
 import android.view.inputmethod.InputMethodManager
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
@@ -18,16 +19,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.oshi.libsearchtoolbar.SearchAnimationToolbar
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_home.*
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.adapters.MoviesAdapter
 import ru.mrrobot1413.movieapp.databinding.FragmentHomeBinding
 import ru.mrrobot1413.movieapp.interfaces.MovieClickListener
-import ru.mrrobot1413.movieapp.model.Movie
-import ru.mrrobot1413.movieapp.model.MovieNetwork
 import ru.mrrobot1413.movieapp.viewModels.MoviesViewModel
+
 
 class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListener {
 
@@ -50,6 +48,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         initFields()
 
         moviesViewModel.movies.observe(viewLifecycleOwner, {
+            runLayoutAnimation(binding.recyclerView)
             binding.recyclerView.visibility = View.VISIBLE
             adapter.setMovies(it)
             binding.refreshLayout.isRefreshing = false
@@ -57,25 +56,24 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
         moviesViewModel.error.observe(viewLifecycleOwner, {
             showSnackbar(it)
-            moviesViewModel.selectAll().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ result ->
-                    showSnackbar(it)
-                    val movies = mutableListOf<MovieNetwork>()
-                    for(i in 0..result.size){
-                        movies[i] = MovieNetwork(
-                            result[i].id,
-                            result[i].title,
-                            result[i].overview,
-                            result[i].posterPath,
-                            result[i].rating,
-                            result[i].releaseDate,
-                            result[i].time,
-                            result[i].language
-                        )
-                    }
-                    adapter.setMovies(movies)
-                }, {})
+//            moviesViewModel.selectAll().subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe({ result ->
+//                    val movies = mutableListOf<MovieNetwork>()
+//                    for(i in 0..result.size){
+//                        movies[i] = MovieNetwork(
+//                            result[i].id,
+//                            result[i].title,
+//                            result[i].overview,
+//                            result[i].posterPath,
+//                            result[i].rating,
+//                            result[i].releaseDate,
+//                            result[i].time,
+//                            result[i].language
+//                        )
+//                    }
+//                    adapter.setMovies(movies)
+//                }, {})
             binding.refreshLayout.isRefreshing = false
         })
 
@@ -178,13 +176,24 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
                 if (firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
                     recyclerView.removeOnScrollListener(this)
-                    moviesPage++
+                    if (moviesPage < 500) {
+                        moviesPage++
+                    }
                     moviesViewModel.getPopularMovies(moviesPage, getString(R.string.no_connection),
                         getString(R.string.error_loading_movies))
                     attachPopularMoviesOnScrollListener()
                 }
             }
         })
+    }
+
+    private fun runLayoutAnimation(recyclerView: RecyclerView) {
+        val context = recyclerView.context
+        val controller: LayoutAnimationController =
+            AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation)
+        recyclerView.layoutAnimation = controller
+        recyclerView.adapter!!.notifyDataSetChanged()
+        recyclerView.scheduleLayoutAnimation()
     }
 
     private fun initRecycler() {
@@ -200,13 +209,10 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
 
     override fun onSearchQueryChanged(query: String?) {
-        if (query != null) {
-            if (query.length >= 2) {
-                Handler(Looper.getMainLooper()).postDelayed({
+
                     adapter.setMoviesFromMenu(mutableListOf())
                     moviesViewModel.searchMovie(1, query, getString(R.string.no_connection),
                         getString(R.string.error_loading_movies))
-                }, 1000)
             }
         }
     }

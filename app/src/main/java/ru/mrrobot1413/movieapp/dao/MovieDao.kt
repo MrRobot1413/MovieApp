@@ -18,6 +18,9 @@ interface MovieDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveAll(movie: List<Movie>)
 
+    @Query("DELETE FROM movies")
+    fun delete()
+
     @Query("SELECT * FROM movies WHERE id=:id")
     fun selectById(id: Int): Single<Movie?>
 

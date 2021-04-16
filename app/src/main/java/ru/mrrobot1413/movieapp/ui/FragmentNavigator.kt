@@ -2,6 +2,7 @@ package ru.mrrobot1413.movieapp.ui
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.*
 import androidx.navigation.fragment.FragmentNavigator

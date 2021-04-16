@@ -7,7 +7,6 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
-@Entity(tableName = "movies")
 @Parcelize
 data class MovieNetwork(
     @SerializedName("id") val id: Int,
