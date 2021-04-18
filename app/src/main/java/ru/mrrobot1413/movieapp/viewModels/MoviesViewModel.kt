@@ -1,32 +1,32 @@
 package ru.mrrobot1413.movieapp.viewModels
 
 import android.content.Context
-import android.os.Build
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
-import android.widget.Toast
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.work.*
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.schedulers.Schedulers.io
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import ru.mrrobot1413.movieapp.NotifyWorker
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.model.Movie
 import ru.mrrobot1413.movieapp.model.MovieNetwork
-import ru.mrrobot1413.movieapp.model.MovieResponse
+import ru.mrrobot1413.movieapp.model.VideoResponse
 import ru.mrrobot1413.movieapp.repositories.DbListRepository
 import ru.mrrobot1413.movieapp.repositories.MovieRepository
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
+
 
 class MoviesViewModel : ViewModel() {
 
@@ -58,22 +58,7 @@ class MoviesViewModel : ViewModel() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ result ->
                 if (result != null) {
-//                    val list = ArrayList<Movie>()
                     _movies.postValue(result.moviesList)
-//                    if (_movies.value?.iterator()?.hasNext() == true) {
-//                        val next = _movies.value?.iterator()!!.next()
-//                        list.add(Movie(
-//                            next.id,
-//                            next.title,
-//                            next.overview,
-//                            next.overview,
-//                            next.rating,
-//                            next.releaseDate,
-//                            next.time,
-//                            next.language
-//                        ))
-//                    }
-//                    saveAll(list)
                 } else {
                     _error.postValue(noConnection)
                 }
@@ -156,7 +141,7 @@ class MoviesViewModel : ViewModel() {
 
     fun searchMovie(
         page: Int,
-        query: String,
+        query: String?,
         noConnection: String,
         errorLoading: String,
     ) {
@@ -180,6 +165,12 @@ class MoviesViewModel : ViewModel() {
                 compositeDisposable.add(observable)
             }
         }
+    }
+
+    fun getVideos(
+        id: Int
+    ): Single<VideoResponse>{
+        return movieRepository.getVideos(id)
     }
 
     override fun onCleared() {

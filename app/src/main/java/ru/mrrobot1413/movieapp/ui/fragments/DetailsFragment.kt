@@ -1,35 +1,38 @@
 package ru.mrrobot1413.movieapp.ui.fragments
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.request.RequestListener
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.schedulers.Schedulers.io
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.databinding.FragmentDetailsBinding
 import ru.mrrobot1413.movieapp.interfaces.MovieClickListener
 import ru.mrrobot1413.movieapp.model.Movie
 import ru.mrrobot1413.movieapp.model.MovieNetwork
+import ru.mrrobot1413.movieapp.repositories.MovieRepository
 import ru.mrrobot1413.movieapp.ui.MainActivity
 import ru.mrrobot1413.movieapp.viewModels.FavoriteListViewModel
 import ru.mrrobot1413.movieapp.viewModels.MoviesViewModel
-import java.text.SimpleDateFormat
 import java.util.*
 
 class DetailsFragment : Fragment() {
@@ -89,6 +92,8 @@ class DetailsFragment : Fragment() {
                             false
                         }
                 }, {})
+
+            setOnPlayTrailerBtnClickListener(movie.id, movie.title)
 
             inviteText = getString(R.string.invite_text) + " " + movie.title
         })
@@ -184,68 +189,109 @@ class DetailsFragment : Fragment() {
         }
     }
 
-    private fun setIconLiked() {
-        binding.fabAddToFavorite.setImageDrawable(
-            ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.ic_favorite
-            )
-        )
-    }
-
-    private fun setIconUnliked() {
-        binding.fabAddToFavorite.setImageDrawable(
-            ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.ic_favorite_border
-            )
-        )
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        menu.clear()
-        binding.toolbar.inflateMenu(R.menu.invite_menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.invite_friend) {
-            val sendIntent = Intent()
-            sendIntent.action = Intent.ACTION_SEND
-            sendIntent.putExtra(Intent.EXTRA_SUBJECT, binding.collapsingToolbarLayout.title)
-            sendIntent.putExtra(Intent.EXTRA_TEXT, inviteText)
-            sendIntent.type = "text/plain"
-            startActivity(sendIntent)
-        } else if (item.itemId == R.id.watch_later) {
-            calendar = Calendar.getInstance()
-            calendar.timeZone = TimeZone.getDefault()
-            val datePickerDialog = MaterialDatePicker.Builder
-                .datePicker()
-                .setTitleText(getString(R.string.select_date))
-                .build()
-
-            val timePicker = MaterialTimePicker.Builder()
-                .setTimeFormat(TimeFormat.CLOCK_12H)
-                .setHour(calendar.get(Calendar.HOUR_OF_DAY))
-                .setMinute(calendar.get(Calendar.MINUTE))
-                .setTitleText(getString(R.string.select_time))
-                .build()
-
-            activity?.supportFragmentManager?.let {
-                datePickerDialog.addOnPositiveButtonClickListener { _ ->
-                    timePicker.show(it, "timePicker")
-                }
-                timePicker.addOnPositiveButtonClickListener {
-                    calendar.timeInMillis = datePickerDialog.selection!!
-                    calendar.set(Calendar.HOUR_OF_DAY, timePicker.hour)
-                    calendar.set(Calendar.MINUTE, timePicker.minute)
-                    calendar.set(Calendar.SECOND, 0)
-                    moviesViewModel.movieDetailed.value?.title?.let { it1 ->
-                        moviesViewModel.scheduleNotification(it1,
-                            calendar,
-                            requireContext(),
-                            moviesViewModel.movieDetailed.value!!.id)
+    private fun setOnPlayTrailerBtnClickListener(id: Int, name: String) {
+        binding.btnPlayTrailer.setOnClickListener {
+            moviesViewModel.getVideos(id)
+                .subscribeOn(io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    RxJavaPlugins.setErrorHandler { _ ->
+                        if(it.list?.isEmpty() == true) {
+                            val intentApp = Intent(Intent.ACTION_VIEW,
+                                Uri.parse("https://www.youtube.com/results?search_query=$name " + getString(R.string.trailer)))
+                            val intentBrowser = Intent(Intent.ACTION_VIEW,
+                                Uri.parse("https://www.youtube.com/results?search_query=$name " + getString(R.string.trailer)))
+                            try {
+                                activity?.startActivity(intentApp)
+                            } catch (ex: ActivityNotFoundException) {
+                                activity?.startActivity(intentBrowser)
+                            }
+                        }
                     }
+                    Log.d("linkTo", it.list?.size.toString())
+                    val intentApp = Intent(Intent.ACTION_VIEW,
+                        Uri.parse("vnd.youtube:" + (it.list?.get(0)?.key)))
+                    val intentBrowser = Intent(Intent.ACTION_VIEW,
+                        Uri.parse("http://www.youtube.com/watch?v=" + (it.list?.get(0)?.key)))
+                    try {
+                        activity?.startActivity(intentApp)
+                    } catch (ex: ActivityNotFoundException) {
+                        activity?.startActivity(intentBrowser)
+                    }
+                }, {
+                    showSnackbar(getString(R.string.error_occurred))
+                })
+        }
+}
+
+private fun showSnackbar(text: String) {
+    view?.let {
+        Snackbar.make(it, text, Snackbar.LENGTH_SHORT).show()
+    }
+}
+
+private fun setIconLiked() {
+    binding.fabAddToFavorite.setImageDrawable(
+        ContextCompat.getDrawable(
+            requireContext(),
+            R.drawable.ic_favorite
+        )
+    )
+}
+
+private fun setIconUnliked() {
+    binding.fabAddToFavorite.setImageDrawable(
+        ContextCompat.getDrawable(
+            requireContext(),
+            R.drawable.ic_favorite_border
+        )
+    )
+}
+
+override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    super.onCreateOptionsMenu(menu, inflater)
+    menu.clear()
+    binding.toolbar.inflateMenu(R.menu.invite_menu)
+}
+
+override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    if (item.itemId == R.id.invite_friend) {
+        val sendIntent = Intent()
+        sendIntent.action = Intent.ACTION_SEND
+        sendIntent.putExtra(Intent.EXTRA_SUBJECT, binding.collapsingToolbarLayout.title)
+        sendIntent.putExtra(Intent.EXTRA_TEXT, inviteText)
+        sendIntent.type = "text/plain"
+        startActivity(sendIntent)
+    } else if (item.itemId == R.id.watch_later) {
+        calendar = Calendar.getInstance()
+        calendar.timeZone = TimeZone.getDefault()
+        val datePickerDialog = MaterialDatePicker.Builder
+            .datePicker()
+            .setTitleText(getString(R.string.select_date))
+            .build()
+
+        val timePicker = MaterialTimePicker.Builder()
+            .setTimeFormat(TimeFormat.CLOCK_12H)
+            .setHour(calendar.get(Calendar.HOUR_OF_DAY))
+            .setMinute(calendar.get(Calendar.MINUTE))
+            .setTitleText(getString(R.string.select_time))
+            .build()
+
+        activity?.supportFragmentManager?.let {
+            datePickerDialog.addOnPositiveButtonClickListener { _ ->
+                timePicker.show(it, "timePicker")
+            }
+            timePicker.addOnPositiveButtonClickListener {
+                calendar.timeInMillis = datePickerDialog.selection!!
+                calendar.set(Calendar.HOUR_OF_DAY, timePicker.hour)
+                calendar.set(Calendar.MINUTE, timePicker.minute)
+                calendar.set(Calendar.SECOND, 0)
+                moviesViewModel.movieDetailed.value?.title?.let { it1 ->
+                    moviesViewModel.scheduleNotification(it1,
+                        calendar,
+                        requireContext(),
+                        moviesViewModel.movieDetailed.value!!.id)
+                }
 
 //                    val format = SimpleDateFormat("HH:mm dd MMM, yyyy")
 //                    val formatted = format.format(calendar.time)
@@ -253,15 +299,15 @@ class DetailsFragment : Fragment() {
 //                    moviesViewModel.movieDetailed.value!!.reminder = formatted
 //                    moviesViewModel.movieDetailed.value!!.isToNotify = true
 //                    favoriteListViewModel.insert(moviesViewModel.movieDetailed.value!!)
-                }
-                datePickerDialog.show(it, "datePicker")
             }
+            datePickerDialog.show(it, "datePicker")
         }
+    }
 //        else if(item.itemId == R.id.watch_later_cancel){
 //            moviesViewModel.unscheduleNotification(moviesViewModel.movieDetailed.value!!, MoviesViewModel.WORK_TAG, requireContext())
 //            favoriteListViewModel.updateDatabaseRecord(moviesViewModel.movieDetailed.value!!)
 //            activity?.onBackPressed()
 //        }
-        return super.onOptionsItemSelected(item)
-    }
+    return super.onOptionsItemSelected(item)
+}
 }

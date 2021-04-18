@@ -3,8 +3,6 @@ package ru.mrrobot1413.movieapp.ui.fragments
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
@@ -34,7 +32,6 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
             (activity as MovieClickListener).openDetailsFragment(id, holder, 1)
         }
     }
-
     private lateinit var linearLayoutManager: GridLayoutManager
     private val moviesViewModel by lazy {
         ViewModelProvider(this).get(MoviesViewModel::class.java)
@@ -155,6 +152,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         binding.toolbar.setOnSearchQueryChangedListener(this)
 
         binding.refreshLayout.setOnRefreshListener {
+            runLayoutAnimation(binding.recyclerView)
             moviesViewModel.getPopularMovies(
                 moviesPage,
                 getString(R.string.no_connection),
@@ -175,25 +173,28 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
                 val firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition()
 
                 if (firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
-                    recyclerView.removeOnScrollListener(this)
                     if (moviesPage < 500) {
+                        recyclerView.removeOnScrollListener(this)
                         moviesPage++
+                        moviesViewModel.getPopularMovies(moviesPage,
+                            getString(R.string.no_connection),
+                            getString(R.string.error_loading_movies))
+                        attachPopularMoviesOnScrollListener()
                     }
-                    moviesViewModel.getPopularMovies(moviesPage, getString(R.string.no_connection),
-                        getString(R.string.error_loading_movies))
-                    attachPopularMoviesOnScrollListener()
                 }
             }
         })
     }
 
     private fun runLayoutAnimation(recyclerView: RecyclerView) {
-        val context = recyclerView.context
-        val controller: LayoutAnimationController =
-            AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation)
-        recyclerView.layoutAnimation = controller
-        recyclerView.adapter!!.notifyDataSetChanged()
-        recyclerView.scheduleLayoutAnimation()
+        if(recyclerView.childCount <= 4){
+            val context = recyclerView.context
+            val controller: LayoutAnimationController =
+                AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation)
+            recyclerView.layoutAnimation = controller
+            recyclerView.adapter!!.notifyDataSetChanged()
+            recyclerView.scheduleLayoutAnimation()
+        }
     }
 
     private fun initRecycler() {
@@ -209,12 +210,9 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
 
     override fun onSearchQueryChanged(query: String?) {
-
-                    adapter.setMoviesFromMenu(mutableListOf())
-                    moviesViewModel.searchMovie(1, query, getString(R.string.no_connection),
-                        getString(R.string.error_loading_movies))
-            }
-        }
+        adapter.setMoviesFromMenu(mutableListOf())
+        moviesViewModel.searchMovie(1, query, getString(R.string.no_connection),
+            getString(R.string.error_loading_movies))
     }
 
     override fun onSearchExpanded() {

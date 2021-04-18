@@ -239,6 +239,16 @@
                     android:textColor="@color/white"
                     android:text="@{viewModel.movieDetailed.overview}"
                     android:textSize="16sp" />
+
+                <Button
+                    android:id="@+id/btn_play_trailer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/txt_descr"
+                    android:textColor="@color/black"
+                    android:backgroundTint="@color/colorAccent"
+                    android:layout_margin="8dp"
+                    android:text="@string/play_trailer"/>
             </RelativeLayout>
         </androidx.core.widget.NestedScrollView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

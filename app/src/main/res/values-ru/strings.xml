@@ -31,4 +31,7 @@
     <string name="watch_later_invite">Напоминание о просмотре</string>
     <string name="watch_the_movie">Посмотреть фильм </string>
     <string name="watch_later">Смотреть позже</string>
+    <string name="play_trailer">проиграть трейлер</string>
+    <string name="error_occurred">Произошла ошибка</string>
+    <string name="trailer">трейлер</string>
 </resources>

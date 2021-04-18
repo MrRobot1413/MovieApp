@@ -31,4 +31,7 @@
     <string name="watch_later_invite">Watch later reminder</string>
     <string name="watch_the_movie">Watch the movie </string>
     <string name="watch_later">Watch later</string>
+    <string name="play_trailer">watch trailer</string>
+    <string name="error_occurred">Error occurred</string>
+    <string name="trailer">trailer</string>
 </resources>

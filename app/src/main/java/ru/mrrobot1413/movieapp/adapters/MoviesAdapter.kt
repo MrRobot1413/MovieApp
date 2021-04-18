@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import androidx.recyclerview.widget.RecyclerView
 import ru.mrrobot1413.movieapp.R
-import ru.mrrobot1413.movieapp.model.Movie
 import ru.mrrobot1413.movieapp.model.MovieNetwork
 import ru.mrrobot1413.movieapp.viewHolders.MoviesViewHolder
 
@@ -31,7 +30,7 @@ class MoviesAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoviesViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return MoviesViewHolder(
-            layoutInflater.inflate(R.layout.list_item, parent, false)
+            layoutInflater.inflate(R.layout.movie_list_item, parent, false)
         )
     }
 
