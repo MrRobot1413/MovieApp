@@ -1,12 +1,14 @@
 package ru.mrrobot1413.movieapp.ui.fragments
 
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -75,7 +77,7 @@ class DetailsFragment : Fragment() {
 
             setOnFabClickListener(movie)
 
-            favoriteListViewModel.selectById(movie.id).subscribeOn(Schedulers.io())
+            favoriteListViewModel.selectById(movie.id).subscribeOn(io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ result ->
                     isAddedToFavorite =
@@ -196,11 +198,13 @@ class DetailsFragment : Fragment() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     RxJavaPlugins.setErrorHandler { _ ->
-                        if(it.list?.isEmpty() == true) {
+                        if (it.list?.isEmpty() == true) {
                             val intentApp = Intent(Intent.ACTION_VIEW,
-                                Uri.parse("https://www.youtube.com/results?search_query=$name " + getString(R.string.trailer)))
+                                Uri.parse("https://www.youtube.com/results?search_query=$name " + getString(
+                                    R.string.trailer)))
                             val intentBrowser = Intent(Intent.ACTION_VIEW,
-                                Uri.parse("https://www.youtube.com/results?search_query=$name " + getString(R.string.trailer)))
+                                Uri.parse("https://www.youtube.com/results?search_query=$name " + getString(
+                                    R.string.trailer)))
                             try {
                                 activity?.startActivity(intentApp)
                             } catch (ex: ActivityNotFoundException) {
@@ -222,76 +226,86 @@ class DetailsFragment : Fragment() {
                     showSnackbar(getString(R.string.error_occurred))
                 })
         }
-}
-
-private fun showSnackbar(text: String) {
-    view?.let {
-        Snackbar.make(it, text, Snackbar.LENGTH_SHORT).show()
     }
-}
 
-private fun setIconLiked() {
-    binding.fabAddToFavorite.setImageDrawable(
-        ContextCompat.getDrawable(
-            requireContext(),
-            R.drawable.ic_favorite
+    override fun onDestroyView() {
+        super.onDestroyView()
+        val view = activity?.currentFocus
+        if (view != null) {
+            val im: InputMethodManager =
+                activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            im.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
+
+    private fun showSnackbar(text: String) {
+        view?.let {
+            Snackbar.make(it, text, Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setIconLiked() {
+        binding.fabAddToFavorite.setImageDrawable(
+            ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_favorite
+            )
         )
-    )
-}
+    }
 
-private fun setIconUnliked() {
-    binding.fabAddToFavorite.setImageDrawable(
-        ContextCompat.getDrawable(
-            requireContext(),
-            R.drawable.ic_favorite_border
+    private fun setIconUnliked() {
+        binding.fabAddToFavorite.setImageDrawable(
+            ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_favorite_border
+            )
         )
-    )
-}
+    }
 
-override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    super.onCreateOptionsMenu(menu, inflater)
-    menu.clear()
-    binding.toolbar.inflateMenu(R.menu.invite_menu)
-}
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        menu.clear()
+        binding.toolbar.inflateMenu(R.menu.invite_menu)
+    }
 
-override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    if (item.itemId == R.id.invite_friend) {
-        val sendIntent = Intent()
-        sendIntent.action = Intent.ACTION_SEND
-        sendIntent.putExtra(Intent.EXTRA_SUBJECT, binding.collapsingToolbarLayout.title)
-        sendIntent.putExtra(Intent.EXTRA_TEXT, inviteText)
-        sendIntent.type = "text/plain"
-        startActivity(sendIntent)
-    } else if (item.itemId == R.id.watch_later) {
-        calendar = Calendar.getInstance()
-        calendar.timeZone = TimeZone.getDefault()
-        val datePickerDialog = MaterialDatePicker.Builder
-            .datePicker()
-            .setTitleText(getString(R.string.select_date))
-            .build()
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.invite_friend) {
+            val sendIntent = Intent()
+            sendIntent.action = Intent.ACTION_SEND
+            sendIntent.putExtra(Intent.EXTRA_SUBJECT, binding.collapsingToolbarLayout.title)
+            sendIntent.putExtra(Intent.EXTRA_TEXT, inviteText)
+            sendIntent.type = "text/plain"
+            startActivity(sendIntent)
+        } else if (item.itemId == R.id.watch_later) {
+            calendar = Calendar.getInstance()
+            calendar.timeZone = TimeZone.getDefault()
+            val datePickerDialog = MaterialDatePicker.Builder
+                .datePicker()
+                .setTitleText(getString(R.string.select_date))
+                .build()
 
-        val timePicker = MaterialTimePicker.Builder()
-            .setTimeFormat(TimeFormat.CLOCK_12H)
-            .setHour(calendar.get(Calendar.HOUR_OF_DAY))
-            .setMinute(calendar.get(Calendar.MINUTE))
-            .setTitleText(getString(R.string.select_time))
-            .build()
+            val timePicker = MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_12H)
+                .setHour(calendar.get(Calendar.HOUR_OF_DAY))
+                .setMinute(calendar.get(Calendar.MINUTE))
+                .setTitleText(getString(R.string.select_time))
+                .build()
 
-        activity?.supportFragmentManager?.let {
-            datePickerDialog.addOnPositiveButtonClickListener { _ ->
-                timePicker.show(it, "timePicker")
-            }
-            timePicker.addOnPositiveButtonClickListener {
-                calendar.timeInMillis = datePickerDialog.selection!!
-                calendar.set(Calendar.HOUR_OF_DAY, timePicker.hour)
-                calendar.set(Calendar.MINUTE, timePicker.minute)
-                calendar.set(Calendar.SECOND, 0)
-                moviesViewModel.movieDetailed.value?.title?.let { it1 ->
-                    moviesViewModel.scheduleNotification(it1,
-                        calendar,
-                        requireContext(),
-                        moviesViewModel.movieDetailed.value!!.id)
+            activity?.supportFragmentManager?.let {
+                datePickerDialog.addOnPositiveButtonClickListener { _ ->
+                    timePicker.show(it, "timePicker")
                 }
+                timePicker.addOnPositiveButtonClickListener {
+                    calendar.timeInMillis = datePickerDialog.selection!!
+                    calendar.set(Calendar.HOUR_OF_DAY, timePicker.hour)
+                    calendar.set(Calendar.MINUTE, timePicker.minute)
+                    calendar.set(Calendar.SECOND, 0)
+                    moviesViewModel.movieDetailed.value?.title?.let { it1 ->
+                        moviesViewModel.scheduleNotification(it1,
+                            calendar,
+                            requireContext(),
+                            moviesViewModel.movieDetailed.value!!.id)
+                    }
 
 //                    val format = SimpleDateFormat("HH:mm dd MMM, yyyy")
 //                    val formatted = format.format(calendar.time)
@@ -299,15 +313,15 @@ override fun onOptionsItemSelected(item: MenuItem): Boolean {
 //                    moviesViewModel.movieDetailed.value!!.reminder = formatted
 //                    moviesViewModel.movieDetailed.value!!.isToNotify = true
 //                    favoriteListViewModel.insert(moviesViewModel.movieDetailed.value!!)
+                }
+                datePickerDialog.show(it, "datePicker")
             }
-            datePickerDialog.show(it, "datePicker")
         }
-    }
 //        else if(item.itemId == R.id.watch_later_cancel){
 //            moviesViewModel.unscheduleNotification(moviesViewModel.movieDetailed.value!!, MoviesViewModel.WORK_TAG, requireContext())
 //            favoriteListViewModel.updateDatabaseRecord(moviesViewModel.movieDetailed.value!!)
 //            activity?.onBackPressed()
 //        }
-    return super.onOptionsItemSelected(item)
-}
+        return super.onOptionsItemSelected(item)
+    }
 }

@@ -14,6 +14,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.oshi.libsearchtoolbar.SearchAnimationToolbar
@@ -45,7 +46,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         initFields()
 
         moviesViewModel.movies.observe(viewLifecycleOwner, {
-            runLayoutAnimation(binding.recyclerView)
+            runLayoutAnimation(binding.recyclerView, binding.recyclerView.layoutManager as GridLayoutManager)
             binding.recyclerView.visibility = View.VISIBLE
             adapter.setMovies(it)
             binding.refreshLayout.isRefreshing = false
@@ -113,7 +114,6 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
 
     private fun showSearchView() {
-        toolbar.onSearchIconClick()
     }
 
     private fun showSnackbar(text: String) {
@@ -132,7 +132,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.search -> showSearchView()
+            R.id.search -> toolbar.onSearchIconClick()
             R.id.popular -> showPopularMovies()
             R.id.top_rated -> showTopRatedMovies()
         }
@@ -152,7 +152,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         binding.toolbar.setOnSearchQueryChangedListener(this)
 
         binding.refreshLayout.setOnRefreshListener {
-            runLayoutAnimation(binding.recyclerView)
+            runLayoutAnimation(binding.recyclerView, binding.recyclerView.layoutManager as GridLayoutManager)
             moviesViewModel.getPopularMovies(
                 moviesPage,
                 getString(R.string.no_connection),
@@ -186,8 +186,8 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         })
     }
 
-    private fun runLayoutAnimation(recyclerView: RecyclerView) {
-        if(recyclerView.childCount <= 4){
+    private fun runLayoutAnimation(recyclerView: RecyclerView, linearLayout: GridLayoutManager) {
+        if(recyclerView.childCount <= 4 && linearLayout.itemCount <= 4){
             val context = recyclerView.context
             val controller: LayoutAnimationController =
                 AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation)
