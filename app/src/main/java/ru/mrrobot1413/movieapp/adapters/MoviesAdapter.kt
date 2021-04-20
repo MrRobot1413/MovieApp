@@ -10,7 +10,7 @@ import ru.mrrobot1413.movieapp.viewHolders.MoviesViewHolder
 
 class MoviesAdapter(
     private var movies: MutableList<MovieNetwork>,
-    private val clickListener: (id: Int, holder: RelativeLayout) -> Unit
+    private val clickListener: (id: Int) -> Unit
 ) :
     RecyclerView.Adapter<MoviesViewHolder>() {
 
@@ -42,7 +42,7 @@ class MoviesAdapter(
     private fun setOnMovieClickListener(holder: MoviesViewHolder, movie: MovieNetwork) {
         holder.holder.setOnClickListener {
             notifyDataSetChanged()
-            clickListener(movie.id, holder.relative)
+            clickListener(movie.id)
         }
     }
 }

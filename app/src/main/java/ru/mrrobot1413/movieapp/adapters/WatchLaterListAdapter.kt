@@ -9,7 +9,7 @@ import ru.mrrobot1413.movieapp.model.Movie
 import ru.mrrobot1413.movieapp.viewHolders.WatchLaterListViewHolder
 
 class WatchLaterListAdapter(
-    private val clickListener: (movie: Movie, holder: RelativeLayout) -> Unit
+    private val clickListener: (movie: Movie) -> Unit
 ) :
     RecyclerView.Adapter<WatchLaterListViewHolder>() {
 
@@ -37,7 +37,7 @@ class WatchLaterListAdapter(
     private fun setOnDetailsClickListener(holder: WatchLaterListViewHolder, movie: Movie) {
         holder.holder.setOnClickListener {
             notifyDataSetChanged()
-            clickListener(movie, holder.relative)
+            clickListener(movie)
         }
     }
 }

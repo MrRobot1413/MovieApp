@@ -4,7 +4,7 @@
     <string name="details">Подробности</string>
     <string name="favorite">Избранное</string>
     <string name="add_to_favorite">Добавить в избранное</string>
-    <string name="no_movies_sign">Ничего не добавлено в избранное</string>
+    <string name="no_movies_sign">Ничего не добавлено в эту категорию</string>
     <string name="exit_text">Вы уверены что хотите выйти?</string>
     <string name="confirm_exit">Выйти</string>
     <string name="cancel_exit">Отмена</string>

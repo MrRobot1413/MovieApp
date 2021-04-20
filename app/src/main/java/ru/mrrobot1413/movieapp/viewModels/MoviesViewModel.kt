@@ -179,15 +179,17 @@ class MoviesViewModel : ViewModel() {
     }
 
     fun scheduleNotification(
-        movieName: String,
+        movie: Movie,
         scheduledTime: Calendar,
         context: Context,
         id: Int,
+        formattedDate: String
     ) {
+        Log.d("WOREK", "works")
         val data = Data.Builder()
         data.putString(NotifyWorker.NAME, context.getString(R.string.watch_later_invite))
         data.putString(NotifyWorker.BODY,
-            context.getString(R.string.watch_the_movie) + " \"$movieName\"")
+            context.getString(R.string.watch_the_movie) + " \"${movie.title}\"")
         data.putInt(NotifyWorker.ICON, R.drawable.ic_baseline_movie_24)
         data.putInt(NotifyWorker.ID, id)
         data.putInt(NotifyWorker.GRAPH, R.navigation.nav_graph)
@@ -196,6 +198,14 @@ class MoviesViewModel : ViewModel() {
         WorkManager
             .getInstance(context)
             .enqueue(buildWorkRequest(data, scheduledTime))
+
+        movie.isToNotify = true
+        movie.reminder = formattedDate
+        Completable.fromCallable {
+            dbRepository.insert(movie)
+        }
+            .subscribeOn(io())
+            .subscribe()
     }
 
     private fun buildWorkRequest(

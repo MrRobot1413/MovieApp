@@ -30,8 +30,8 @@ class FavoriteListFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var txtNoMovie: TextView
     private val adapter by lazy {
-        FavoriteListAdapter { id: Int, holder: RelativeLayout ->
-            (activity as? MovieClickListener)?.openDetailsFragment(id, holder, 1)
+        FavoriteListAdapter { id: Int ->
+            (activity as? MovieClickListener)?.openDetailsFragment(id, 1)
         }
     }
     private val favoriteListViewModel by lazy {

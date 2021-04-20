@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/holder"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/itemColor"
-    tools:ignore="MissingDefaultResource">
+    android:background="@color/itemColor">
 
     <RelativeLayout
         android:id="@+id/relative"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="16dp"
-        android:paddingRight="16dp"
-        android:paddingLeft="16dp">
+        android:paddingTop="10dp"
+        android:paddingRight="12dp"
+        android:paddingLeft="12dp">
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="250dp"
             app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardMaxElevation="4dp"
             android:backgroundTint="@color/itemColor">
 
             <ProgressBar
@@ -45,7 +45,7 @@
         android:layout_centerHorizontal="true"
         android:ellipsize="end"
         android:fontFamily="sans-serif-black"
-        android:padding="16dp"
+        android:padding="8dp"
         android:singleLine="false"
         android:transitionName="title_start"
         android:gravity="center"
@@ -54,14 +54,16 @@
         android:textSize="16sp" />
 
     <TextView
-        android:id="@+id/txt_remind"
+        android:id="@+id/txt_reminder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/txt_name"
         android:layout_centerHorizontal="true"
         android:ellipsize="end"
         android:fontFamily="sans-serif-black"
-        android:padding="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="16dp"
         android:singleLine="false"
         android:transitionName="title_start"
         android:gravity="center"

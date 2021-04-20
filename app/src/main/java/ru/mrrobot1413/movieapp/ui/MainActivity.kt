@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         bottomNavigationView.setupWithNavController(navController)
     }
 
-    override fun openDetailsFragment(id: Int, holder: RelativeLayout, source: Int) {
+    override fun openDetailsFragment(id: Int, source: Int) {
         val bundle = Bundle()
         bundle.putInt(MOVIE, id)
         val navOptions = NavOptions.Builder().setEnterAnim(R.anim.fragment_open_enter)

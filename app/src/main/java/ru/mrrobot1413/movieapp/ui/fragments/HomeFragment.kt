@@ -29,8 +29,8 @@ import ru.mrrobot1413.movieapp.viewModels.MoviesViewModel
 class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListener {
 
     private val adapter by lazy {
-        MoviesAdapter(mutableListOf()) { id: Int, holder: RelativeLayout ->
-            (activity as MovieClickListener).openDetailsFragment(id, holder, 1)
+        MoviesAdapter(mutableListOf()) { id: Int ->
+            (activity as MovieClickListener).openDetailsFragment(id, 1)
         }
     }
     private lateinit var linearLayoutManager: GridLayoutManager
@@ -54,6 +54,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
         moviesViewModel.error.observe(viewLifecycleOwner, {
             showSnackbar(it)
+            binding.refreshLayout.isRefreshing = false
 //            moviesViewModel.selectAll().subscribeOn(Schedulers.io())
 //                .observeOn(AndroidSchedulers.mainThread())
 //                .subscribe({ result ->
@@ -72,7 +73,6 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 //                    }
 //                    adapter.setMovies(movies)
 //                }, {})
-            binding.refreshLayout.isRefreshing = false
         })
 
         moviesViewModel.getPopularMovies(moviesPage, getString(R.string.no_connection),
@@ -113,9 +113,6 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
             getString(R.string.error_loading_movies))
     }
 
-    private fun showSearchView() {
-    }
-
     private fun showSnackbar(text: String) {
         view?.let {
             Snackbar.make(it, text, Snackbar.LENGTH_INDEFINITE).setAnchorView(R.id.bottom)
@@ -152,12 +149,9 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         binding.toolbar.setOnSearchQueryChangedListener(this)
 
         binding.refreshLayout.setOnRefreshListener {
-            runLayoutAnimation(binding.recyclerView, binding.recyclerView.layoutManager as GridLayoutManager)
-            moviesViewModel.getPopularMovies(
-                moviesPage,
-                getString(R.string.no_connection),
-                getString(R.string.error_loading_movies)
-            )
+            adapter.setMoviesFromMenu(mutableListOf())
+            moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
+                getString(R.string.error_loading_movies))
             binding.refreshLayout.isRefreshing = false
         }
 
@@ -187,7 +181,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
 
     private fun runLayoutAnimation(recyclerView: RecyclerView, linearLayout: GridLayoutManager) {
-        if(recyclerView.childCount <= 4 && linearLayout.itemCount <= 4){
+        if(linearLayout.childCount <= 4 && linearLayout.itemCount <= 4){
             val context = recyclerView.context
             val controller: LayoutAnimationController =
                 AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation)

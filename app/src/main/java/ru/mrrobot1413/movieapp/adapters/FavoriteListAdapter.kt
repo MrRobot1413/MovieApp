@@ -9,7 +9,7 @@ import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.model.Movie
 
 class FavoriteListAdapter(
-    private val clickListener: (id: Int, holder: RelativeLayout) -> Unit
+    private val clickListener: (id: Int) -> Unit
 ) :
     RecyclerView.Adapter<MoviesViewHolder>() {
 
@@ -37,7 +37,7 @@ class FavoriteListAdapter(
     private fun setOnDetailsClickListener(holder: MoviesViewHolder, movie: Movie) {
         holder.holder.setOnClickListener {
             notifyDataSetChanged()
-            clickListener(movie.id, holder.relative)
+            clickListener(movie.id)
         }
     }
 }

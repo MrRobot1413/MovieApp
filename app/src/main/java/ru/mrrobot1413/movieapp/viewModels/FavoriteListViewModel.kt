@@ -19,9 +19,9 @@ class FavoriteListViewModel : ViewModel() {
         return dbListRepository.selectAllFavorite()
     }
 
-//    fun getWatchLaterList(): LiveData<List<Movie>>{
-//        return dbListRepository.selectWatchLaterList()
-//    }
+    fun getWatchLaterList(): Single<List<Movie>>{
+        return dbListRepository.selectWatchLaterList()
+    }
 
     fun selectById(id: Int): Single<Movie?> {
         return dbListRepository.selectById(id)

@@ -9,8 +9,8 @@ interface MovieDao {
     @Query("SELECT * FROM movies WHERE isLiked is 1")
     fun selectAllFavorite(): Single<List<Movie>>
 
-//    @Query("SELECT * FROM movies WHERE isToNotify is 1")
-//    fun selectWatchLaterList(): LiveData<List<Movie>>
+    @Query("SELECT * FROM movies WHERE isToNotify is 1")
+    fun selectWatchLaterList(): Single<List<Movie>>
 
     @Query("SELECT * FROM movies")
     fun selectAll(): Single<List<Movie>>

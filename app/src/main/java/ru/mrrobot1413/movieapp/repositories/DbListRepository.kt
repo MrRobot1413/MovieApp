@@ -27,9 +27,9 @@ object DbListRepository {
         return movieDao.selectAllFavorite()
     }
 
-//    fun selectWatchLaterList(): LiveData<List<Movie>> {
-//        return movieDao.selectWatchLaterList()
-//    }
+    fun selectWatchLaterList(): Single<List<Movie>> {
+        return movieDao.selectWatchLaterList()
+    }
 
     fun selectAll(): Single<List<Movie>> {
         return movieDao.selectAll()
@@ -48,6 +48,12 @@ object DbListRepository {
     }
 
     fun delete(movie: Movie) {
-        movieDao.deleteMovie(movie)
+        if(movie.isToNotify && !movie.liked){
+            movieDao.insertMovie(movie)
+        } else if(!movie.isToNotify && !movie.liked){
+            movieDao.deleteMovie(movie)
+        } else if(movie.liked && !movie.isToNotify){
+            movieDao.insertMovie(movie)
+        }
     }
 }

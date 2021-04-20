@@ -34,6 +34,7 @@ class App : Application() {
             AppDatabase::class.java,
             "movies"
         )
+            .fallbackToDestructiveMigration()
             .build()
     }
 

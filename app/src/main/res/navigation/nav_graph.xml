@@ -7,9 +7,9 @@
     <fragment
         android:id="@+id/favoriteListFragment"
         android:name="ru.mrrobot1413.movieapp.ui.fragments.FavoriteListFragment" />
-<!--    <fragment-->
-<!--        android:id="@+id/watchLaterFragment"-->
-<!--        android:name="ru.mrrobot1413.movieapp.ui.fragments.WatchLaterFragment" />-->
+    <fragment
+        android:id="@+id/watchLaterFragment"
+        android:name="ru.mrrobot1413.movieapp.ui.fragments.WatchLaterFragment" />
     <fragment
         android:id="@+id/homeFragment"
         android:name="ru.mrrobot1413.movieapp.ui.fragments.HomeFragment" >

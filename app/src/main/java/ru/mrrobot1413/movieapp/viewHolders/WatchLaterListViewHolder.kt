@@ -20,7 +20,7 @@ import ru.mrrobot1413.movieapp.model.Movie
 class WatchLaterListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     var title: TextView = itemView.findViewById(R.id.txt_name)
     var image: ImageView = itemView.findViewById(R.id.image_main)
-    var reminder: TextView = itemView.findViewById(R.id.txt_remind)
+    var reminder: TextView = itemView.findViewById(R.id.txt_reminder)
     var holder: RelativeLayout = itemView.findViewById(R.id.holder)
     var relative: RelativeLayout = itemView.findViewById(R.id.relative)
     var progressBar: ProgressBar = itemView.findViewById(R.id.progress)
@@ -28,6 +28,7 @@ class WatchLaterListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
     fun bind(movie: Movie) {
         image.clipToOutline = true
         title.text = movie.title
+        reminder.text = movie.reminder
         Glide.with(itemView)
             .load("https://image.tmdb.org/t/p/w342${movie.posterPath}")
             .transform(CenterInside())

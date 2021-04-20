@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -35,6 +36,7 @@ import ru.mrrobot1413.movieapp.repositories.MovieRepository
 import ru.mrrobot1413.movieapp.ui.MainActivity
 import ru.mrrobot1413.movieapp.viewModels.FavoriteListViewModel
 import ru.mrrobot1413.movieapp.viewModels.MoviesViewModel
+import java.text.SimpleDateFormat
 import java.util.*
 
 class DetailsFragment : Fragment() {
@@ -116,44 +118,70 @@ class DetailsFragment : Fragment() {
     private fun setOnFabClickListener(movie: MovieNetwork?) {
         binding.fabAddToFavorite.setOnClickListener {
             if (movie != null) {
-                if (isAddedToFavorite) {
-                    isAddedToFavorite = false
+                favoriteListViewModel.selectById(movie.id)
+                    .subscribeOn(io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        if (isAddedToFavorite) {
+                            isAddedToFavorite = false
 
-                    val movieToDelete =
-                        Movie(
-                            movie.id,
-                            movie.title,
-                            movie.overview,
-                            movie.posterPath,
-                            movie.rating,
-                            movie.releaseDate,
-                            movie.time,
-                            movie.language
-                        )
-                    movieToDelete.liked = false
-                    favoriteListViewModel.delete(movieToDelete)
+                            val movieToDelete =
+                                Movie(
+                                    movie.id,
+                                    movie.title,
+                                    movie.overview,
+                                    movie.posterPath,
+                                    movie.rating,
+                                    movie.releaseDate,
+                                    movie.time,
+                                    movie.language
+                                )
+                            movieToDelete.liked = false
+                            movieToDelete.isToNotify = it?.isToNotify!!
+                            movieToDelete.reminder = it.reminder
+                            favoriteListViewModel.delete(movieToDelete)
 
-                    setIconUnliked()
-                } else {
-                    isAddedToFavorite = true
+                            setIconUnliked()
+                        } else {
+                            isAddedToFavorite = true
+                            val movieToInsert =
+                                Movie(
+                                    movie.id,
+                                    movie.title,
+                                    movie.overview,
+                                    movie.posterPath,
+                                    movie.rating,
+                                    movie.releaseDate,
+                                    movie.time,
+                                    movie.language,
+                                    true,
+                                    it?.isToNotify!!,
+                                    it.reminder
+                                )
+                            movieToInsert.time = moviesViewModel.movieDetailed.value?.time!!
+                            favoriteListViewModel.insert(movieToInsert)
 
-                    val movieToInsert =
-                        Movie(
-                            movie.id,
-                            movie.title,
-                            movie.overview,
-                            movie.posterPath,
-                            movie.rating,
-                            movie.releaseDate,
-                            movie.time,
-                            movie.language
-                        )
-                    movieToInsert.liked = true
-                    movieToInsert.time = moviesViewModel.movieDetailed.value?.time!!
-                    favoriteListViewModel.insert(movieToInsert)
+                            setIconLiked()
+                        }
+                    }, {
+                        isAddedToFavorite = true
+                        val movieToInsert =
+                            Movie(
+                                movie.id,
+                                movie.title,
+                                movie.overview,
+                                movie.posterPath,
+                                movie.rating,
+                                movie.releaseDate,
+                                movie.time,
+                                movie.language,
+                                true
+                            )
+                        movieToInsert.time = moviesViewModel.movieDetailed.value?.time!!
+                        favoriteListViewModel.insert(movieToInsert)
 
-                    setIconLiked()
-                }
+                        setIconLiked()
+                    })
             }
         }
     }
@@ -291,30 +319,67 @@ class DetailsFragment : Fragment() {
                 .setTitleText(getString(R.string.select_time))
                 .build()
 
-            activity?.supportFragmentManager?.let {
-                datePickerDialog.addOnPositiveButtonClickListener { _ ->
-                    timePicker.show(it, "timePicker")
+            activity?.supportFragmentManager?.let { fm ->
+                datePickerDialog.addOnPositiveButtonClickListener {
+                    timePicker.show(fm, "timePicker")
                 }
                 timePicker.addOnPositiveButtonClickListener {
                     calendar.timeInMillis = datePickerDialog.selection!!
                     calendar.set(Calendar.HOUR_OF_DAY, timePicker.hour)
                     calendar.set(Calendar.MINUTE, timePicker.minute)
                     calendar.set(Calendar.SECOND, 0)
-                    moviesViewModel.movieDetailed.value?.title?.let { it1 ->
-                        moviesViewModel.scheduleNotification(it1,
-                            calendar,
-                            requireContext(),
-                            moviesViewModel.movieDetailed.value!!.id)
-                    }
 
-//                    val format = SimpleDateFormat("HH:mm dd MMM, yyyy")
-//                    val formatted = format.format(calendar.time)
-//
-//                    moviesViewModel.movieDetailed.value!!.reminder = formatted
+                    val format = SimpleDateFormat("HH:mm dd MMM, yyyy")
+                    val formatted = format.format(calendar.time)
+
+                    favoriteListViewModel.selectById(it.id)
+                        .subscribeOn(io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            moviesViewModel.movieDetailed.value?.let { movie ->
+                                moviesViewModel.scheduleNotification(Movie(
+                                    movie.id,
+                                    movie.title,
+                                    movie.overview,
+                                    movie.posterPath,
+                                    movie.rating,
+                                    movie.releaseDate,
+                                    movie.time,
+                                    movie.language,
+                                    it?.liked!!,
+                                    it.isToNotify,
+                                    it.reminder
+                                ),
+                                    calendar,
+                                    requireContext(),
+                                    moviesViewModel.movieDetailed.value!!.id,
+                                    formatted
+                                )
+                            }
+                        }, {
+                            moviesViewModel.movieDetailed.value?.let { movie ->
+                                moviesViewModel.scheduleNotification(Movie(
+                                    movie.id,
+                                    movie.title,
+                                    movie.overview,
+                                    movie.posterPath,
+                                    movie.rating,
+                                    movie.releaseDate,
+                                    movie.time,
+                                    movie.language
+                                ),
+                                    calendar,
+                                    requireContext(),
+                                    moviesViewModel.movieDetailed.value!!.id,
+                                    formatted
+                                )
+                            }
+                        })
+
 //                    moviesViewModel.movieDetailed.value!!.isToNotify = true
 //                    favoriteListViewModel.insert(moviesViewModel.movieDetailed.value!!)
                 }
-                datePickerDialog.show(it, "datePicker")
+                datePickerDialog.show(fm, "datePicker")
             }
         }
 //        else if(item.itemId == R.id.watch_later_cancel){

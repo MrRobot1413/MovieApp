@@ -10,8 +10,8 @@
         android:icon="@drawable/ic_favorite"
         android:title="@string/favorite"/>
 
-<!--    <item-->
-<!--        android:id="@+id/watchLaterFragment"-->
-<!--        android:icon="@drawable/ic_baseline_watch_later_24"-->
-<!--        android:title="@string/watch_later"/>-->
+    <item
+        android:id="@+id/watchLaterFragment"
+        android:icon="@drawable/ic_baseline_watch_later_24"
+        android:title="@string/watch_later"/>
 </menu>
