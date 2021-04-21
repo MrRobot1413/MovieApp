@@ -44,10 +44,6 @@ class MoviesViewModel : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()
 
-    companion object {
-        const val WORK_TAG = "notificationTag"
-    }
-
     fun getPopularMovies(
         page: Int,
         noConnection: String,
@@ -168,8 +164,8 @@ class MoviesViewModel : ViewModel() {
     }
 
     fun getVideos(
-        id: Int
-    ): Single<VideoResponse>{
+        id: Int,
+    ): Single<VideoResponse> {
         return movieRepository.getVideos(id)
     }
 
@@ -183,7 +179,7 @@ class MoviesViewModel : ViewModel() {
         scheduledTime: Calendar,
         context: Context,
         id: Int,
-        formattedDate: String
+        formattedDate: String,
     ) {
         Log.d("WOREK", "works")
         val data = Data.Builder()
@@ -197,12 +193,27 @@ class MoviesViewModel : ViewModel() {
 
         WorkManager
             .getInstance(context)
-            .enqueue(buildWorkRequest(data, scheduledTime))
+            .enqueue(buildWorkRequest(data, scheduledTime, movie.id.toString()))
 
         movie.isToNotify = true
         movie.reminder = formattedDate
+
         Completable.fromCallable {
             dbRepository.insert(movie)
+        }
+            .subscribeOn(io())
+            .subscribe()
+    }
+
+    fun unscheduleNotification(context: Context, movie: Movie) {
+        WorkManager
+            .getInstance(context)
+            .cancelAllWorkByTag(movie.id.toString())
+
+        movie.isToNotify = false
+
+        Completable.fromCallable {
+            dbRepository.delete(movie)
         }
             .subscribeOn(io())
             .subscribe()
@@ -211,10 +222,11 @@ class MoviesViewModel : ViewModel() {
     private fun buildWorkRequest(
         data: Data.Builder,
         scheduledTime: Calendar,
+        tag: String,
     ): WorkRequest {
         val currentTime = Calendar.getInstance()
         return OneTimeWorkRequest.Builder(NotifyWorker::class.java)
-            .addTag(WORK_TAG)
+            .addTag(tag)
             .setInputData(data.build())
             .setInitialDelay(scheduledTime.timeInMillis - currentTime.timeInMillis,
                 TimeUnit.MILLISECONDS)

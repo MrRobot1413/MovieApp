@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
     override fun openDetailsFragment(id: Int, source: Int) {
         val bundle = Bundle()
         bundle.putInt(MOVIE, id)
+        bundle.putInt("source", source)
         val navOptions = NavOptions.Builder().setEnterAnim(R.anim.fragment_open_enter)
             .setExitAnim(R.anim.fragment_close_exit).setPopEnterAnim(R.anim.nav_default_pop_enter_anim).setPopExitAnim(R.anim.nav_default_pop_exit_anim).build()
         navController.navigate(R.id.detailsFragment, bundle, navOptions, null)

@@ -53,6 +53,8 @@ object DbListRepository {
         } else if(!movie.isToNotify && !movie.liked){
             movieDao.deleteMovie(movie)
         } else if(movie.liked && !movie.isToNotify){
+            movie.isToNotify = false
+            movie.liked = true
             movieDao.insertMovie(movie)
         }
     }

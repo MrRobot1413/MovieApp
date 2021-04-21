@@ -293,100 +293,122 @@ class DetailsFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         menu.clear()
-        binding.toolbar.inflateMenu(R.menu.invite_menu)
+        if (arguments?.getInt("source") == 3) {
+            binding.toolbar.inflateMenu(R.menu.watch_later_menu)
+        } else {
+            binding.toolbar.inflateMenu(R.menu.invite_menu)
+        }
+    }
+
+    private fun sendInviteToWatch(){
+        val sendIntent = Intent()
+        sendIntent.action = Intent.ACTION_SEND
+        sendIntent.putExtra(Intent.EXTRA_SUBJECT, binding.collapsingToolbarLayout.title)
+        sendIntent.putExtra(Intent.EXTRA_TEXT, inviteText)
+        sendIntent.type = "text/plain"
+        startActivity(sendIntent)
+    }
+
+    private fun scheduleNotification(){
+        calendar = Calendar.getInstance()
+        calendar.timeZone = TimeZone.getDefault()
+        val datePickerDialog = MaterialDatePicker.Builder
+            .datePicker()
+            .setTitleText(getString(R.string.select_date))
+            .build()
+
+        val timePicker = MaterialTimePicker.Builder()
+            .setTimeFormat(TimeFormat.CLOCK_12H)
+            .setHour(calendar.get(Calendar.HOUR_OF_DAY))
+            .setMinute(calendar.get(Calendar.MINUTE))
+            .setTitleText(getString(R.string.select_time))
+            .build()
+
+        activity?.supportFragmentManager?.let { fm ->
+            datePickerDialog.addOnPositiveButtonClickListener {
+                timePicker.show(fm, "timePicker")
+            }
+            timePicker.addOnPositiveButtonClickListener {
+                calendar.timeInMillis = datePickerDialog.selection!!
+                calendar.set(Calendar.HOUR_OF_DAY, timePicker.hour)
+                calendar.set(Calendar.MINUTE, timePicker.minute)
+                calendar.set(Calendar.SECOND, 0)
+
+                val format = SimpleDateFormat("HH:mm dd MMM, yyyy")
+                val formatted = format.format(calendar.time)
+
+                favoriteListViewModel.selectById(it.id)
+                    .subscribeOn(io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        moviesViewModel.movieDetailed.value?.let { movie ->
+                            moviesViewModel.scheduleNotification(Movie(
+                                movie.id,
+                                movie.title,
+                                movie.overview,
+                                movie.posterPath,
+                                movie.rating,
+                                movie.releaseDate,
+                                movie.time,
+                                movie.language,
+                                it?.liked!!,
+                                it.isToNotify,
+                                it.reminder
+                            ),
+                                calendar,
+                                requireContext(),
+                                moviesViewModel.movieDetailed.value!!.id,
+                                formatted
+                            )
+                        }
+                    }, {
+                        moviesViewModel.movieDetailed.value?.let { movie ->
+                            moviesViewModel.scheduleNotification(Movie(
+                                movie.id,
+                                movie.title,
+                                movie.overview,
+                                movie.posterPath,
+                                movie.rating,
+                                movie.releaseDate,
+                                movie.time,
+                                movie.language,
+                                isAddedToFavorite
+                            ),
+                                calendar,
+                                requireContext(),
+                                moviesViewModel.movieDetailed.value!!.id,
+                                formatted
+                            )
+                        }
+                    })
+            }
+            datePickerDialog.show(fm, "datePicker")
+        }
+    }
+
+    private fun unscheduleNotification(){
+        moviesViewModel.unscheduleNotification(requireContext(), Movie(
+            moviesViewModel.movieDetailed.value?.id!!,
+            moviesViewModel.movieDetailed.value?.title!!,
+            moviesViewModel.movieDetailed.value?.overview!!,
+            moviesViewModel.movieDetailed.value?.posterPath,
+            moviesViewModel.movieDetailed.value?.rating!!,
+            moviesViewModel.movieDetailed.value?.releaseDate!!,
+            moviesViewModel.movieDetailed.value?.time!!,
+            moviesViewModel.movieDetailed.value?.language!!,
+            isAddedToFavorite
+        ))
+        activity?.onBackPressed()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.invite_friend) {
-            val sendIntent = Intent()
-            sendIntent.action = Intent.ACTION_SEND
-            sendIntent.putExtra(Intent.EXTRA_SUBJECT, binding.collapsingToolbarLayout.title)
-            sendIntent.putExtra(Intent.EXTRA_TEXT, inviteText)
-            sendIntent.type = "text/plain"
-            startActivity(sendIntent)
-        } else if (item.itemId == R.id.watch_later) {
-            calendar = Calendar.getInstance()
-            calendar.timeZone = TimeZone.getDefault()
-            val datePickerDialog = MaterialDatePicker.Builder
-                .datePicker()
-                .setTitleText(getString(R.string.select_date))
-                .build()
+        when (item.itemId) {
+            R.id.invite_friend -> sendInviteToWatch()
 
-            val timePicker = MaterialTimePicker.Builder()
-                .setTimeFormat(TimeFormat.CLOCK_12H)
-                .setHour(calendar.get(Calendar.HOUR_OF_DAY))
-                .setMinute(calendar.get(Calendar.MINUTE))
-                .setTitleText(getString(R.string.select_time))
-                .build()
+            R.id.watch_later -> scheduleNotification()
 
-            activity?.supportFragmentManager?.let { fm ->
-                datePickerDialog.addOnPositiveButtonClickListener {
-                    timePicker.show(fm, "timePicker")
-                }
-                timePicker.addOnPositiveButtonClickListener {
-                    calendar.timeInMillis = datePickerDialog.selection!!
-                    calendar.set(Calendar.HOUR_OF_DAY, timePicker.hour)
-                    calendar.set(Calendar.MINUTE, timePicker.minute)
-                    calendar.set(Calendar.SECOND, 0)
-
-                    val format = SimpleDateFormat("HH:mm dd MMM, yyyy")
-                    val formatted = format.format(calendar.time)
-
-                    favoriteListViewModel.selectById(it.id)
-                        .subscribeOn(io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            moviesViewModel.movieDetailed.value?.let { movie ->
-                                moviesViewModel.scheduleNotification(Movie(
-                                    movie.id,
-                                    movie.title,
-                                    movie.overview,
-                                    movie.posterPath,
-                                    movie.rating,
-                                    movie.releaseDate,
-                                    movie.time,
-                                    movie.language,
-                                    it?.liked!!,
-                                    it.isToNotify,
-                                    it.reminder
-                                ),
-                                    calendar,
-                                    requireContext(),
-                                    moviesViewModel.movieDetailed.value!!.id,
-                                    formatted
-                                )
-                            }
-                        }, {
-                            moviesViewModel.movieDetailed.value?.let { movie ->
-                                moviesViewModel.scheduleNotification(Movie(
-                                    movie.id,
-                                    movie.title,
-                                    movie.overview,
-                                    movie.posterPath,
-                                    movie.rating,
-                                    movie.releaseDate,
-                                    movie.time,
-                                    movie.language
-                                ),
-                                    calendar,
-                                    requireContext(),
-                                    moviesViewModel.movieDetailed.value!!.id,
-                                    formatted
-                                )
-                            }
-                        })
-
-//                    moviesViewModel.movieDetailed.value!!.isToNotify = true
-//                    favoriteListViewModel.insert(moviesViewModel.movieDetailed.value!!)
-                }
-                datePickerDialog.show(fm, "datePicker")
-            }
+            R.id.watch_later_notif_off -> unscheduleNotification()
         }
-//        else if(item.itemId == R.id.watch_later_cancel){
-//            moviesViewModel.unscheduleNotification(moviesViewModel.movieDetailed.value!!, MoviesViewModel.WORK_TAG, requireContext())
-//            favoriteListViewModel.updateDatabaseRecord(moviesViewModel.movieDetailed.value!!)
-//            activity?.onBackPressed()
-//        }
         return super.onOptionsItemSelected(item)
     }
 }

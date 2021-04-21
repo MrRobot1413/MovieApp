@@ -31,7 +31,6 @@ class NotifyWorker(context: Context, params: WorkerParameters) : Worker(context,
     }
 
     override fun doWork(): Result {
-        Log.d("WORKERE", "worker")
         sendNotification(
             inputData.getString(NAME),
             inputData.getString(BODY),
