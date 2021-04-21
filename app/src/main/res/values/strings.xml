@@ -8,17 +8,12 @@
     <string name="exit_text">Are you sure you want to exit?</string>
     <string name="confirm_exit">Exit</string>
     <string name="cancel_exit">Cancel</string>
-    <string name="toast">Movie </string>
-    <string name="toast_delete"> was deleted from favorite</string>
-    <string name="toast_add"> was added to favorite</string>
-    <string name="undo">Undo</string>
     <string name="time">Time:</string>
     <string name="no_connection">No connection</string>
     <string name="error_loading_movies">Error loading movies</string>
     <string name="release_date">Release date:</string>
     <string name="language">Language:</string>
     <string name="rating">Rating:</string>
-    <string name="series">Series</string>
     <string name="top_rated">Top rated</string>
     <string name="popular">Popular</string>
     <string name="upcoming">Upcoming</string>
