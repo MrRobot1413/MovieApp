@@ -50,4 +50,10 @@ object MovieRepository {
     ): Single<VideoResponse>{
         return app.api.getVideos(id, language = Locale.getDefault().language)
     }
+
+    fun searchMovieByGenre(
+        genreId: Int
+    ): Single<MovieResponse>{
+        return app.api.searchByGenre(id = genreId, language = Locale.getDefault().language)
+    }
 }

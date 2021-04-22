@@ -2,9 +2,11 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <data>
 
     </data>
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/refresh_layout"
         android:layout_width="match_parent"
@@ -25,13 +27,13 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recycler_view"
                     android:layout_width="match_parent"
-                    android:transitionName="image_start"
                     android:layout_height="match_parent"
                     android:layout_marginTop="50dp"
                     android:layout_marginBottom="50dp"
                     android:background="@color/itemColor"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
                     android:layoutAnimation="@anim/layout_animation"
+                    android:transitionName="image_start"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -50,6 +52,185 @@
                         app:subtitleTextColor="@color/colorAccent"
                         app:title="@string/app_name" />
                 </com.google.android.material.appbar.AppBarLayout>
+
+                <HorizontalScrollView
+                    android:id="@+id/genre_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@color/colorPrimaryDark"
+                    android:paddingStart="8dp"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/app_bar_layout">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/group"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/action" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_adventure"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/adventure" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_animation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/animation" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_comedy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/comedy" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_crime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/crime" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_documentary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/documentary" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_drama"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/drama" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_family"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/family" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_fantasy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/fantasy" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_history"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/history" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_horror"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/horror" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_music"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/music" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_mystery"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/mystery" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_romance"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/romance" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_science_fiction"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/science_fiction" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_thriller"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/thriller" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_war"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/war" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_western"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="8dp"
+                            android:checkable="true"
+                            android:text="@string/western" />
+                    </com.google.android.material.chip.ChipGroup>
+                </HorizontalScrollView>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <include

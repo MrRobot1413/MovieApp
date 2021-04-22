@@ -51,4 +51,11 @@ interface Api {
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String
     ): Single<VideoResponse>
+
+    @GET("discover/movie")
+    fun searchByGenre(
+        @Query("with_genres") id: Int,
+        @Query("api_key") apiKey: String = API_KEY,
+        @Query("language") language: String
+    ): Single<MovieResponse>
 }
