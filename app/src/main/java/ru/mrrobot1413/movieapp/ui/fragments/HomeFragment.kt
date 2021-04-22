@@ -3,15 +3,14 @@ package ru.mrrobot1413.movieapp.ui.fragments
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.transition.Explode
 import android.transition.Slide
 import android.transition.Transition
 import android.transition.TransitionManager
-import android.util.Log
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -133,8 +132,8 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
 
     private fun showGenreSearchArea() {
-        val transition: Transition = Slide(Gravity.TOP)
-        transition.duration = 300
+        val transition: Transition = Explode()
+        transition.duration = 700
         transition.addTarget(binding.genreSearch)
 
         TransitionManager.beginDelayedTransition(binding.container, transition)
@@ -176,7 +175,6 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
             binding.group.clearCheck()
         }
-
 
         binding.refreshLayout.isEnabled = true
     }
@@ -484,9 +482,9 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
         binding.chipWestern.setOnClickListener {
             adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipWestern.isChecked) {
+            if (binding.chipWar.isChecked) {
                 moviesViewModel.searchMovieByGenre(
-                    37,
+                    53,
                     getString(R.string.no_connection),
                     getString(R.string.error_loading_movies)
                 )
