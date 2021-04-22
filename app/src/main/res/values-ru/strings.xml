@@ -18,7 +18,6 @@
     <string name="popular">Популярные</string>
     <string name="upcoming">Скоро выйдут</string>
     <string name="invite_text">Приглашаю тебя на просмотр фильма </string>
-    <string name="revenue">Бюджет:</string>
     <string name="min">мин.</string>
     <string name="retry">Повторить</string>
     <string name="select_date">Выберите дату напоминания</string>
@@ -36,7 +35,7 @@
     <string name="crime">Криминальные</string>
     <string name="documentary">Документальные</string>
     <string name="drama">Драмы</string>
-    <string name="family">Симейные</string>
+    <string name="family">Семейные</string>
     <string name="fantasy">Фантастика</string>
     <string name="history">Исторические</string>
     <string name="horror">Хорроры</string>
