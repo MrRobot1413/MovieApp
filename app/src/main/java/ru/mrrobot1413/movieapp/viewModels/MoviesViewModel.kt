@@ -21,6 +21,7 @@ import ru.mrrobot1413.movieapp.NotifyWorker
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.model.Movie
 import ru.mrrobot1413.movieapp.model.MovieNetwork
+import ru.mrrobot1413.movieapp.model.MovieResponse
 import ru.mrrobot1413.movieapp.model.VideoResponse
 import ru.mrrobot1413.movieapp.repositories.DbListRepository
 import ru.mrrobot1413.movieapp.repositories.MovieRepository
@@ -164,9 +165,30 @@ class MoviesViewModel : ViewModel() {
     }
 
     fun getVideos(
-        id: Int,
+        id: Int
     ): Single<VideoResponse> {
         return movieRepository.getVideos(id)
+    }
+
+    fun searchMovieByGenre(
+        genreId: Int,
+        noConnection: String,
+        errorLoading: String,
+    ){
+        val observable = movieRepository.searchMovieByGenre(genreId)
+            .subscribeOn(io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ result ->
+                if (result != null) {
+                    _movies.postValue(result.moviesList)
+                } else {
+                    _error.postValue(errorLoading)
+                }
+            }, {
+                _error.postValue(noConnection)
+            })
+
+        compositeDisposable.add(observable)
     }
 
     override fun onCleared() {
@@ -181,7 +203,6 @@ class MoviesViewModel : ViewModel() {
         id: Int,
         formattedDate: String,
     ) {
-        Log.d("WOREK", "works")
         val data = Data.Builder()
         data.putString(NotifyWorker.NAME, context.getString(R.string.watch_later_invite))
         data.putString(NotifyWorker.BODY,
