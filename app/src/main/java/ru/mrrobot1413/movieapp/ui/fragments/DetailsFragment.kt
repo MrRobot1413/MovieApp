@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -113,25 +114,14 @@ class DetailsFragment : Fragment() {
         }
     }
 
-    private fun observeVideos(name: String) {
+    private fun observeVideos(link: String) {
         moviesViewModel.videoKey.observe(viewLifecycleOwner, {
             if (!it.isNullOrEmpty()) {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
                 val intentApp = Intent(Intent.ACTION_VIEW,
-                    Uri.parse("vnd.youtube:$it"))
+                    Uri.parse(it))
                 val intentBrowser = Intent(Intent.ACTION_VIEW,
-                    Uri.parse("http://www.youtube.com/watch?v=$it"))
-                try {
-                    activity?.startActivity(intentApp)
-                } catch (ex: ActivityNotFoundException) {
-                    activity?.startActivity(intentBrowser)
-                }
-            } else {
-                val intentApp = Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://www.youtube.com/results?search_query=$name " + getString(
-                        R.string.trailer)))
-                val intentBrowser = Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://www.youtube.com/results?search_query=$name " + getString(
-                        R.string.trailer)))
+                    Uri.parse(it))
                 try {
                     activity?.startActivity(intentApp)
                 } catch (ex: ActivityNotFoundException) {
