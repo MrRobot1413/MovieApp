@@ -225,8 +225,8 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
     override fun onSearchQueryChanged(query: String?) {
         adapter.setMoviesFromMenu(mutableListOf())
-        moviesViewModel.searchMovie(1, query, getString(R.string.no_connection),
-            getString(R.string.error_loading_movies))
+        moviesViewModel.searchMovie(1, query, getString(R.string.no_connection)
+        )
     }
 
     override fun onSearchExpanded() {

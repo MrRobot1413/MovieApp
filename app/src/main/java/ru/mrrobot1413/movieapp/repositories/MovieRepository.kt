@@ -1,7 +1,8 @@
 package ru.mrrobot1413.movieapp.repositories
 
-import io.reactivex.Single
+import kotlinx.coroutines.Deferred
 import retrofit2.Call
+import retrofit2.Response
 import ru.mrrobot1413.movieapp.App
 import ru.mrrobot1413.movieapp.model.Movie
 import ru.mrrobot1413.movieapp.model.MovieNetwork
@@ -22,38 +23,38 @@ object MovieRepository {
 
     fun getPopularMovies(
         page: Int
-    ): Single<MovieResponse>{
+    ): Deferred<Response<MovieResponse>> {
         return app.api.getPopularMovies(page = page, language = Locale.getDefault().language)
     }
 
     fun getTopRatedMovies(
         page: Int = 1
-    ): Single<MovieResponse>{
+    ): Deferred<Response<MovieResponse>>{
         return app.api.getTopRatedMovies(page = page, language = Locale.getDefault().language)
     }
 
     fun getMovieDetails(
         id: Int
-    ): Single<MovieNetwork>{
+    ): Deferred<Response<MovieNetwork>>{
         return app.api.getMovieDetails(id = id, language = Locale.getDefault().language)
     }
 
     fun searchMovie(
         page: Int,
         query: String
-    ): Single<MovieResponse>{
+    ): Deferred<Response<MovieResponse>>{
         return app.api.searchMovie(page = page, language = Locale.getDefault().language, query = query)
     }
 
     fun getVideos(
         id: Int,
-    ): Single<VideoResponse>{
+    ): Deferred<Response<VideoResponse>>{
         return app.api.getVideos(id, language = Locale.getDefault().language)
     }
 
     fun searchMovieByGenre(
         genreId: Int
-    ): Single<MovieResponse>{
+    ): Deferred<Response<MovieResponse>>{
         return app.api.searchByGenre(id = genreId, language = Locale.getDefault().language)
     }
 }

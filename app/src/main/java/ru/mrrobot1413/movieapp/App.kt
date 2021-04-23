@@ -1,12 +1,8 @@
 package ru.mrrobot1413.movieapp
 
 import android.app.Application
-import android.content.ContentValues
-import android.util.Log
 import androidx.room.Room
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.messaging.FirebaseMessaging
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -58,7 +54,7 @@ class App : Application() {
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .client(client)
             .build()
 

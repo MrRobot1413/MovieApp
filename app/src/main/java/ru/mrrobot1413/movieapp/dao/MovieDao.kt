@@ -1,32 +1,29 @@
 package ru.mrrobot1413.movieapp.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
-import io.reactivex.Single
 import ru.mrrobot1413.movieapp.model.Movie
 
 @Dao
 interface MovieDao {
     @Query("SELECT * FROM movies WHERE isLiked is 1")
-    fun selectAllFavorite(): Single<List<Movie>>
+    fun selectAllFavorite(): LiveData<List<Movie>>
 
     @Query("SELECT * FROM movies WHERE isToNotify is 1")
-    fun selectWatchLaterList(): Single<List<Movie>>
+    fun selectWatchLaterList(): LiveData<List<Movie>>
 
-    @Query("SELECT * FROM movies")
-    fun selectAll(): Single<List<Movie>>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun saveAll(movie: List<Movie>)
-
-    @Query("DELETE FROM movies")
-    fun delete()
+//    suspend fun selectAll(): LiveData<List<Movie>>
+//
+//    @Insert(onConflict = OnConflictStrategy.REPLACE)
+//    suspend fun saveAll(movie: List<Movie>)
+//    @Query("SELECT * FROM movies")
 
     @Query("SELECT * FROM movies WHERE id=:id")
-    fun selectById(id: Int): Single<Movie?>
+    fun selectById(id: Int): LiveData<Movie>
 
     @Delete
-    fun deleteMovie(movie: Movie)
+    suspend fun deleteMovie(movie: Movie)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertMovie(movie: Movie)
+    suspend fun insertMovie(movie: Movie)
 }

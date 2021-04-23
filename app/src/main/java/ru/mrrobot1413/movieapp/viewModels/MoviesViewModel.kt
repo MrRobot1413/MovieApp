@@ -1,28 +1,19 @@
 package ru.mrrobot1413.movieapp.viewModels
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.util.Log
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import io.reactivex.Completable
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers.io
+import kotlinx.coroutines.*
 import ru.mrrobot1413.movieapp.NotifyWorker
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.model.Movie
 import ru.mrrobot1413.movieapp.model.MovieNetwork
-import ru.mrrobot1413.movieapp.model.MovieResponse
-import ru.mrrobot1413.movieapp.model.VideoResponse
 import ru.mrrobot1413.movieapp.repositories.DbListRepository
 import ru.mrrobot1413.movieapp.repositories.MovieRepository
 import java.util.*
@@ -43,28 +34,28 @@ class MoviesViewModel : ViewModel() {
     private val _movieDetailed = MutableLiveData<MovieNetwork>()
     val movieDetailed: LiveData<MovieNetwork> = _movieDetailed
 
-    private val compositeDisposable = CompositeDisposable()
+    private val _videoKey = MutableLiveData<String>()
+    val videoKey = _videoKey
 
     fun getPopularMovies(
         page: Int,
         noConnection: String,
         errorLoading: String,
     ) {
-        val observable = movieRepository.getPopularMovies(page = page)
-            .subscribeOn(io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ result ->
-                if (result != null) {
-                    _movies.postValue(result.moviesList)
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val request = movieRepository.getPopularMovies(page = page).await()
+                if (request.isSuccessful) {
+                    if (request.body() != null) {
+                        _movies.postValue(request.body()!!.moviesList)
+                    } else {
+                        _error.postValue(errorLoading)
+                    }
                 } else {
                     _error.postValue(noConnection)
                 }
-            },
-                {
-                    _error.postValue(errorLoading)
-                })
-
-        compositeDisposable.add(observable)
+            }
+        }
     }
 
     fun getTopRatedMovies(
@@ -72,128 +63,102 @@ class MoviesViewModel : ViewModel() {
         noConnection: String,
         errorLoading: String,
     ) {
-        val observable = movieRepository.getTopRatedMovies(page = page)
-            .subscribeOn(io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ result ->
-                if (result != null) {
-                    _movies.postValue(result.moviesList)
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val request = movieRepository.getTopRatedMovies(page = page).await()
+                if (request.isSuccessful) {
+                    if (request.body() != null) {
+                        _movies.postValue(request.body()!!.moviesList)
+                    } else {
+                        _error.postValue(errorLoading)
+                    }
                 } else {
                     _error.postValue(noConnection)
                 }
-            },
-                {
-                    _error.postValue(errorLoading)
-                })
-
-        compositeDisposable.add(observable)
+            }
+        }
     }
 
     fun getMovieDetails(
         id: Int,
-        noConnection: String,
         errorLoading: String,
     ) {
-        val observable = movieRepository.getMovieDetails(id = id)
-            .subscribeOn(io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnError {
-                val repository = DbListRepository.getInstance()
-                val movie = repository.selectById(id)
-                movie
-                    .subscribeOn(io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ movieFromDb ->
-                        if (movieFromDb != null) {
-                            _movieDetailed.postValue(
-                                MovieNetwork(
-                                    movieFromDb.id,
-                                    movieFromDb.title,
-                                    movieFromDb.overview,
-                                    movieFromDb.posterPath,
-                                    movieFromDb.rating,
-                                    movieFromDb.releaseDate,
-                                    movieFromDb.time,
-                                    movieFromDb.language
-                                )
-                            )
-                        } else {
-                            _error.postValue(noConnection)
-                        }
-                    }, { _error.postValue(noConnection) })
-            }
-            .subscribe({ result ->
-                if (result != null) {
-                    _movieDetailed.postValue(result)
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val request = movieRepository.getMovieDetails(id = id).await()
+                if (request.isSuccessful) {
+                    if (request.body() != null) {
+                        val movie = request.body()!!
+                        _movieDetailed.postValue(movie)
+                    } else {
+                        _error.postValue(errorLoading)
+                    }
                 } else {
-                    _error.postValue(noConnection)
+                    viewModelScope.launch {
+//                        val repository = DbListRepository.getInstance()
+//                        val movie = repository.selectById(id).await().body()
+//                        if (movie != null) {
+//                            _movieDetailed.postValue(movie)
+//                        }
+                    }
                 }
-            },
-                {
-                    _error.postValue(errorLoading)
-                })
-
-        compositeDisposable.add(observable)
+            }
+        }
     }
 
     fun searchMovie(
         page: Int,
         query: String?,
         noConnection: String,
-        errorLoading: String,
     ) {
-        if (query != null) {
-            if (query.length >= 2) {
-                val observable = movieRepository.searchMovie(page = page, query = query)
-                    .subscribeOn(io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .delay(500, TimeUnit.MILLISECONDS)
-                    .subscribe({ result ->
-                        if (result != null) {
-                            _movies.postValue(result.moviesList)
-                        } else {
-                            _error.postValue(errorLoading)
-                        }
-                    },
-                        {
-                            _error.postValue(noConnection)
-                        })
-
-                compositeDisposable.add(observable)
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                if (query?.length!! >= 2) {
+                    val request = movieRepository.searchMovie(page = page, query = query).await()
+                    delay(1000)
+                    if (request.isSuccessful) {
+                        _movies.postValue(request.body()?.moviesList)
+                    } else {
+                        _error.postValue(noConnection)
+                    }
+                }
             }
         }
     }
 
+
     fun getVideos(
-        id: Int
-    ): Single<VideoResponse> {
-        return movieRepository.getVideos(id)
+        id: Int,
+    ) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val request = movieRepository.getVideos(id).await()
+                if (request.isSuccessful) {
+                    _videoKey.postValue(request.body()?.list?.get(0)?.key)
+                }
+            }
+        }
     }
 
     fun searchMovieByGenre(
         genreId: Int,
         noConnection: String,
         errorLoading: String,
-    ){
-        val observable = movieRepository.searchMovieByGenre(genreId)
-            .subscribeOn(io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ result ->
-                if (result != null) {
-                    _movies.postValue(result.moviesList)
+    ) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val request = movieRepository.searchMovieByGenre(genreId).await()
+                if (request.isSuccessful) {
+                    if (request.body() != null) {
+                        _movies.postValue(request.body()!!.moviesList)
+                    } else {
+                        _error.postValue(errorLoading)
+                    }
                 } else {
-                    _error.postValue(errorLoading)
+                    _error.postValue(noConnection)
                 }
-            }, {
-                _error.postValue(noConnection)
-            })
-
-        compositeDisposable.add(observable)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        compositeDisposable.clear()
+            }
+        }
     }
 
     fun scheduleNotification(
@@ -219,11 +184,11 @@ class MoviesViewModel : ViewModel() {
         movie.isToNotify = true
         movie.reminder = formattedDate
 
-        Completable.fromCallable {
-            dbRepository.insert(movie)
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                dbRepository.insert(movie)
+            }
         }
-            .subscribeOn(io())
-            .subscribe()
     }
 
     fun unscheduleNotification(context: Context, movie: Movie) {
@@ -233,11 +198,11 @@ class MoviesViewModel : ViewModel() {
 
         movie.isToNotify = false
 
-        Completable.fromCallable {
-            dbRepository.delete(movie)
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                dbRepository.delete(movie)
+            }
         }
-            .subscribeOn(io())
-            .subscribe()
     }
 
     private fun buildWorkRequest(
@@ -254,14 +219,14 @@ class MoviesViewModel : ViewModel() {
             .build()
     }
 
-    private fun saveAll(movies: List<Movie>) {
-        Completable.fromRunnable { dbRepository.saveAll(movies) }
-            .subscribeOn(io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe()
-    }
-
-    fun selectAll(): Single<List<Movie>> {
-        return dbRepository.selectAll()
-    }
+//    private fun saveAll(movies: List<Movie>) {
+//        Completable.fromRunnable { dbRepository.saveAll(movies) }
+//            .subscribeOn(io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe()
+//    }
+//
+//    fun selectAll(): Single<List<Movie>> {
+//        return dbRepository.selectAll()
+//    }
 }
