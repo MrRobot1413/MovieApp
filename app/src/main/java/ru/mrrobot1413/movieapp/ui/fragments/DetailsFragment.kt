@@ -1,16 +1,15 @@
 package ru.mrrobot1413.movieapp.ui.fragments
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -23,16 +22,11 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.plugins.RxJavaPlugins
-import io.reactivex.schedulers.Schedulers
-import io.reactivex.schedulers.Schedulers.io
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.databinding.FragmentDetailsBinding
 import ru.mrrobot1413.movieapp.interfaces.MovieClickListener
 import ru.mrrobot1413.movieapp.model.Movie
 import ru.mrrobot1413.movieapp.model.MovieNetwork
-import ru.mrrobot1413.movieapp.repositories.MovieRepository
 import ru.mrrobot1413.movieapp.ui.MainActivity
 import ru.mrrobot1413.movieapp.viewModels.FavoriteListViewModel
 import ru.mrrobot1413.movieapp.viewModels.MoviesViewModel
@@ -51,6 +45,9 @@ class DetailsFragment : Fragment() {
     lateinit var binding: FragmentDetailsBinding
     private var isAddedToFavorite = false
     private lateinit var calendar: Calendar
+    private var isLiked = false
+    private var isToNotify = false
+    private var reminder = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -67,6 +64,7 @@ class DetailsFragment : Fragment() {
         (activity as MovieClickListener).hideBottomNav()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
@@ -77,34 +75,34 @@ class DetailsFragment : Fragment() {
         moviesViewModel.movieDetailed.observe(viewLifecycleOwner, { movie ->
             setImage(binding.imageBackdrop, ("https://image.tmdb.org/t/p/w342" + movie.posterPath))
 
+            observeVideos(movie.title)
+            setOnPlayTrailerBtnClickListener(movie.id)
+
             setOnFabClickListener(movie)
 
-            favoriteListViewModel.selectById(movie.id).subscribeOn(io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ result ->
+            favoriteListViewModel.selectById(movie.id).observe(viewLifecycleOwner, { result ->
+                if (result != null) {
                     isAddedToFavorite =
-                        if (result != null) {
-                            if (result.liked) {
-                                setIconLiked()
-                                true
-                            } else {
-                                setIconUnliked()
-                                false
-                            }
+                        if (result.liked) {
+                            setIconLiked()
+                            true
                         } else {
                             setIconUnliked()
                             false
                         }
-                }, {})
-
-            setOnPlayTrailerBtnClickListener(movie.id, movie.title)
+                    isLiked = result.liked
+                    isToNotify = result.isToNotify
+                    reminder = result.reminder
+                } else {
+                    setIconUnliked()
+                }
+            })
 
             inviteText = getString(R.string.invite_text) + " " + movie.title
         })
 
         arguments?.getInt(MainActivity.MOVIE)?.let {
             moviesViewModel.getMovieDetails(it,
-                getString(R.string.no_connection),
                 getString(R.string.error_loading_movies))
         }
 
@@ -115,73 +113,78 @@ class DetailsFragment : Fragment() {
         }
     }
 
+    private fun observeVideos(name: String) {
+        moviesViewModel.videoKey.observe(viewLifecycleOwner, {
+            if (!it.isNullOrEmpty()) {
+                val intentApp = Intent(Intent.ACTION_VIEW,
+                    Uri.parse("vnd.youtube:$it"))
+                val intentBrowser = Intent(Intent.ACTION_VIEW,
+                    Uri.parse("http://www.youtube.com/watch?v=$it"))
+                try {
+                    activity?.startActivity(intentApp)
+                } catch (ex: ActivityNotFoundException) {
+                    activity?.startActivity(intentBrowser)
+                }
+            } else {
+                val intentApp = Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://www.youtube.com/results?search_query=$name " + getString(
+                        R.string.trailer)))
+                val intentBrowser = Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://www.youtube.com/results?search_query=$name " + getString(
+                        R.string.trailer)))
+                try {
+                    activity?.startActivity(intentApp)
+                } catch (ex: ActivityNotFoundException) {
+                    activity?.startActivity(intentBrowser)
+                }
+            }
+        })
+    }
+
     private fun setOnFabClickListener(movie: MovieNetwork?) {
         binding.fabAddToFavorite.setOnClickListener {
             if (movie != null) {
-                favoriteListViewModel.selectById(movie.id)
-                    .subscribeOn(io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        if (isAddedToFavorite) {
-                            isAddedToFavorite = false
+                if (isAddedToFavorite) {
+                    isAddedToFavorite = false
 
-                            val movieToDelete =
-                                Movie(
-                                    movie.id,
-                                    movie.title,
-                                    movie.overview,
-                                    movie.posterPath,
-                                    movie.rating,
-                                    movie.releaseDate,
-                                    movie.time,
-                                    movie.language
-                                )
-                            movieToDelete.liked = false
-                            movieToDelete.isToNotify = it?.isToNotify!!
-                            movieToDelete.reminder = it.reminder
-                            favoriteListViewModel.delete(movieToDelete)
+                    val movieToDelete =
+                        Movie(
+                            movie.id,
+                            movie.title,
+                            movie.overview,
+                            movie.posterPath,
+                            movie.rating,
+                            movie.releaseDate,
+                            movie.time,
+                            movie.language,
+                            false,
+                            isToNotify,
+                            reminder
+                        )
+                    favoriteListViewModel.delete(movieToDelete)
 
-                            setIconUnliked()
-                        } else {
-                            isAddedToFavorite = true
-                            val movieToInsert =
-                                Movie(
-                                    movie.id,
-                                    movie.title,
-                                    movie.overview,
-                                    movie.posterPath,
-                                    movie.rating,
-                                    movie.releaseDate,
-                                    movie.time,
-                                    movie.language,
-                                    true,
-                                    it?.isToNotify!!,
-                                    it.reminder
-                                )
-                            movieToInsert.time = moviesViewModel.movieDetailed.value?.time!!
-                            favoriteListViewModel.insert(movieToInsert)
+                    setIconUnliked()
+                } else {
+                    isAddedToFavorite = true
+                    val movieToInsert =
+                        Movie(
+                            movie.id,
+                            movie.title,
+                            movie.overview,
+                            movie.posterPath,
+                            movie.rating,
+                            movie.releaseDate,
+                            movie.time,
+                            movie.language,
+                            true,
+                            isToNotify,
+                            reminder
+                        )
+                    movieToInsert.time = moviesViewModel.movieDetailed.value?.time!!
+                    favoriteListViewModel.insert(movieToInsert)
 
-                            setIconLiked()
-                        }
-                    }, {
-                        isAddedToFavorite = true
-                        val movieToInsert =
-                            Movie(
-                                movie.id,
-                                movie.title,
-                                movie.overview,
-                                movie.posterPath,
-                                movie.rating,
-                                movie.releaseDate,
-                                movie.time,
-                                movie.language,
-                                true
-                            )
-                        movieToInsert.time = moviesViewModel.movieDetailed.value?.time!!
-                        favoriteListViewModel.insert(movieToInsert)
-
-                        setIconLiked()
-                    })
+                    setIconLiked()
+                }
             }
         }
     }
@@ -219,40 +222,9 @@ class DetailsFragment : Fragment() {
         }
     }
 
-    private fun setOnPlayTrailerBtnClickListener(id: Int, name: String) {
+    private fun setOnPlayTrailerBtnClickListener(id: Int) {
         binding.btnPlayTrailer.setOnClickListener {
             moviesViewModel.getVideos(id)
-                .subscribeOn(io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    RxJavaPlugins.setErrorHandler { _ ->
-                        if (it.list?.isEmpty() == true) {
-                            val intentApp = Intent(Intent.ACTION_VIEW,
-                                Uri.parse("https://www.youtube.com/results?search_query=$name " + getString(
-                                    R.string.trailer)))
-                            val intentBrowser = Intent(Intent.ACTION_VIEW,
-                                Uri.parse("https://www.youtube.com/results?search_query=$name " + getString(
-                                    R.string.trailer)))
-                            try {
-                                activity?.startActivity(intentApp)
-                            } catch (ex: ActivityNotFoundException) {
-                                activity?.startActivity(intentBrowser)
-                            }
-                        }
-                    }
-                    Log.d("linkTo", it.list?.size.toString())
-                    val intentApp = Intent(Intent.ACTION_VIEW,
-                        Uri.parse("vnd.youtube:" + (it.list?.get(0)?.key)))
-                    val intentBrowser = Intent(Intent.ACTION_VIEW,
-                        Uri.parse("http://www.youtube.com/watch?v=" + (it.list?.get(0)?.key)))
-                    try {
-                        activity?.startActivity(intentApp)
-                    } catch (ex: ActivityNotFoundException) {
-                        activity?.startActivity(intentBrowser)
-                    }
-                }, {
-                    showSnackbar(getString(R.string.error_occurred))
-                })
         }
     }
 
@@ -300,7 +272,7 @@ class DetailsFragment : Fragment() {
         }
     }
 
-    private fun sendInviteToWatch(){
+    private fun sendInviteToWatch() {
         val sendIntent = Intent()
         sendIntent.action = Intent.ACTION_SEND
         sendIntent.putExtra(Intent.EXTRA_SUBJECT, binding.collapsingToolbarLayout.title)
@@ -309,7 +281,7 @@ class DetailsFragment : Fragment() {
         startActivity(sendIntent)
     }
 
-    private fun scheduleNotification(){
+    private fun scheduleNotification() {
         calendar = Calendar.getInstance()
         calendar.timeZone = TimeZone.getDefault()
         val datePickerDialog = MaterialDatePicker.Builder
@@ -337,56 +309,32 @@ class DetailsFragment : Fragment() {
                 val format = SimpleDateFormat("HH:mm dd MMM, yyyy")
                 val formatted = format.format(calendar.time)
 
-                favoriteListViewModel.selectById(it.id)
-                    .subscribeOn(io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        moviesViewModel.movieDetailed.value?.let { movie ->
-                            moviesViewModel.scheduleNotification(Movie(
-                                movie.id,
-                                movie.title,
-                                movie.overview,
-                                movie.posterPath,
-                                movie.rating,
-                                movie.releaseDate,
-                                movie.time,
-                                movie.language,
-                                it?.liked!!,
-                                it.isToNotify,
-                                it.reminder
-                            ),
-                                calendar,
-                                requireContext(),
-                                moviesViewModel.movieDetailed.value!!.id,
-                                formatted
-                            )
-                        }
-                    }, {
-                        moviesViewModel.movieDetailed.value?.let { movie ->
-                            moviesViewModel.scheduleNotification(Movie(
-                                movie.id,
-                                movie.title,
-                                movie.overview,
-                                movie.posterPath,
-                                movie.rating,
-                                movie.releaseDate,
-                                movie.time,
-                                movie.language,
-                                isAddedToFavorite
-                            ),
-                                calendar,
-                                requireContext(),
-                                moviesViewModel.movieDetailed.value!!.id,
-                                formatted
-                            )
-                        }
-                    })
+                moviesViewModel.movieDetailed.value?.let { movie ->
+                    moviesViewModel.scheduleNotification(Movie(
+                        movie.id,
+                        movie.title,
+                        movie.overview,
+                        movie.posterPath,
+                        movie.rating,
+                        movie.releaseDate,
+                        movie.time,
+                        movie.language,
+                        isLiked,
+                        isToNotify,
+                        reminder
+                    ),
+                        calendar,
+                        requireContext(),
+                        moviesViewModel.movieDetailed.value!!.id,
+                        formatted
+                    )
+                }
             }
             datePickerDialog.show(fm, "datePicker")
         }
     }
 
-    private fun unscheduleNotification(){
+    private fun unscheduleNotification() {
         moviesViewModel.unscheduleNotification(requireContext(), Movie(
             moviesViewModel.movieDetailed.value?.id!!,
             moviesViewModel.movieDetailed.value?.title!!,
@@ -396,7 +344,9 @@ class DetailsFragment : Fragment() {
             moviesViewModel.movieDetailed.value?.releaseDate!!,
             moviesViewModel.movieDetailed.value?.time!!,
             moviesViewModel.movieDetailed.value?.language!!,
-            isAddedToFavorite
+            isLiked,
+            isToNotify,
+            reminder
         ))
         activity?.onBackPressed()
     }

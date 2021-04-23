@@ -1,6 +1,6 @@
 package ru.mrrobot1413.movieapp.repositories
 
-import io.reactivex.Single
+import androidx.lifecycle.LiveData
 import ru.mrrobot1413.movieapp.App
 import ru.mrrobot1413.movieapp.dao.MovieDao
 import ru.mrrobot1413.movieapp.model.Movie
@@ -23,38 +23,36 @@ object DbListRepository {
         return instance
     }
 
-    fun selectAllFavorite(): Single<List<Movie>> {
+    fun selectAllFavorite(): LiveData<List<Movie>> {
         return movieDao.selectAllFavorite()
     }
 
-    fun selectWatchLaterList(): Single<List<Movie>> {
+    fun selectWatchLaterList(): LiveData<List<Movie>> {
         return movieDao.selectWatchLaterList()
     }
 
-    fun selectAll(): Single<List<Movie>> {
-        return movieDao.selectAll()
-    }
+//    suspend fun selectAll(): LiveData<List<Movie>> {
+//        return movieDao.selectAll()
+//    }
+//
+//    suspend fun saveAll(movies: List<Movie>){
+//        movieDao.saveAll(movies)
+//    }
 
-    fun saveAll(movies: List<Movie>){
-        movieDao.saveAll(movies)
-    }
-
-    fun selectById(id: Int): Single<Movie?> {
+    fun selectById(id: Int): LiveData<Movie> {
         return movieDao.selectById(id)
     }
 
-    fun insert(movie: Movie){
+    suspend fun insert(movie: Movie){
         movieDao.insertMovie(movie)
     }
 
-    fun delete(movie: Movie) {
+    suspend fun delete(movie: Movie) {
         if(movie.isToNotify && !movie.liked){
             movieDao.insertMovie(movie)
         } else if(!movie.isToNotify && !movie.liked){
             movieDao.deleteMovie(movie)
         } else if(movie.liked && !movie.isToNotify){
-            movie.isToNotify = false
-            movie.liked = true
             movieDao.insertMovie(movie)
         }
     }

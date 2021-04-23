@@ -5,15 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers.io
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.adapters.WatchLaterListAdapter
 import ru.mrrobot1413.movieapp.databinding.FragmentWatchLaterBinding
@@ -50,19 +47,14 @@ class WatchLaterFragment: Fragment() {
 
         initFields()
 
-        favoriteListViewModel.getWatchLaterList()
-            .subscribeOn(io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                if (it.isEmpty()){
-                    binding.txtNoMovie.visibility = View.VISIBLE
-                } else{
-                    binding.txtNoMovie.visibility = View.GONE
-                }
-                adapter.setMovies(it)
-            }, {
+        favoriteListViewModel.getWatchLaterList().observe(viewLifecycleOwner, {
+            if (it.isEmpty()){
                 binding.txtNoMovie.visibility = View.VISIBLE
-            })
+            } else{
+                binding.txtNoMovie.visibility = View.GONE
+            }
+            adapter.setMovies(it)
+        })
 
         initRecycler()
     }
