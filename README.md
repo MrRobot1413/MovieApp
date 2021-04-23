@@ -22,4 +22,4 @@ Technologies:
  -Glide
 	<br>
 	<br>
- App showcase: https://vimeo.com/539638322 
+ App showcase: https://vimeo.com/540532923
