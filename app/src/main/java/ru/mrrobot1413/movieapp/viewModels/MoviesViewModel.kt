@@ -115,7 +115,7 @@ class MoviesViewModel : ViewModel() {
             withContext(Dispatchers.IO) {
                 if (query?.length!! >= 2) {
                     val request = movieRepository.searchMovie(page = page, query = query).await()
-                    delay(1000)
+                    delay(700)
                     if (request.isSuccessful) {
                         _movies.postValue(request.body()?.moviesList)
                     } else {
@@ -126,7 +126,6 @@ class MoviesViewModel : ViewModel() {
         }
     }
 
-
     fun getVideos(
         id: Int,
     ) {
@@ -134,7 +133,13 @@ class MoviesViewModel : ViewModel() {
             withContext(Dispatchers.IO) {
                 val request = movieRepository.getVideos(id).await()
                 if (request.isSuccessful) {
-                    _videoKey.postValue(request.body()?.list?.get(0)?.key)
+                        if(request.body()?.list?.isEmpty() == true){
+                            _videoKey.postValue("https://www.youtube.com/results?search_query=${_movieDetailed.value?.title + " " + _movieDetailed.value?.releaseDate} trailer")
+                        } else{
+                            _videoKey.postValue("http://www.youtube.com/watch?v=${request.body()?.list?.get(0)?.key}")
+                        }
+                    } else{
+                    _videoKey.postValue("https://www.youtube.com/results?search_query=${_movieDetailed.value?.title} trailer")
                 }
             }
         }
