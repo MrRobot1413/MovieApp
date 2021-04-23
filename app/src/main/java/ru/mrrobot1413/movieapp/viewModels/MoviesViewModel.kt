@@ -19,7 +19,6 @@ import ru.mrrobot1413.movieapp.repositories.MovieRepository
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-
 class MoviesViewModel : ViewModel() {
 
     private var movieRepository: MovieRepository = MovieRepository.getInstance()

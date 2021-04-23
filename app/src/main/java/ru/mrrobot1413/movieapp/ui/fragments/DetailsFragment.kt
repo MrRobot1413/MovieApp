@@ -76,7 +76,7 @@ class DetailsFragment : Fragment() {
         moviesViewModel.movieDetailed.observe(viewLifecycleOwner, { movie ->
             setImage(binding.imageBackdrop, ("https://image.tmdb.org/t/p/w342" + movie.posterPath))
 
-            observeVideos(movie.title)
+            observeVideos()
             setOnPlayTrailerBtnClickListener(movie.id)
 
             setOnFabClickListener(movie)
@@ -114,10 +114,9 @@ class DetailsFragment : Fragment() {
         }
     }
 
-    private fun observeVideos(link: String) {
+    private fun observeVideos() {
         moviesViewModel.videoKey.observe(viewLifecycleOwner, {
             if (!it.isNullOrEmpty()) {
-                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
                 val intentApp = Intent(Intent.ACTION_VIEW,
                     Uri.parse(it))
                 val intentBrowser = Intent(Intent.ACTION_VIEW,

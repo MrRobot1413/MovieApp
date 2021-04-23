@@ -11,6 +11,7 @@ import android.view.*
 import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -19,6 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import com.oshi.libsearchtoolbar.SearchAnimationToolbar
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -241,257 +243,60 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         }
     }
 
+    private fun setChipListener(chip: Chip, id: Int) {
+        adapter.setMoviesFromMenu(mutableListOf())
+        if (chip.isChecked) {
+            moviesViewModel.searchMovieByGenre(
+                id,
+                getString(R.string.no_connection),
+                getString(R.string.error_loading_movies)
+            )
+        } else {
+            moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
+                getString(R.string.error_loading_movies))
+        }
+    }
+
     private fun initChips() {
-        binding.chipAction.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipAction.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    28,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
+        val clickListener = View.OnClickListener {
+            when (it.id) {
+                binding.chipAction.id -> setChipListener(binding.chipAction, 28)
+                binding.chipAdventure.id -> setChipListener(binding.chipAdventure, 12)
+                binding.chipAnimation.id -> setChipListener(binding.chipAnimation, 16)
+                binding.chipComedy.id -> setChipListener(binding.chipComedy, 35)
+                binding.chipCrime.id -> setChipListener(binding.chipCrime, 80)
+                binding.chipDocumentary.id -> setChipListener(binding.chipDocumentary, 99)
+                binding.chipDrama.id -> setChipListener(binding.chipDrama, 18)
+                binding.chipFamily.id -> setChipListener(binding.chipFamily, 10751)
+                binding.chipFantasy.id -> setChipListener(binding.chipFantasy, 14)
+                binding.chipHistory.id -> setChipListener(binding.chipHistory, 36)
+                binding.chipHorror.id -> setChipListener(binding.chipHorror, 27)
+                binding.chipMusic.id -> setChipListener(binding.chipMusic, 10402)
+                binding.chipMystery.id -> setChipListener(binding.chipMystery, 9648)
+                binding.chipRomance.id -> setChipListener(binding.chipRomance, 10749)
+                binding.chipScienceFiction.id -> setChipListener(binding.chipScienceFiction, 878)
+                binding.chipThriller.id -> setChipListener(binding.chipThriller, 53)
+                binding.chipWar.id -> setChipListener(binding.chipWar, 10752)
+                binding.chipWestern.id -> setChipListener(binding.chipWestern, 37)
             }
         }
 
-        binding.chipAdventure.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipAdventure.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    12,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
-
-        binding.chipAnimation.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipAnimation.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    16,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
-
-        binding.chipComedy.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipComedy.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    35,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
-
-        binding.chipCrime.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipCrime.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    80,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
-
-        binding.chipDocumentary.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipDocumentary.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    99,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
-
-        binding.chipDrama.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipDrama.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    18,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
-
-        binding.chipFamily.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipFamily.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    10751,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
-
-        binding.chipFantasy.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipFantasy.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    14,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
-
-        binding.chipHistory.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipHistory.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    36,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
-
-        binding.chipHorror.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipHorror.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    27,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
-
-        binding.chipMusic.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipMusic.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    10402,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
-
-        binding.chipMystery.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipMystery.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    9648,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
-
-        binding.chipRomance.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipRomance.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    10749,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
-
-        binding.chipScienceFiction.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipScienceFiction.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    878,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
-
-        binding.chipThriller.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipThriller.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    53,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
-
-        binding.chipWar.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipWar.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    10752,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
-
-        binding.chipWestern.setOnClickListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            if (binding.chipWar.isChecked) {
-                moviesViewModel.searchMovieByGenre(
-                    53,
-                    getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies)
-                )
-            } else {
-                moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                    getString(R.string.error_loading_movies))
-            }
-        }
+        binding.chipAction.setOnClickListener(clickListener)
+        binding.chipAdventure.setOnClickListener(clickListener)
+        binding.chipAnimation.setOnClickListener(clickListener)
+        binding.chipComedy.setOnClickListener(clickListener)
+        binding.chipCrime.setOnClickListener(clickListener)
+        binding.chipDocumentary.setOnClickListener(clickListener)
+        binding.chipDrama.setOnClickListener(clickListener)
+        binding.chipFamily.setOnClickListener(clickListener)
+        binding.chipFantasy.setOnClickListener(clickListener)
+        binding.chipHistory.setOnClickListener(clickListener)
+        binding.chipHorror.setOnClickListener(clickListener)
+        binding.chipMusic.setOnClickListener(clickListener)
+        binding.chipMystery.setOnClickListener(clickListener)
+        binding.chipRomance.setOnClickListener(clickListener)
+        binding.chipScienceFiction.setOnClickListener(clickListener)
+        binding.chipThriller.setOnClickListener(clickListener)
+        binding.chipWar.setOnClickListener(clickListener)
     }
 }
