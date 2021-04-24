@@ -7,10 +7,10 @@ import ru.mrrobot1413.movieapp.model.Movie
 @Dao
 interface MovieDao {
     @Query("SELECT * FROM movies WHERE isLiked is 1")
-    fun selectAllFavorite(): LiveData<List<Movie>>
+     suspend fun selectAllFavorite(): List<Movie>
 
     @Query("SELECT * FROM movies WHERE isToNotify is 1")
-    fun selectWatchLaterList(): LiveData<List<Movie>>
+    suspend fun selectWatchLaterList(): List<Movie>
 
 //    suspend fun selectAll(): LiveData<List<Movie>>
 //
@@ -19,7 +19,7 @@ interface MovieDao {
 //    @Query("SELECT * FROM movies")
 
     @Query("SELECT * FROM movies WHERE id=:id")
-    fun selectById(id: Int): LiveData<Movie>
+    suspend fun selectById(id: Int): Movie
 
     @Delete
     suspend fun deleteMovie(movie: Movie)

@@ -43,15 +43,17 @@ class MoviesViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val request = movieRepository.getPopularMovies(page = page).await()
-                if (request.isSuccessful) {
-                    if (request.body() != null) {
-                        _movies.postValue(request.body()!!.moviesList)
+                val request = movieRepository.getPopularMovies(page = page)
+                withContext(Dispatchers.Main) {
+                    if (request.isSuccessful) {
+                        if (request.body() != null) {
+                            _movies.postValue(request.body()!!.moviesList)
+                        } else {
+                            _error.postValue(errorLoading)
+                        }
                     } else {
-                        _error.postValue(errorLoading)
+                        _error.postValue(noConnection)
                     }
-                } else {
-                    _error.postValue(noConnection)
                 }
             }
         }
@@ -64,15 +66,17 @@ class MoviesViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val request = movieRepository.getTopRatedMovies(page = page).await()
-                if (request.isSuccessful) {
-                    if (request.body() != null) {
-                        _movies.postValue(request.body()!!.moviesList)
+                val request = movieRepository.getTopRatedMovies(page = page)
+                withContext(Dispatchers.Main) {
+                    if (request.isSuccessful) {
+                        if (request.body() != null) {
+                            _movies.postValue(request.body()!!.moviesList)
+                        } else {
+                            _error.postValue(errorLoading)
+                        }
                     } else {
-                        _error.postValue(errorLoading)
+                        _error.postValue(noConnection)
                     }
-                } else {
-                    _error.postValue(noConnection)
                 }
             }
         }
@@ -84,21 +88,34 @@ class MoviesViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val request = movieRepository.getMovieDetails(id = id).await()
-                if (request.isSuccessful) {
-                    if (request.body() != null) {
-                        val movie = request.body()!!
-                        _movieDetailed.postValue(movie)
+                val request = movieRepository.getMovieDetails(id = id)
+                withContext(Dispatchers.Main) {
+                    if (request.isSuccessful) {
+                        if (request.body() != null) {
+                            val movie = request.body()!!
+                            _movieDetailed.postValue(movie)
+                        } else {
+                            _error.postValue(errorLoading)
+                        }
                     } else {
-                        _error.postValue(errorLoading)
-                    }
-                } else {
-                    viewModelScope.launch {
-//                        val repository = DbListRepository.getInstance()
-//                        val movie = repository.selectById(id).await().body()
-//                        if (movie != null) {
-//                            _movieDetailed.postValue(movie)
-//                        }
+                        withContext(Dispatchers.IO) {
+                            val repository = DbListRepository.getInstance()
+                            val movie = repository.selectById(id)
+                            withContext(Dispatchers.Main) {
+                                if (movie != null) {
+                                    _movieDetailed.postValue(MovieNetwork(
+                                        movie.id,
+                                        movie.title,
+                                        movie.overview,
+                                        movie.posterPath,
+                                        movie.rating,
+                                        movie.releaseDate,
+                                        movie.time,
+                                        movie.language
+                                    ))
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -113,12 +130,14 @@ class MoviesViewModel : ViewModel() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 if (query?.length!! >= 2) {
-                    val request = movieRepository.searchMovie(page = page, query = query).await()
-                    delay(700)
-                    if (request.isSuccessful) {
-                        _movies.postValue(request.body()?.moviesList)
-                    } else {
-                        _error.postValue(noConnection)
+                    val request = movieRepository.searchMovie(page = page, query = query)
+                    withContext(Dispatchers.Main) {
+                        delay(300)
+                        if (request.isSuccessful) {
+                            _movies.postValue(request.body()?.moviesList)
+                        } else {
+                            _error.postValue(noConnection)
+                        }
                     }
                 }
             }
@@ -130,15 +149,19 @@ class MoviesViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val request = movieRepository.getVideos(id).await()
-                if (request.isSuccessful) {
-                        if(request.body()?.list?.isEmpty() == true){
+                val request = movieRepository.getVideos(id)
+                withContext(Dispatchers.Main) {
+                    if (request.isSuccessful) {
+                        if (request.body()?.list?.isEmpty() == true) {
                             _videoKey.postValue("https://www.youtube.com/results?search_query=${_movieDetailed.value?.title + " " + _movieDetailed.value?.releaseDate} trailer")
-                        } else{
-                            _videoKey.postValue("http://www.youtube.com/watch?v=${request.body()?.list?.get(0)?.key}")
+                        } else {
+                            _videoKey.postValue("http://www.youtube.com/watch?v=${
+                                request.body()?.list?.get(0)?.key
+                            }")
                         }
-                    } else{
-                    _videoKey.postValue("https://www.youtube.com/results?search_query=${_movieDetailed.value?.title} trailer")
+                    } else {
+                        _videoKey.postValue("https://www.youtube.com/results?search_query=${_movieDetailed.value?.title} trailer")
+                    }
                 }
             }
         }
@@ -151,15 +174,17 @@ class MoviesViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val request = movieRepository.searchMovieByGenre(genreId).await()
-                if (request.isSuccessful) {
-                    if (request.body() != null) {
-                        _movies.postValue(request.body()!!.moviesList)
+                val request = movieRepository.searchMovieByGenre(genreId)
+                withContext(Dispatchers.Main) {
+                    if (request.isSuccessful) {
+                        if (request.body() != null) {
+                            _movies.postValue(request.body()!!.moviesList)
+                        } else {
+                            _error.postValue(errorLoading)
+                        }
                     } else {
-                        _error.postValue(errorLoading)
+                        _error.postValue(noConnection)
                     }
-                } else {
-                    _error.postValue(noConnection)
                 }
             }
         }
@@ -189,7 +214,7 @@ class MoviesViewModel : ViewModel() {
         movie.reminder = formattedDate
 
         viewModelScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 dbRepository.insert(movie)
             }
         }
@@ -203,7 +228,7 @@ class MoviesViewModel : ViewModel() {
         movie.isToNotify = false
 
         viewModelScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 dbRepository.delete(movie)
             }
         }

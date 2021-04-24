@@ -41,20 +41,22 @@ class WatchLaterFragment: Fragment() {
         return binding.root
     }
 
-    @SuppressLint("CheckResult")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         initFields()
 
-        favoriteListViewModel.getWatchLaterList().observe(viewLifecycleOwner, {
-            if (it.isEmpty()){
+        favoriteListViewModel.watchLaterMovies.observe(viewLifecycleOwner, {
+            if (it.isNullOrEmpty()){
+                adapter.setMovies(mutableListOf())
                 binding.txtNoMovie.visibility = View.VISIBLE
             } else{
+                adapter.setMovies(it)
                 binding.txtNoMovie.visibility = View.GONE
             }
-            adapter.setMovies(it)
         })
+
+        favoriteListViewModel.getWatchLaterList()
 
         initRecycler()
     }

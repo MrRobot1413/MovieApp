@@ -81,7 +81,7 @@ class DetailsFragment : Fragment() {
 
             setOnFabClickListener(movie)
 
-            favoriteListViewModel.selectById(movie.id).observe(viewLifecycleOwner, { result ->
+            favoriteListViewModel.movieDetailed.observe(viewLifecycleOwner, { result ->
                 if (result != null) {
                     isAddedToFavorite =
                         if (result.liked) {
@@ -98,6 +98,8 @@ class DetailsFragment : Fragment() {
                     setIconUnliked()
                 }
             })
+
+            favoriteListViewModel.selectById(movie.id)
 
             inviteText = getString(R.string.invite_text) + " " + movie.title
         })

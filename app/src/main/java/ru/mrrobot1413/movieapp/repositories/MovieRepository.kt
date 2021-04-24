@@ -21,40 +21,40 @@ object MovieRepository {
         return instance
     }
 
-    fun getPopularMovies(
+    suspend fun getPopularMovies(
         page: Int
-    ): Deferred<Response<MovieResponse>> {
+    ): Response<MovieResponse> {
         return app.api.getPopularMovies(page = page, language = Locale.getDefault().language)
     }
 
-    fun getTopRatedMovies(
+    suspend fun getTopRatedMovies(
         page: Int = 1
-    ): Deferred<Response<MovieResponse>>{
+    ): Response<MovieResponse>{
         return app.api.getTopRatedMovies(page = page, language = Locale.getDefault().language)
     }
 
-    fun getMovieDetails(
+    suspend fun getMovieDetails(
         id: Int
-    ): Deferred<Response<MovieNetwork>>{
+    ): Response<MovieNetwork>{
         return app.api.getMovieDetails(id = id, language = Locale.getDefault().language)
     }
 
-    fun searchMovie(
+    suspend fun searchMovie(
         page: Int,
         query: String
-    ): Deferred<Response<MovieResponse>>{
+    ): Response<MovieResponse>{
         return app.api.searchMovie(page = page, language = Locale.getDefault().language, query = query)
     }
 
-    fun getVideos(
+    suspend fun getVideos(
         id: Int,
-    ): Deferred<Response<VideoResponse>>{
+    ): Response<VideoResponse>{
         return app.api.getVideos(id, language = Locale.getDefault().language)
     }
 
-    fun searchMovieByGenre(
+    suspend fun searchMovieByGenre(
         genreId: Int
-    ): Deferred<Response<MovieResponse>>{
+    ): Response<MovieResponse>{
         return app.api.searchByGenre(id = genreId, language = Locale.getDefault().language)
     }
 }
