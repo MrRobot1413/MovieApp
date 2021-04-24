@@ -231,8 +231,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         )
     }
 
-    override fun onSearchExpanded() {
-    }
+    override fun onSearchExpanded() {}
 
     override fun onSearchSubmitted(query: String?) {
         val view = activity?.currentFocus
@@ -243,9 +242,9 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         }
     }
 
-    private fun setChipListener(chip: Chip, id: Int) {
+    private fun setChipListener(isChecked: Boolean, id: Int) {
         adapter.setMoviesFromMenu(mutableListOf())
-        if (chip.isChecked) {
+        if (isChecked) {
             moviesViewModel.searchMovieByGenre(
                 id,
                 getString(R.string.no_connection),
@@ -260,24 +259,24 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     private fun initChips() {
         val clickListener = View.OnClickListener {
             when (it.id) {
-                binding.chipAction.id -> setChipListener(binding.chipAction, 28)
-                binding.chipAdventure.id -> setChipListener(binding.chipAdventure, 12)
-                binding.chipAnimation.id -> setChipListener(binding.chipAnimation, 16)
-                binding.chipComedy.id -> setChipListener(binding.chipComedy, 35)
-                binding.chipCrime.id -> setChipListener(binding.chipCrime, 80)
-                binding.chipDocumentary.id -> setChipListener(binding.chipDocumentary, 99)
-                binding.chipDrama.id -> setChipListener(binding.chipDrama, 18)
-                binding.chipFamily.id -> setChipListener(binding.chipFamily, 10751)
-                binding.chipFantasy.id -> setChipListener(binding.chipFantasy, 14)
-                binding.chipHistory.id -> setChipListener(binding.chipHistory, 36)
-                binding.chipHorror.id -> setChipListener(binding.chipHorror, 27)
-                binding.chipMusic.id -> setChipListener(binding.chipMusic, 10402)
-                binding.chipMystery.id -> setChipListener(binding.chipMystery, 9648)
-                binding.chipRomance.id -> setChipListener(binding.chipRomance, 10749)
-                binding.chipScienceFiction.id -> setChipListener(binding.chipScienceFiction, 878)
-                binding.chipThriller.id -> setChipListener(binding.chipThriller, 53)
-                binding.chipWar.id -> setChipListener(binding.chipWar, 10752)
-                binding.chipWestern.id -> setChipListener(binding.chipWestern, 37)
+                binding.chipAction.id -> setChipListener(binding.chipAction.isChecked, 28)
+                binding.chipAdventure.id -> setChipListener(binding.chipAdventure.isChecked, 12)
+                binding.chipAnimation.id -> setChipListener(binding.chipAnimation.isChecked, 16)
+                binding.chipComedy.id -> setChipListener(binding.chipComedy.isChecked, 35)
+                binding.chipCrime.id -> setChipListener(binding.chipCrime.isChecked, 80)
+                binding.chipDocumentary.id -> setChipListener(binding.chipDocumentary.isChecked, 99)
+                binding.chipDrama.id -> setChipListener(binding.chipDrama.isChecked, 18)
+                binding.chipFamily.id -> setChipListener(binding.chipFamily.isChecked, 10751)
+                binding.chipFantasy.id -> setChipListener(binding.chipFantasy.isChecked, 14)
+                binding.chipHistory.id -> setChipListener(binding.chipHistory.isChecked, 36)
+                binding.chipHorror.id -> setChipListener(binding.chipHorror.isChecked, 27)
+                binding.chipMusic.id -> setChipListener(binding.chipMusic.isChecked, 10402)
+                binding.chipMystery.id -> setChipListener(binding.chipMystery.isChecked, 9648)
+                binding.chipRomance.id -> setChipListener(binding.chipRomance.isChecked, 10749)
+                binding.chipScienceFiction.id -> setChipListener(binding.chipScienceFiction.isChecked, 878)
+                binding.chipThriller.id -> setChipListener(binding.chipThriller.isChecked, 53)
+                binding.chipWar.id -> setChipListener(binding.chipWar.isChecked, 10752)
+                binding.chipWestern.id -> setChipListener(binding.chipWestern.isChecked, 37)
             }
         }
 

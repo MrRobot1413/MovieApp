@@ -23,11 +23,11 @@ object DbListRepository {
         return instance
     }
 
-    fun selectAllFavorite(): LiveData<List<Movie>> {
+    suspend fun selectAllFavorite(): List<Movie> {
         return movieDao.selectAllFavorite()
     }
 
-    fun selectWatchLaterList(): LiveData<List<Movie>> {
+    suspend fun selectWatchLaterList(): List<Movie> {
         return movieDao.selectWatchLaterList()
     }
 
@@ -39,7 +39,7 @@ object DbListRepository {
 //        movieDao.saveAll(movies)
 //    }
 
-    fun selectById(id: Int): LiveData<Movie> {
+    suspend fun selectById(id: Int): Movie {
         return movieDao.selectById(id)
     }
 

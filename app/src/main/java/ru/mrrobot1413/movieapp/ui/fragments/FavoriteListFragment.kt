@@ -44,7 +44,7 @@ class FavoriteListFragment : Fragment() {
 
         initFields()
 
-        favoriteListViewModel.getFavoriteMovies().observe(viewLifecycleOwner, { result ->
+        favoriteListViewModel.favoriteMovies.observe(viewLifecycleOwner, { result ->
             if (result.isNullOrEmpty()) {
                 binding.txtNoMovie.visibility = View.VISIBLE
             } else {
@@ -53,6 +53,8 @@ class FavoriteListFragment : Fragment() {
             }
 
         })
+
+        favoriteListViewModel.getFavoriteMovies()
 
         initRecycler()
     }

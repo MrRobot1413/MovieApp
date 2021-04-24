@@ -16,45 +16,45 @@ interface Api {
     }
 
     @GET("movie/popular")
-    fun getPopularMovies(
+    suspend fun getPopularMovies(
         @Query("api_key") apiKey: String = API_KEY,
         @Query("page") page: Int,
         @Query("language") language: String = "en-US"
-    ): Deferred<Response<MovieResponse>>
+    ): Response<MovieResponse>
 
     @GET("movie/top_rated")
-    fun getTopRatedMovies(
+    suspend fun getTopRatedMovies(
         @Query("api_key") apiKey: String = API_KEY,
         @Query("page") page: Int,
         @Query("language") language: String = "en-US"
-    ): Deferred<Response<MovieResponse>>
+    ): Response<MovieResponse>
 
     @GET("movie/{id}")
-    fun getMovieDetails(
+    suspend fun getMovieDetails(
         @Path("id") id: Int,
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = "en-US"
-    ): Deferred<Response<MovieNetwork>>
+    ): Response<MovieNetwork>
 
     @GET("search/movie")
-    fun searchMovie(
+    suspend fun searchMovie(
         @Query("api_key") apiKey: String = API_KEY,
         @Query("page") page: Int,
         @Query("language") language: String,
         @Query("query") query: String
-    ): Deferred<Response<MovieResponse>>
+    ): Response<MovieResponse>
 
     @GET("movie/{movie_id}/videos")
-    fun getVideos(
+    suspend fun getVideos(
         @Path("movie_id") id: Int,
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String
-    ): Deferred<Response<VideoResponse>>
+    ): Response<VideoResponse>
 
     @GET("discover/movie")
-    fun searchByGenre(
+    suspend fun searchByGenre(
         @Query("with_genres") id: Int,
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String
-    ): Deferred<Response<MovieResponse>>
+    ): Response<MovieResponse>
 }
