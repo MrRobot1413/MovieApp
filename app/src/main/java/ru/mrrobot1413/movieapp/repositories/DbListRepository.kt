@@ -1,6 +1,7 @@
 package ru.mrrobot1413.movieapp.repositories
 
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import ru.mrrobot1413.movieapp.App
 import ru.mrrobot1413.movieapp.dao.MovieDao
 import ru.mrrobot1413.movieapp.model.Movie
@@ -24,11 +25,11 @@ object DbListRepository {
     }
 
     suspend fun selectAllFavorite(): List<Movie> {
-        return movieDao.selectAllFavorite()
+        return withContext(Dispatchers.IO){movieDao.selectAllFavorite()}
     }
 
     suspend fun selectWatchLaterList(): List<Movie> {
-        return movieDao.selectWatchLaterList()
+        return withContext(Dispatchers.IO){movieDao.selectWatchLaterList()}
     }
 
 //    suspend fun selectAll(): LiveData<List<Movie>> {
@@ -40,20 +41,20 @@ object DbListRepository {
 //    }
 
     suspend fun selectById(id: Int): Movie {
-        return movieDao.selectById(id)
+        return withContext(Dispatchers.IO){movieDao.selectById(id)}
     }
 
     suspend fun insert(movie: Movie){
-        movieDao.insertMovie(movie)
+        withContext(Dispatchers.IO){movieDao.insertMovie(movie)}
     }
 
     suspend fun delete(movie: Movie) {
-        if(movie.isToNotify && !movie.liked){
+        withContext(Dispatchers.IO){if(movie.isToNotify && !movie.liked){
             movieDao.insertMovie(movie)
         } else if(!movie.isToNotify && !movie.liked){
             movieDao.deleteMovie(movie)
         } else if(movie.liked && !movie.isToNotify){
             movieDao.insertMovie(movie)
-        }
+        }}
     }
 }

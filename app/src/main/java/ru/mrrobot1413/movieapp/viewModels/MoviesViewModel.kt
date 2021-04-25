@@ -83,8 +83,7 @@ class MoviesViewModel : ViewModel() {
                 val movie = movieRepository.getMovieDetails(id = id)
                 _movieDetailed.value = movie
             } catch (e: Exception) {
-                val repository = DbListRepository.getInstance()
-                val movieFromDb = repository.selectById(id)
+                val movieFromDb = dbRepository.selectById(id)
                 _movieDetailed.value = MovieNetwork(
                     movieFromDb.id,
                     movieFromDb.title,
