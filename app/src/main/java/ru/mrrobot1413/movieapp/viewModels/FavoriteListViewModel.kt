@@ -23,43 +23,33 @@ class FavoriteListViewModel : ViewModel() {
     private val _movieDetailed = MutableLiveData<Movie>()
     val movieDetailed: MutableLiveData<Movie> = _movieDetailed
 
-    fun getFavoriteMovies(){
+    fun getFavoriteMovies() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                _favoriteMovies.postValue(dbListRepository.selectAllFavorite())
-            }
+            _favoriteMovies.value = dbListRepository.selectAllFavorite()
         }
     }
 
-    fun getWatchLaterList(){
+    fun getWatchLaterList() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                _watchLaterMovies.postValue(dbListRepository.selectWatchLaterList())
-            }
+            _watchLaterMovies.value = dbListRepository.selectWatchLaterList()
         }
     }
 
     fun selectById(id: Int) {
         viewModelScope.launch {
-            withContext(Dispatchers.Default) {
-                _movieDetailed.postValue(dbListRepository.selectById(id))
-            }
+            _movieDetailed.value = dbListRepository.selectById(id)
         }
     }
 
     fun insert(movie: Movie) {
         viewModelScope.launch {
-            withContext(Dispatchers.Default){
-                dbListRepository.insert(movie)
-            }
+            dbListRepository.insert(movie)
         }
     }
 
     fun delete(movie: Movie) {
         viewModelScope.launch {
-            withContext(Dispatchers.Default){
-                dbListRepository.delete(movie)
-            }
+            dbListRepository.delete(movie)
         }
     }
 }
