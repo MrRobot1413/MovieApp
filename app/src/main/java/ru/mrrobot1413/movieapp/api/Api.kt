@@ -20,21 +20,21 @@ interface Api {
         @Query("api_key") apiKey: String = API_KEY,
         @Query("page") page: Int,
         @Query("language") language: String = "en-US"
-    ): Response<MovieResponse>
+    ): MovieResponse
 
     @GET("movie/top_rated")
     suspend fun getTopRatedMovies(
         @Query("api_key") apiKey: String = API_KEY,
         @Query("page") page: Int,
         @Query("language") language: String = "en-US"
-    ): Response<MovieResponse>
+    ): MovieResponse
 
     @GET("movie/{id}")
     suspend fun getMovieDetails(
         @Path("id") id: Int,
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = "en-US"
-    ): Response<MovieNetwork>
+    ): MovieNetwork
 
     @GET("search/movie")
     suspend fun searchMovie(
@@ -42,19 +42,19 @@ interface Api {
         @Query("page") page: Int,
         @Query("language") language: String,
         @Query("query") query: String
-    ): Response<MovieResponse>
+    ): MovieResponse
 
     @GET("movie/{movie_id}/videos")
     suspend fun getVideos(
         @Path("movie_id") id: Int,
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String
-    ): Response<VideoResponse>
+    ): VideoResponse
 
     @GET("discover/movie")
     suspend fun searchByGenre(
         @Query("with_genres") id: Int,
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String
-    ): Response<MovieResponse>
+    ): MovieResponse
 }

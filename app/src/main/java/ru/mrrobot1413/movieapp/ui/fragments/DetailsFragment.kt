@@ -105,8 +105,7 @@ class DetailsFragment : Fragment() {
         })
 
         arguments?.getInt(MainActivity.MOVIE)?.let {
-            moviesViewModel.getMovieDetails(it,
-                getString(R.string.error_loading_movies))
+            moviesViewModel.getMovieDetails(it)
         }
 
         (activity as MainActivity?)!!.setSupportActionBar(binding.toolbar)
