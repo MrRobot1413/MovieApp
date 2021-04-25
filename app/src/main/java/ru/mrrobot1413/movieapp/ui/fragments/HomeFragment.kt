@@ -81,8 +81,8 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 //                }, {})
         })
 
-        moviesViewModel.getPopularMovies(moviesPage, getString(R.string.no_connection),
-            getString(R.string.error_loading_movies))
+        moviesViewModel.getPopularMovies(moviesPage,
+            getString(R.string.error_loading_movies), getString(R.string.no_connection))
 
         binding.toolbar.setSupportActionBar(activity as AppCompatActivity)
         setHasOptionsMenu(true)
@@ -109,14 +109,14 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
     private fun showTopRatedMovies() {
         adapter.setMoviesFromMenu(mutableListOf())
-        moviesViewModel.getTopRatedMovies(1, getString(R.string.no_connection),
-            getString(R.string.error_loading_movies))
+        moviesViewModel.getTopRatedMovies(1,
+            getString(R.string.error_loading_movies), getString(R.string.no_connection))
     }
 
     private fun showPopularMovies() {
         adapter.setMoviesFromMenu(mutableListOf())
-        moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-            getString(R.string.error_loading_movies))
+        moviesViewModel.getPopularMovies(1,
+            getString(R.string.error_loading_movies), getString(R.string.no_connection))
     }
 
     private fun showSnackbar(text: String) {
@@ -125,8 +125,8 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
                 .setAction(getString(R.string.retry)) {
                     moviesViewModel.getPopularMovies(
                         moviesPage,
-                        getString(R.string.no_connection),
-                        getString(R.string.error_loading_movies)
+                        getString(R.string.error_loading_movies),
+                        getString(R.string.no_connection)
                     )
                 }.setActionTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccent))
                 .show()
@@ -171,8 +171,8 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
         binding.refreshLayout.setOnRefreshListener {
             adapter.setMoviesFromMenu(mutableListOf())
-            moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                getString(R.string.error_loading_movies))
+            moviesViewModel.getPopularMovies(1,
+                getString(R.string.error_loading_movies), getString(R.string.no_connection))
             binding.refreshLayout.isRefreshing = false
 
             binding.group.clearCheck()
@@ -193,8 +193,8 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
                         recyclerView.removeOnScrollListener(this)
                         moviesPage++
                         moviesViewModel.getPopularMovies(moviesPage,
-                            getString(R.string.no_connection),
-                            getString(R.string.error_loading_movies))
+                            getString(R.string.error_loading_movies),
+                            getString(R.string.no_connection))
                         attachPopularMoviesOnScrollListener()
                     }
                 }
@@ -227,7 +227,10 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
     override fun onSearchQueryChanged(query: String?) {
         adapter.setMoviesFromMenu(mutableListOf())
-        moviesViewModel.searchMovie(1, query, getString(R.string.no_connection)
+        moviesViewModel.searchMovie(1,
+            query,
+            getString(R.string.error_loading_movies),
+            getString(R.string.no_connection)
         )
     }
 
@@ -247,12 +250,12 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         if (isChecked) {
             moviesViewModel.searchMovieByGenre(
                 id,
-                getString(R.string.no_connection),
-                getString(R.string.error_loading_movies)
+                getString(R.string.error_loading_movies),
+                getString(R.string.no_connection)
             )
         } else {
-            moviesViewModel.getPopularMovies(1, getString(R.string.no_connection),
-                getString(R.string.error_loading_movies))
+            moviesViewModel.getPopularMovies(1,
+                getString(R.string.error_loading_movies), getString(R.string.no_connection))
         }
     }
 
@@ -273,7 +276,8 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
                 binding.chipMusic.id -> setChipListener(binding.chipMusic.isChecked, 10402)
                 binding.chipMystery.id -> setChipListener(binding.chipMystery.isChecked, 9648)
                 binding.chipRomance.id -> setChipListener(binding.chipRomance.isChecked, 10749)
-                binding.chipScienceFiction.id -> setChipListener(binding.chipScienceFiction.isChecked, 878)
+                binding.chipScienceFiction.id -> setChipListener(binding.chipScienceFiction.isChecked,
+                    878)
                 binding.chipThriller.id -> setChipListener(binding.chipThriller.isChecked, 53)
                 binding.chipWar.id -> setChipListener(binding.chipWar.isChecked, 10752)
                 binding.chipWestern.id -> setChipListener(binding.chipWestern.isChecked, 37)

@@ -47,11 +47,11 @@ class FavoriteListFragment : Fragment() {
         favoriteListViewModel.favoriteMovies.observe(viewLifecycleOwner, { result ->
             if (result.isNullOrEmpty()) {
                 binding.txtNoMovie.visibility = View.VISIBLE
+                adapter.setMovies(mutableListOf())
             } else {
                 binding.txtNoMovie.visibility = View.GONE
                 adapter.setMovies(result)
             }
-
         })
 
         favoriteListViewModel.getFavoriteMovies()

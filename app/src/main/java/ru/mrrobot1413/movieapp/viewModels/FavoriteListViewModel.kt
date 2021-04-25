@@ -1,6 +1,5 @@
 package ru.mrrobot1413.movieapp.viewModels
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,7 +8,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.mrrobot1413.movieapp.model.Movie
-import ru.mrrobot1413.movieapp.model.MovieNetwork
 import ru.mrrobot1413.movieapp.repositories.DbListRepository
 
 class FavoriteListViewModel : ViewModel() {

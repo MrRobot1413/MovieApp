@@ -38,86 +38,63 @@ class MoviesViewModel : ViewModel() {
 
     fun getPopularMovies(
         page: Int,
-        noConnection: String,
         errorLoading: String,
+        noConnection: String,
     ) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val request = movieRepository.getPopularMovies(page = page)
-                withContext(Dispatchers.Main) {
-                    if (request.isSuccessful) {
-                        if (request.body() != null) {
-                            _movies.postValue(request.body()!!.moviesList)
-                        } else {
-                            _error.postValue(errorLoading)
-                        }
-                    } else {
-                        _error.postValue(noConnection)
-                    }
+            try {
+                val list = movieRepository.getPopularMovies(page = page).moviesList
+                if (!list.isNullOrEmpty()) {
+                    _movies.value = list
+                } else {
+                    _error.value = errorLoading
                 }
+            } catch (e: Exception) {
+                _error.value = noConnection
             }
         }
     }
 
+
     fun getTopRatedMovies(
         page: Int,
-        noConnection: String,
         errorLoading: String,
+        noConnection: String,
     ) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val request = movieRepository.getTopRatedMovies(page = page)
-                withContext(Dispatchers.Main) {
-                    if (request.isSuccessful) {
-                        if (request.body() != null) {
-                            _movies.postValue(request.body()!!.moviesList)
-                        } else {
-                            _error.postValue(errorLoading)
-                        }
-                    } else {
-                        _error.postValue(noConnection)
-                    }
+            try {
+                val list = movieRepository.getTopRatedMovies(page = page).moviesList
+                if (!list.isNullOrEmpty()) {
+                    _movies.value = list
+                } else {
+                    _error.value = errorLoading
                 }
+            } catch (e: Exception) {
+                _error.value = noConnection
             }
         }
     }
 
     fun getMovieDetails(
         id: Int,
-        errorLoading: String,
     ) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val request = movieRepository.getMovieDetails(id = id)
-                withContext(Dispatchers.Main) {
-                    if (request.isSuccessful) {
-                        if (request.body() != null) {
-                            val movie = request.body()!!
-                            _movieDetailed.postValue(movie)
-                        } else {
-                            _error.postValue(errorLoading)
-                        }
-                    } else {
-                        withContext(Dispatchers.IO) {
-                            val repository = DbListRepository.getInstance()
-                            val movie = repository.selectById(id)
-                            withContext(Dispatchers.Main) {
-                                if (movie != null) {
-                                    _movieDetailed.postValue(MovieNetwork(
-                                        movie.id,
-                                        movie.title,
-                                        movie.overview,
-                                        movie.posterPath,
-                                        movie.rating,
-                                        movie.releaseDate,
-                                        movie.time,
-                                        movie.language
-                                    ))
-                                }
-                            }
-                        }
-                    }
-                }
+            try {
+                val movie = movieRepository.getMovieDetails(id = id)
+                _movieDetailed.value = movie
+            } catch (e: Exception) {
+                val repository = DbListRepository.getInstance()
+                val movieFromDb = repository.selectById(id)
+                _movieDetailed.value = MovieNetwork(
+                    movieFromDb.id,
+                    movieFromDb.title,
+                    movieFromDb.overview,
+                    movieFromDb.posterPath,
+                    movieFromDb.rating,
+                    movieFromDb.releaseDate,
+                    movieFromDb.time,
+                    movieFromDb.language
+                )
             }
         }
     }
@@ -125,67 +102,60 @@ class MoviesViewModel : ViewModel() {
     fun searchMovie(
         page: Int,
         query: String?,
+        errorLoading: String,
         noConnection: String,
     ) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                if (query?.length!! >= 2) {
-                    val request = movieRepository.searchMovie(page = page, query = query)
-                    withContext(Dispatchers.Main) {
-                        delay(300)
-                        if (request.isSuccessful) {
-                            _movies.postValue(request.body()?.moviesList)
-                        } else {
-                            _error.postValue(noConnection)
-                        }
+            if (query?.length!! >= 2) {
+                try {
+                    val list = movieRepository.searchMovie(page = page, query = query).moviesList
+                    delay(300)
+                    if (!list.isNullOrEmpty()) {
+                        _movies.value = list
+                    } else {
+                        _error.value = errorLoading
                     }
+                } catch (e: Exception) {
+                    _error.value = noConnection
                 }
             }
         }
     }
 
     fun getVideos(
-        id: Int,
+        id: Int
     ) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val request = movieRepository.getVideos(id)
-                withContext(Dispatchers.Main) {
-                    if (request.isSuccessful) {
-                        if (request.body()?.list?.isEmpty() == true) {
-                            _videoKey.postValue("https://www.youtube.com/results?search_query=${_movieDetailed.value?.title + " " + _movieDetailed.value?.releaseDate} trailer")
-                        } else {
-                            _videoKey.postValue("http://www.youtube.com/watch?v=${
-                                request.body()?.list?.get(0)?.key
-                            }")
-                        }
-                    } else {
-                        _videoKey.postValue("https://www.youtube.com/results?search_query=${_movieDetailed.value?.title} trailer")
-                    }
+            try {
+                val list = movieRepository.getVideos(id).list
+                if (list.isNullOrEmpty()) {
+                    _videoKey.value = "https://www.youtube.com/results?search_query=${_movieDetailed.value?.title + " " + _movieDetailed.value?.releaseDate} trailer"
+                } else {
+                    _videoKey.value = "http://www.youtube.com/watch?v=${
+                        list[0].key
+                    }"
                 }
+            } catch (e: Exception){
+                _videoKey.value = "https://www.youtube.com/results?search_query=${_movieDetailed.value?.title + " " + _movieDetailed.value?.releaseDate} trailer"
             }
         }
     }
 
     fun searchMovieByGenre(
         genreId: Int,
-        noConnection: String,
         errorLoading: String,
+        noConnection: String
     ) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val request = movieRepository.searchMovieByGenre(genreId)
-                withContext(Dispatchers.Main) {
-                    if (request.isSuccessful) {
-                        if (request.body() != null) {
-                            _movies.postValue(request.body()!!.moviesList)
-                        } else {
-                            _error.postValue(errorLoading)
-                        }
-                    } else {
-                        _error.postValue(noConnection)
-                    }
+            try {
+                val list = movieRepository.searchMovieByGenre(genreId).moviesList
+                if (!list.isNullOrEmpty()) {
+                    _movies.value = list
+                } else {
+                    _error.value = errorLoading
                 }
+            } catch (e: Exception){
+                _error.value = noConnection
             }
         }
     }
