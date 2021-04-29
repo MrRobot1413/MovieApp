@@ -16,6 +16,7 @@ class App : Application() {
 
     companion object {
         const val BASE_URL = "https://api.themoviedb.org/3/"
+        const val API_KEY = "82f337a96c72f107c937a1fcf9d4072c"
 
         lateinit var instance: App
             private set
@@ -36,13 +37,13 @@ class App : Application() {
 
     fun initRetrofit() {
         val client = OkHttpClient.Builder()
-            .addInterceptor { chain ->
-                return@addInterceptor chain.proceed(
-                    chain
-                        .request()
-                        .newBuilder()
-                        .build()
-                )
+            .addNetworkInterceptor { chain ->
+
+                val request = chain.request().newBuilder()
+                val originalHttpUrl = chain.request().url
+                val url = originalHttpUrl.newBuilder().addQueryParameter("api_key", API_KEY).build()
+                request.url(url)
+                return@addNetworkInterceptor chain.proceed(request.build())
             }
             .addInterceptor(HttpLoggingInterceptor().apply {
                 if (BuildConfig.DEBUG) {
