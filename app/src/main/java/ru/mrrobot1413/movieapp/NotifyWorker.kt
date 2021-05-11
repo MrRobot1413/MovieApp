@@ -12,6 +12,7 @@ import androidx.navigation.NavDeepLinkBuilder
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import ru.mrrobot1413.movieapp.ui.MainActivity
+import kotlin.random.Random
 
 class NotifyWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
@@ -27,7 +28,6 @@ class NotifyWorker(context: Context, params: WorkerParameters) : Worker(context,
         const val DESTINATION = "destination"
         const val CHANNEL_ID = "0"
         const val CHANNEL_NAME = "Reminder to watch a movie"
-        const val NOTIFY_ID = 1
     }
 
     override fun doWork(): Result {
@@ -76,6 +76,6 @@ class NotifyWorker(context: Context, params: WorkerParameters) : Worker(context,
             .setContentIntent(pendingIntent)
             .setSmallIcon(icon)
             .setAutoCancel(true)
-        notificationManager.notify(NOTIFY_ID, notification.build())
+        notificationManager.notify(Random.nextInt(), notification.build())
     }
 }
