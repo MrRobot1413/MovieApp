@@ -32,6 +32,7 @@
             <ImageView
                 android:id="@+id/image_main"
                 android:layout_width="match_parent"
+                android:transitionName="image_small"
                 android:scaleType="centerCrop"
                 android:layout_height="250dp" />
         </androidx.cardview.widget.CardView>

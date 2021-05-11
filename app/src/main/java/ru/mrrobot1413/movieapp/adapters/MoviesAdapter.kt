@@ -2,6 +2,7 @@ package ru.mrrobot1413.movieapp.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.recyclerview.widget.RecyclerView
 import ru.mrrobot1413.movieapp.R
