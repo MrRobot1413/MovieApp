@@ -1,15 +1,19 @@
 package ru.mrrobot1413.movieapp.viewModels
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collectLatest
 import ru.mrrobot1413.movieapp.NotifyWorker
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.model.Movie
@@ -24,8 +28,8 @@ class MoviesViewModel : ViewModel() {
     private var movieRepository: MovieRepository = MovieRepository.getInstance()
     private var dbRepository: DbListRepository = DbListRepository.getInstance()
 
-    private val _movies = MutableLiveData<List<MovieNetwork>>()
-    val movies: LiveData<List<MovieNetwork>> = _movies
+    private val _movies = MutableLiveData<PagingData<MovieNetwork>>()
+    val movies: LiveData<PagingData<MovieNetwork>> = _movies
 
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
@@ -37,17 +41,12 @@ class MoviesViewModel : ViewModel() {
     val videoKey = _videoKey
 
     fun getPopularMovies(
-        page: Int,
-        errorLoading: String,
-        noConnection: String,
+        noConnection: String
     ) {
         viewModelScope.launch {
             try {
-                val list = movieRepository.getPopularMovies(page = page).moviesList
-                if (!list.isNullOrEmpty()) {
-                    _movies.value = list
-                } else {
-                    _error.value = errorLoading
+                movieRepository.getPopularMovies().cachedIn(viewModelScope).collectLatest { data ->
+                    _movies.value = data
                 }
             } catch (e: Exception) {
                 _error.value = noConnection
@@ -55,19 +54,13 @@ class MoviesViewModel : ViewModel() {
         }
     }
 
-
     fun getTopRatedMovies(
-        page: Int,
-        errorLoading: String,
-        noConnection: String,
+        noConnection: String
     ) {
         viewModelScope.launch {
             try {
-                val list = movieRepository.getTopRatedMovies(page = page).moviesList
-                if (!list.isNullOrEmpty()) {
-                    _movies.value = list
-                } else {
-                    _error.value = errorLoading
+                movieRepository.getTopRatedMovies().cachedIn(viewModelScope).collectLatest { data ->
+                    _movies.value = data
                 }
             } catch (e: Exception) {
                 _error.value = noConnection
@@ -99,20 +92,15 @@ class MoviesViewModel : ViewModel() {
     }
 
     fun searchMovie(
-        page: Int,
         query: String?,
-        errorLoading: String,
-        noConnection: String,
+        noConnection: String
     ) {
         viewModelScope.launch {
             if (query?.length!! >= 2) {
                 try {
-                    val list = movieRepository.searchMovie(page = page, query = query).moviesList
-                    delay(300)
-                    if (!list.isNullOrEmpty()) {
-                        _movies.value = list
-                    } else {
-                        _error.value = errorLoading
+                    delay(600)
+                    movieRepository.searchMovie(query).cachedIn(viewModelScope).collectLatest { data ->
+                        _movies.value = data
                     }
                 } catch (e: Exception) {
                     _error.value = noConnection
@@ -142,16 +130,12 @@ class MoviesViewModel : ViewModel() {
 
     fun searchMovieByGenre(
         genreId: Int,
-        errorLoading: String,
         noConnection: String
     ) {
         viewModelScope.launch {
             try {
-                val list = movieRepository.searchMovieByGenre(genreId).moviesList
-                if (!list.isNullOrEmpty()) {
-                    _movies.value = list
-                } else {
-                    _error.value = errorLoading
+                movieRepository.searchMovieByGenre(genreId).cachedIn(viewModelScope).collectLatest { data ->
+                    _movies.value = data
                 }
             } catch (e: Exception){
                 _error.value = noConnection
