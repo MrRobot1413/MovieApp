@@ -4,37 +4,35 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.transition.Explode
-import android.transition.Slide
 import android.transition.Transition
 import android.transition.TransitionManager
 import android.view.*
-import android.view.animation.AnimationUtils
-import android.view.animation.LayoutAnimationController
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import com.oshi.libsearchtoolbar.SearchAnimationToolbar
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.adapters.MoviesAdapter
 import ru.mrrobot1413.movieapp.databinding.FragmentHomeBinding
 import ru.mrrobot1413.movieapp.interfaces.MovieClickListener
+import ru.mrrobot1413.movieapp.ui.MovieLoadStateAdapter
 import ru.mrrobot1413.movieapp.viewModels.MoviesViewModel
-
 
 class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListener {
 
     private val adapter by lazy {
-        MoviesAdapter(mutableListOf()) { id: Int ->
+        MoviesAdapter { id: Int ->
             (activity as MovieClickListener).openDetailsFragment(id, 1)
         }
     }
@@ -42,56 +40,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     private val moviesViewModel by lazy {
         ViewModelProvider(this).get(MoviesViewModel::class.java)
     }
-    private var moviesPage = 1
     lateinit var binding: FragmentHomeBinding
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        initFields()
-
-        moviesViewModel.movies.observe(viewLifecycleOwner, {
-            runLayoutAnimation(binding.recyclerView,
-                binding.recyclerView.layoutManager as GridLayoutManager)
-            binding.recyclerView.visibility = View.VISIBLE
-            adapter.setMovies(it)
-            binding.refreshLayout.isRefreshing = false
-        })
-
-        moviesViewModel.error.observe(viewLifecycleOwner, {
-            showSnackbar(it)
-            binding.refreshLayout.isRefreshing = false
-//            moviesViewModel.selectAll().subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe({ result ->
-//                    val movies = mutableListOf<MovieNetwork>()
-//                    for(i in 0..result.size){
-//                        movies[i] = MovieNetwork(
-//                            result[i].id,
-//                            result[i].title,
-//                            result[i].overview,
-//                            result[i].posterPath,
-//                            result[i].rating,
-//                            result[i].releaseDate,
-//                            result[i].time,
-//                            result[i].language
-//                        )
-//                    }
-//                    adapter.setMovies(movies)
-//                }, {})
-        })
-
-        moviesViewModel.getPopularMovies(moviesPage,
-            getString(R.string.error_loading_movies), getString(R.string.no_connection))
-
-        binding.toolbar.setSupportActionBar(activity as AppCompatActivity)
-        setHasOptionsMenu(true)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        (activity as MovieClickListener).showBottomNav()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -102,21 +51,61 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        initFields()
+
+        moviesViewModel.movies.observe(viewLifecycleOwner, {
+            binding.recyclerView.visibility = View.VISIBLE
+            adapter.submitData(viewLifecycleOwner.lifecycle, it)
+            binding.refreshLayout.isRefreshing = false
+        })
+
+        moviesViewModel.error.observe(viewLifecycleOwner, {
+            showSnackbar(it)
+            binding.refreshLayout.isRefreshing = false
+        })
+
+        lifecycleScope.launch {
+            adapter.loadStateFlow.collectLatest { loadStates ->
+                binding.apply {
+                    progressBar.isVisible = loadStates.refresh is LoadState.Loading
+                    recyclerView.isVisible = loadStates.refresh is LoadState.NotLoading
+                    errorAnimation.isVisible = loadStates.refresh is LoadState.NotLoading
+                    if(loadStates.refresh is LoadState.Error){
+                        errorAnimation.isVisible = true
+                        showSnackbar(getString(R.string.error_occurred))
+                    }
+                }
+            }
+        }
+
+        moviesViewModel.getPopularMovies(
+            getString(R.string.error_loading_movies))
+
+        binding.toolbar.setSupportActionBar(activity as AppCompatActivity)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as MovieClickListener).showBottomNav()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.main_menu, menu)
     }
 
     private fun showTopRatedMovies() {
-        adapter.setMoviesFromMenu(mutableListOf())
-        moviesViewModel.getTopRatedMovies(1,
-            getString(R.string.error_loading_movies), getString(R.string.no_connection))
+        moviesViewModel.getTopRatedMovies(getString(R.string.no_connection))
+        binding.recyclerView.scrollToPosition(0)
     }
 
     private fun showPopularMovies() {
-        adapter.setMoviesFromMenu(mutableListOf())
-        moviesViewModel.getPopularMovies(1,
-            getString(R.string.error_loading_movies), getString(R.string.no_connection))
+        moviesViewModel.getPopularMovies(getString(R.string.no_connection))
+        binding.recyclerView.scrollToPosition(0)
     }
 
     private fun showSnackbar(text: String) {
@@ -124,8 +113,6 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
             Snackbar.make(it, text, Snackbar.LENGTH_INDEFINITE).setAnchorView(R.id.bottom)
                 .setAction(getString(R.string.retry)) {
                     moviesViewModel.getPopularMovies(
-                        moviesPage,
-                        getString(R.string.error_loading_movies),
                         getString(R.string.no_connection)
                     )
                 }.setActionTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccent))
@@ -170,55 +157,31 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         binding.toolbar.setOnSearchQueryChangedListener(this)
 
         binding.refreshLayout.setOnRefreshListener {
-            adapter.setMoviesFromMenu(mutableListOf())
-            moviesViewModel.getPopularMovies(1,
-                getString(R.string.error_loading_movies), getString(R.string.no_connection))
+            moviesViewModel.getPopularMovies(getString(R.string.no_connection))
             binding.refreshLayout.isRefreshing = false
-
+            binding.recyclerView.scrollToPosition(0)
             binding.group.clearCheck()
         }
 
         binding.refreshLayout.isEnabled = true
     }
 
-    private fun attachPopularMoviesOnScrollListener() {
-        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val totalItemCount = linearLayoutManager.itemCount
-                val visibleItemCount = linearLayoutManager.childCount
-                val firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition()
-
-                if (firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
-                    if (moviesPage < 500) {
-                        recyclerView.removeOnScrollListener(this)
-                        moviesPage++
-                        moviesViewModel.getPopularMovies(moviesPage,
-                            getString(R.string.error_loading_movies),
-                            getString(R.string.no_connection))
-                        attachPopularMoviesOnScrollListener()
-                    }
-                }
-            }
-        })
-    }
-
-    private fun runLayoutAnimation(recyclerView: RecyclerView, linearLayout: GridLayoutManager) {
-        if (linearLayout.childCount <= 4 && linearLayout.itemCount <= 4) {
-            val context = recyclerView.context
-            val controller: LayoutAnimationController =
-                AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation)
-            recyclerView.layoutAnimation = controller
-            recyclerView.adapter!!.notifyDataSetChanged()
-            recyclerView.scheduleLayoutAnimation()
-        }
-    }
+//    private fun runLayoutAnimation(recyclerView: RecyclerView, linearLayout: GridLayoutManager) {
+//        if (linearLayout.childCount <= 4 && linearLayout.itemCount <= 4) {
+//            val context = recyclerView.context
+//            val controller: LayoutAnimationController =
+//                AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation)
+//            recyclerView.layoutAnimation = controller
+//            recyclerView.adapter!!.notifyDataSetChanged()
+//            recyclerView.scheduleLayoutAnimation()
+//        }
+//    }
 
     private fun initRecycler() {
         binding.recyclerView.layoutManager = linearLayoutManager
-
-        binding.recyclerView.adapter = adapter
-
-        attachPopularMoviesOnScrollListener()
+        binding.recyclerView.adapter = adapter.withLoadStateFooter(
+            footer = MovieLoadStateAdapter()
+        )
     }
 
     override fun onSearchCollapsed() {
@@ -226,10 +189,8 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
 
     override fun onSearchQueryChanged(query: String?) {
-        adapter.setMoviesFromMenu(mutableListOf())
-        moviesViewModel.searchMovie(1,
+        moviesViewModel.searchMovie(
             query,
-            getString(R.string.error_loading_movies),
             getString(R.string.no_connection)
         )
     }
@@ -246,17 +207,15 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
 
     private fun setChipListener(isChecked: Boolean, id: Int) {
-        adapter.setMoviesFromMenu(mutableListOf())
         if (isChecked) {
             moviesViewModel.searchMovieByGenre(
                 id,
-                getString(R.string.error_loading_movies),
-                getString(R.string.no_connection)
+                getString(R.string.error_loading_movies)
             )
         } else {
-            moviesViewModel.getPopularMovies(1,
-                getString(R.string.error_loading_movies), getString(R.string.no_connection))
+            moviesViewModel.getPopularMovies(getString(R.string.no_connection))
         }
+        binding.recyclerView.scrollToPosition(0)
     }
 
     private fun initChips() {

@@ -42,7 +42,7 @@ interface Api {
 
     @GET("discover/movie")
     suspend fun searchByGenre(
-        @Query("with_genres") id: Int,
+        @Query("with_genres") id: Int?,
         @Query("language") language: String
     ): MovieResponse
 }
