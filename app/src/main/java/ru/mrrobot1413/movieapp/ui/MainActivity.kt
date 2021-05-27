@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.View
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.ui.setupWithNavController
+import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import ru.mrrobot1413.movieapp.R
@@ -37,8 +39,8 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
         val bundle = Bundle()
         bundle.putInt(MOVIE, id)
         bundle.putInt("source", source)
-        val navOptions = NavOptions.Builder().setEnterAnim(R.anim.fragment_open_enter)
-            .setExitAnim(R.anim.fragment_close_exit).setPopEnterAnim(R.anim.nav_default_pop_enter_anim).setPopExitAnim(R.anim.nav_default_pop_exit_anim).build()
+        val navOptions = NavOptions.Builder().setEnterAnim(R.anim.nav_default_enter_anim)
+            .setExitAnim(R.anim.nav_default_exit_anim).setPopEnterAnim(R.anim.nav_default_pop_enter_anim).setPopExitAnim(R.anim.nav_default_pop_exit_anim).build()
         navController.navigate(R.id.detailsFragment, bundle, navOptions, null)
     }
 

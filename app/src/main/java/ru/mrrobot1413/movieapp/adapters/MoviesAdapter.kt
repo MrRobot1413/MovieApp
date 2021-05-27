@@ -2,24 +2,27 @@ package ru.mrrobot1413.movieapp.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.paging.LoadState
-import androidx.paging.PagingDataAdapter
-import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.model.MovieNetwork
 import ru.mrrobot1413.movieapp.viewHolders.MoviesViewHolder
 
 class MoviesAdapter(
+    moviesSrc: MutableList<MovieNetwork>,
     private val clickListener: (id: Int) -> Unit
 ) :
-    PagingDataAdapter<MovieNetwork, MoviesViewHolder>(DIFF_UTIL) {
+    RecyclerView.Adapter<MoviesViewHolder>() {
+    private val list: MutableList<MovieNetwork> = moviesSrc
 
-    companion object{
-        private val DIFF_UTIL = object: DiffUtil.ItemCallback<MovieNetwork>(){
-            override fun areContentsTheSame(oldItem: MovieNetwork, newItem: MovieNetwork) = oldItem.id == newItem.id
+    fun setMovies(list: List<MovieNetwork>){
+        this.list.addAll(list)
+        notifyDataSetChanged()
+    }
 
-            override fun areItemsTheSame(oldItem: MovieNetwork, newItem: MovieNetwork) = oldItem == newItem
-        }
+    fun setMoviesFromMenu(list: List<MovieNetwork>){
+        this.list.clear()
+        this.list.addAll(list)
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoviesViewHolder {
@@ -30,9 +33,9 @@ class MoviesAdapter(
     }
 
     override fun onBindViewHolder(holder: MoviesViewHolder, position: Int) {
-        val item = getItem(position)
+        val item = list[position]
 
-        holder.bind(item!!)
+        holder.bind(item)
         setOnMovieClickListener(holder, item)
     }
 
@@ -41,5 +44,9 @@ class MoviesAdapter(
             notifyDataSetChanged()
             clickListener(movie.id)
         }
+    }
+
+    override fun getItemCount(): Int {
+        return list.size
     }
 }

@@ -5,12 +5,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import ru.mrrobot1413.movieapp.di.AppComponentSource.Companion.appComponentSource
 import ru.mrrobot1413.movieapp.model.Movie
 import ru.mrrobot1413.movieapp.repositories.DbListRepository
+import javax.inject.Inject
 
 class FavoriteListViewModel : ViewModel() {
 
-    private var dbListRepository: DbListRepository = DbListRepository.getInstance()
+    @Inject
+    lateinit var dbListRepository: DbListRepository
 
     private val _favoriteMovies = MutableLiveData<List<Movie>>()
     val favoriteMovies: LiveData<List<Movie>> = _favoriteMovies
@@ -20,6 +23,10 @@ class FavoriteListViewModel : ViewModel() {
 
     private val _movieDetailed = MutableLiveData<Movie>()
     val movieDetailed: MutableLiveData<Movie> = _movieDetailed
+
+    init {
+        appComponentSource.inject(this)
+    }
 
     fun getFavoriteMovies() {
         viewModelScope.launch {

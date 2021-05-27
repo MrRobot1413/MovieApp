@@ -1,5 +1,6 @@
 package ru.mrrobot1413.movieapp.ui.fragments
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
@@ -14,33 +15,35 @@ import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.oshi.libsearchtoolbar.SearchAnimationToolbar
 import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.adapters.MoviesAdapter
 import ru.mrrobot1413.movieapp.databinding.FragmentHomeBinding
 import ru.mrrobot1413.movieapp.interfaces.MovieClickListener
-import ru.mrrobot1413.movieapp.ui.MovieLoadStateAdapter
 import ru.mrrobot1413.movieapp.viewModels.MoviesViewModel
 
 class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListener {
 
     private val adapter by lazy {
-        MoviesAdapter { id: Int ->
+        MoviesAdapter(mutableListOf()) { id: Int ->
             (activity as MovieClickListener).openDetailsFragment(id, 1)
         }
     }
-    private lateinit var linearLayoutManager: GridLayoutManager
+    private lateinit var layoutManager: GridLayoutManager
+
     private val moviesViewModel by lazy {
         ViewModelProvider(this).get(MoviesViewModel::class.java)
     }
-    lateinit var binding: FragmentHomeBinding
+    private lateinit var binding: FragmentHomeBinding
+    private lateinit var snackbar: Snackbar
+
+    companion object {
+        private const val RECYCLER_VIEW_SAVE_STATE = "recycler_view_state"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,40 +60,63 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         initFields()
 
         moviesViewModel.movies.observe(viewLifecycleOwner, {
+            snackbar.dismiss()
+            binding.errorAnimation.isVisible = false
+            binding.progressBar.isVisible = true
             binding.recyclerView.visibility = View.VISIBLE
-            adapter.submitData(viewLifecycleOwner.lifecycle, it)
+            adapter.setMovies(it)
             binding.refreshLayout.isRefreshing = false
+            binding.progressBar.isVisible = false
         })
 
         moviesViewModel.error.observe(viewLifecycleOwner, {
-            showSnackbar(it)
+            adapter.setMoviesFromMenu(mutableListOf())
+            binding.progressBar.isVisible = false
+            binding.errorAnimation.isVisible = true
+            binding.errorAnimation.playAnimation()
+            showSnackbar()
             binding.refreshLayout.isRefreshing = false
         })
 
-        lifecycleScope.launch {
-            adapter.loadStateFlow.collectLatest { loadStates ->
-                binding.apply {
-                    progressBar.isVisible = loadStates.refresh is LoadState.Loading
-                    recyclerView.isVisible = loadStates.refresh is LoadState.NotLoading
-                    errorAnimation.isVisible = loadStates.refresh is LoadState.NotLoading
-                    if(loadStates.refresh is LoadState.Error){
-                        errorAnimation.isVisible = true
-                        showSnackbar(getString(R.string.error_occurred))
-                    }
-                }
-            }
-        }
-
-        moviesViewModel.getPopularMovies(
+        moviesViewModel.getPopularMovies(1,
             getString(R.string.error_loading_movies))
 
         binding.toolbar.setSupportActionBar(activity as AppCompatActivity)
         setHasOptionsMenu(true)
+
+        binding.recyclerView.layoutManager?.onRestoreInstanceState(savedInstanceState?.getParcelable(
+            RECYCLER_VIEW_SAVE_STATE))
+    }
+
+    private fun attachRecyclerScroll() {
+        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                val totalItemCount = layoutManager.itemCount
+                val visibleItemCount = layoutManager.childCount
+                val firstVisibleItem = layoutManager.findFirstVisibleItemPosition()
+
+                if (firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
+                    if (moviesViewModel.pages < 500) {
+                        recyclerView.removeOnScrollListener(this)
+                        moviesViewModel.pages++
+                        moviesViewModel.getPopularMovies(moviesViewModel.pages,
+                            getString(R.string.error_occurred))
+                        attachRecyclerScroll()
+                    }
+                }
+            }
+        })
     }
 
     override fun onResume() {
         super.onResume()
         (activity as MovieClickListener).showBottomNav()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable(RECYCLER_VIEW_SAVE_STATE,
+            binding.recyclerView.layoutManager?.onSaveInstanceState())
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -99,24 +125,21 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
 
     private fun showTopRatedMovies() {
-        moviesViewModel.getTopRatedMovies(getString(R.string.no_connection))
+        adapter.setMoviesFromMenu(mutableListOf())
+        moviesViewModel.getTopRatedMovies(1, getString(R.string.error_occurred))
         binding.recyclerView.scrollToPosition(0)
     }
 
     private fun showPopularMovies() {
-        moviesViewModel.getPopularMovies(getString(R.string.no_connection))
+        adapter.setMoviesFromMenu(mutableListOf())
+        moviesViewModel.getPopularMovies(1, getString(R.string.error_occurred))
         binding.recyclerView.scrollToPosition(0)
     }
 
-    private fun showSnackbar(text: String) {
+    @SuppressLint("ShowToast")
+    private fun showSnackbar() {
         view?.let {
-            Snackbar.make(it, text, Snackbar.LENGTH_INDEFINITE).setAnchorView(R.id.bottom)
-                .setAction(getString(R.string.retry)) {
-                    moviesViewModel.getPopularMovies(
-                        getString(R.string.no_connection)
-                    )
-                }.setActionTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccent))
-                .show()
+            snackbar.show()
         }
     }
 
@@ -144,7 +167,11 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
 
     private fun initFields() {
-        linearLayoutManager =
+        snackbar = Snackbar.make(binding.recyclerView,
+            getString(R.string.error_occurred),
+            Snackbar.LENGTH_INDEFINITE)
+
+        layoutManager =
             if (this.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 GridLayoutManager(requireContext(), 3)
             } else {
@@ -157,7 +184,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         binding.toolbar.setOnSearchQueryChangedListener(this)
 
         binding.refreshLayout.setOnRefreshListener {
-            moviesViewModel.getPopularMovies(getString(R.string.no_connection))
+            moviesViewModel.getPopularMovies(1, getString(R.string.error_occurred))
             binding.refreshLayout.isRefreshing = false
             binding.recyclerView.scrollToPosition(0)
             binding.group.clearCheck()
@@ -166,32 +193,24 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         binding.refreshLayout.isEnabled = true
     }
 
-//    private fun runLayoutAnimation(recyclerView: RecyclerView, linearLayout: GridLayoutManager) {
-//        if (linearLayout.childCount <= 4 && linearLayout.itemCount <= 4) {
-//            val context = recyclerView.context
-//            val controller: LayoutAnimationController =
-//                AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation)
-//            recyclerView.layoutAnimation = controller
-//            recyclerView.adapter!!.notifyDataSetChanged()
-//            recyclerView.scheduleLayoutAnimation()
-//        }
-//    }
-
     private fun initRecycler() {
-        binding.recyclerView.layoutManager = linearLayoutManager
-        binding.recyclerView.adapter = adapter.withLoadStateFooter(
-            footer = MovieLoadStateAdapter()
-        )
+        binding.recyclerView.layoutManager = layoutManager
+        binding.recyclerView.adapter = adapter
+        attachRecyclerScroll()
     }
 
     override fun onSearchCollapsed() {
-
+        moviesViewModel.getPopularMovies(
+            1,
+            getString(R.string.error_occurred)
+        )
     }
 
     override fun onSearchQueryChanged(query: String?) {
         moviesViewModel.searchMovie(
+            1,
             query,
-            getString(R.string.no_connection)
+            getString(R.string.error_occurred)
         )
     }
 
@@ -207,13 +226,14 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
 
     private fun setChipListener(isChecked: Boolean, id: Int) {
+        adapter.setMoviesFromMenu(mutableListOf())
         if (isChecked) {
             moviesViewModel.searchMovieByGenre(
                 id,
-                getString(R.string.error_loading_movies)
+                getString(R.string.error_occurred)
             )
         } else {
-            moviesViewModel.getPopularMovies(getString(R.string.no_connection))
+            moviesViewModel.getPopularMovies(1, getString(R.string.error_occurred))
         }
         binding.recyclerView.scrollToPosition(0)
     }
