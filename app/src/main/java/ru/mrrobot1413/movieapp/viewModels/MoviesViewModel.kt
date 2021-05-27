@@ -1,35 +1,37 @@
 package ru.mrrobot1413.movieapp.viewModels
 
 import android.content.Context
-import android.util.Log
+import android.view.View
+import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import com.airbnb.lottie.LottieAnimationView
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collectLatest
 import ru.mrrobot1413.movieapp.NotifyWorker
 import ru.mrrobot1413.movieapp.R
+import ru.mrrobot1413.movieapp.di.AppComponentSource.Companion.appComponentSource
 import ru.mrrobot1413.movieapp.model.Movie
 import ru.mrrobot1413.movieapp.model.MovieNetwork
 import ru.mrrobot1413.movieapp.repositories.DbListRepository
 import ru.mrrobot1413.movieapp.repositories.MovieRepository
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 class MoviesViewModel : ViewModel() {
+    @Inject
+    lateinit var movieRepository: MovieRepository
+    @Inject
+    lateinit var dbRepository: DbListRepository
 
-    private var movieRepository: MovieRepository = MovieRepository.getInstance()
-    private var dbRepository: DbListRepository = DbListRepository.getInstance()
-
-    private val _movies = MutableLiveData<PagingData<MovieNetwork>>()
-    val movies: LiveData<PagingData<MovieNetwork>> = _movies
+    private val _movies = MutableLiveData<List<MovieNetwork>>()
+    val movies: LiveData<List<MovieNetwork>> = _movies
 
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
@@ -40,28 +42,32 @@ class MoviesViewModel : ViewModel() {
     private val _videoKey = MutableLiveData<String>()
     val videoKey = _videoKey
 
+    var pages = 0
+
+    init {
+        appComponentSource.inject(this)
+    }
+
     fun getPopularMovies(
-        noConnection: String
+        page: Int,
+        error: String
     ) {
         viewModelScope.launch {
             try {
-                movieRepository.getPopularMovies().cachedIn(viewModelScope).collectLatest { data ->
-                    _movies.value = data
-                }
+                _movies.value = movieRepository.getPopularMovies(page).moviesList
             } catch (e: Exception) {
-                _error.value = noConnection
+                _error.value = error
             }
         }
     }
 
     fun getTopRatedMovies(
+        page: Int,
         noConnection: String
     ) {
         viewModelScope.launch {
             try {
-                movieRepository.getTopRatedMovies().cachedIn(viewModelScope).collectLatest { data ->
-                    _movies.value = data
-                }
+                _movies.value = movieRepository.getTopRatedMovies(page).moviesList
             } catch (e: Exception) {
                 _error.value = noConnection
             }
@@ -77,31 +83,32 @@ class MoviesViewModel : ViewModel() {
                 _movieDetailed.value = movie
             } catch (e: Exception) {
                 val movieFromDb = dbRepository.selectById(id)
-                _movieDetailed.value = MovieNetwork(
-                    movieFromDb.id,
-                    movieFromDb.title,
-                    movieFromDb.overview,
-                    movieFromDb.posterPath,
-                    movieFromDb.rating,
-                    movieFromDb.releaseDate,
-                    movieFromDb.time,
-                    movieFromDb.language
-                )
+                if(movieFromDb != null) {
+                    _movieDetailed.value = MovieNetwork(
+                        movieFromDb.id,
+                        movieFromDb.title,
+                        movieFromDb.overview,
+                        movieFromDb.posterPath,
+                        movieFromDb.rating,
+                        movieFromDb.releaseDate,
+                        movieFromDb.time,
+                        movieFromDb.language
+                    )
+                }
             }
         }
     }
 
     fun searchMovie(
+        page: Int,
         query: String?,
         noConnection: String
     ) {
         viewModelScope.launch {
             if (query?.length!! >= 2) {
                 try {
-                    delay(600)
-                    movieRepository.searchMovie(query).cachedIn(viewModelScope).collectLatest { data ->
-                        _movies.value = data
-                    }
+                    delay(300)
+                    _movies.value = movieRepository.searchMovie(page, query).moviesList
                 } catch (e: Exception) {
                     _error.value = noConnection
                 }
@@ -134,9 +141,7 @@ class MoviesViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             try {
-                movieRepository.searchMovieByGenre(genreId).cachedIn(viewModelScope).collectLatest { data ->
-                    _movies.value = data
-                }
+                _movies.value = movieRepository.searchMovieByGenre(genreId).moviesList
             } catch (e: Exception){
                 _error.value = noConnection
             }

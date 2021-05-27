@@ -1,22 +1,28 @@
 package ru.mrrobot1413.movieapp
 
 import android.app.Application
-import androidx.room.Room
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import ru.mrrobot1413.movieapp.api.Api
+import ru.mrrobot1413.movieapp.di.AppComponent
+import ru.mrrobot1413.movieapp.di.AppComponentSource
+import ru.mrrobot1413.movieapp.di.DaggerAppComponent
+import ru.mrrobot1413.movieapp.di.modules.AppModule
+import ru.mrrobot1413.movieapp.di.modules.NetworkModule
+import ru.mrrobot1413.movieapp.di.modules.RepositoriesModule
+import ru.mrrobot1413.movieapp.di.modules.RoomModule
 
 class App : Application() {
 
-    lateinit var api: Api
-    lateinit var db: AppDatabase
+    private val appComponent: AppComponent = DaggerAppComponent
+        .builder()
+        .appModule(AppModule(this))
+        .networkModule(NetworkModule())
+        .roomModule(RoomModule(this))
+        .repositoriesModule(RepositoriesModule())
+        .build()
 
     companion object {
         const val BASE_URL = "https://api.themoviedb.org/3/"
         const val API_KEY = "82f337a96c72f107c937a1fcf9d4072c"
+        const val TABLE_NAME = "movies"
 
         lateinit var instance: App
             private set
@@ -26,47 +32,6 @@ class App : Application() {
         super.onCreate()
         instance = this
 
-        db = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java,
-            "movies"
-        )
-            .fallbackToDestructiveMigration()
-            .build()
-    }
-
-    fun initRetrofit() {
-        val client = OkHttpClient.Builder()
-            .addNetworkInterceptor { chain ->
-
-                val request = chain.request().newBuilder()
-                val originalHttpUrl = chain.request().url
-                val url = originalHttpUrl.newBuilder().addQueryParameter("api_key", API_KEY).build()
-                request.url(url)
-                return@addNetworkInterceptor chain.proceed(request.build())
-            }
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                if (BuildConfig.DEBUG) {
-                    level = HttpLoggingInterceptor.Level.BODY
-                }
-            })
-            .build()
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(CoroutineCallAdapterFactory())
-            .client(client)
-            .build()
-
-        api = retrofit.create(Api::class.java)
-    }
-
-    fun getInstance(): App {
-        return instance
-    }
-
-    fun getDatabase(): AppDatabase {
-        return db
+        AppComponentSource.setAppComponent(appComponent)
     }
 }

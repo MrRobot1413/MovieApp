@@ -12,19 +12,19 @@ interface Api {
     @GET("movie/popular")
     suspend fun getPopularMovies(
         @Query("page") page: Int,
-        @Query("language") language: String = "en-US"
+        @Query("language") language: String
     ): MovieResponse
 
     @GET("movie/top_rated")
     suspend fun getTopRatedMovies(
         @Query("page") page: Int,
-        @Query("language") language: String = "en-US"
+        @Query("language") language: String
     ): MovieResponse
 
     @GET("movie/{id}")
     suspend fun getMovieDetails(
         @Path("id") id: Int,
-        @Query("language") language: String = "en-US"
+        @Query("language") language: String
     ): MovieNetwork
 
     @GET("search/movie")

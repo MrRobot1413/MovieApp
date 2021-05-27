@@ -23,6 +23,7 @@ class MoviesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         Glide.with(itemView)
             .load("https://image.tmdb.org/t/p/w342${movie.posterPath}")
             .transform(CenterInside())
+            .placeholder(null)
             .transition(DrawableTransitionOptions.withCrossFade())
             .error(ContextCompat.getDrawable(itemView.context, R.drawable.ic_round_error_24))
             .into(image)
