@@ -1,9 +1,9 @@
 package ru.mrrobot1413.movieapp.viewModels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import ru.mrrobot1413.movieapp.di.AppComponentSource.Companion.appComponentSource
 import ru.mrrobot1413.movieapp.model.Movie
@@ -15,14 +15,14 @@ class FavoriteListViewModel : ViewModel() {
     @Inject
     lateinit var dbListRepository: DbListRepository
 
-    private val _favoriteMovies = MutableLiveData<List<Movie>>()
-    val favoriteMovies: LiveData<List<Movie>> = _favoriteMovies
+    private val _favoriteMovies = MutableStateFlow<List<Movie>>(mutableListOf())
+    val favoriteMovies: StateFlow<List<Movie>> = _favoriteMovies
 
-    private val _watchLaterMovies = MutableLiveData<List<Movie>>()
-    val watchLaterMovies: LiveData<List<Movie>> = _watchLaterMovies
+    private val _watchLaterMovies = MutableStateFlow<List<Movie>>(mutableListOf())
+    val watchLaterMovies: StateFlow<List<Movie>> = _watchLaterMovies
 
-    private val _movieDetailed = MutableLiveData<Movie>()
-    val movieDetailed: MutableLiveData<Movie> = _movieDetailed
+    private val _movieDetailed = MutableStateFlow<Movie?>(null)
+    val movieDetailed: StateFlow<Movie?> = _movieDetailed
 
     init {
         appComponentSource.inject(this)

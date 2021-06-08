@@ -46,4 +46,5 @@
     <string name="thriller">Thrillers</string>
     <string name="war">Wars</string>
     <string name="western">Westerns</string>
+    <string name="movie_image">Movie image</string>
 </resources>

@@ -1,6 +1,7 @@
 package ru.mrrobot1413.movieapp.viewModels
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
@@ -13,6 +14,8 @@ import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.airbnb.lottie.LottieAnimationView
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import ru.mrrobot1413.movieapp.NotifyWorker
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.di.AppComponentSource.Companion.appComponentSource
@@ -30,17 +33,24 @@ class MoviesViewModel : ViewModel() {
     @Inject
     lateinit var dbRepository: DbListRepository
 
-    private val _movies = MutableLiveData<List<MovieNetwork>>()
-    val movies: LiveData<List<MovieNetwork>> = _movies
+    private val _movies = MutableStateFlow<List<MovieNetwork>>(mutableListOf())
+    val movies: StateFlow<List<MovieNetwork>> = _movies
 
-    private val _error = MutableLiveData<String>()
-    val error: LiveData<String> = _error
+    private val _error = MutableStateFlow("")
+    val error: StateFlow<String> = _error
 
-    private val _movieDetailed = MutableLiveData<MovieNetwork>()
-    val movieDetailed: LiveData<MovieNetwork> = _movieDetailed
+    private val _movieDetailed = MutableStateFlow(MovieNetwork(
+        0,
+        "",
+        "", "", 1.0f, "", 1, ""
+    ))
+    val movieDetailed: StateFlow<MovieNetwork?> = _movieDetailed
 
-    private val _videoKey = MutableLiveData<String>()
-    val videoKey = _videoKey
+    private val _videoKey = MutableStateFlow("")
+    val videoKey: StateFlow<String> = _videoKey
+
+    private val _isVisible = MutableStateFlow(false)
+    val isVisible: StateFlow<Boolean> = _isVisible
 
     var pages = 0
 
@@ -54,7 +64,9 @@ class MoviesViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             try {
+                _isVisible.value = true
                 _movies.value = movieRepository.getPopularMovies(page).moviesList
+                _isVisible.value = false
             } catch (e: Exception) {
                 _error.value = error
             }
@@ -67,7 +79,9 @@ class MoviesViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             try {
+                _isVisible.value = true
                 _movies.value = movieRepository.getTopRatedMovies(page).moviesList
+                _isVisible.value = false
             } catch (e: Exception) {
                 _error.value = noConnection
             }
@@ -79,10 +93,10 @@ class MoviesViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             try {
-                val movie = movieRepository.getMovieDetails(id = id)
-                _movieDetailed.value = movie
+                Log.d("SUPERTAG", movieRepository.getMovieDetails(id = id).toString())
+                _movieDetailed.value = movieRepository.getMovieDetails(id = id)
             } catch (e: Exception) {
-                val movieFromDb = dbRepository.selectById(id)
+                val movieFromDb: Movie? = dbRepository.selectById(id)
                 if(movieFromDb != null) {
                     _movieDetailed.value = MovieNetwork(
                         movieFromDb.id,
@@ -107,8 +121,10 @@ class MoviesViewModel : ViewModel() {
         viewModelScope.launch {
             if (query?.length!! >= 2) {
                 try {
+                    _isVisible.value = true
                     delay(300)
                     _movies.value = movieRepository.searchMovie(page, query).moviesList
+                    _isVisible.value = false
                 } catch (e: Exception) {
                     _error.value = noConnection
                 }
@@ -141,7 +157,9 @@ class MoviesViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             try {
+                _isVisible.value = true
                 _movies.value = movieRepository.searchMovieByGenre(genreId).moviesList
+                _isVisible.value = false
             } catch (e: Exception){
                 _error.value = noConnection
             }
