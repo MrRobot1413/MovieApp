@@ -11,6 +11,8 @@ Technologies:
 	<br>
  -RxJava
 	<br>
+-Dagger
+	<br>
  -Room
 	<br>
  -Retrofit
