@@ -1,5 +1,6 @@
 package ru.mrrobot1413.movieapp.ui.fragments
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -7,20 +8,25 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
+import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.request.RequestListener
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import ru.mrrobot1413.movieapp.ui.OnSwipeTouchListener
+import kotlinx.coroutines.launch
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.databinding.FragmentDetailsBinding
 import ru.mrrobot1413.movieapp.interfaces.MovieClickListener
@@ -32,6 +38,7 @@ import ru.mrrobot1413.movieapp.viewModels.MoviesViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 class DetailsFragment : Fragment() {
 
     private lateinit var inviteText: String
@@ -41,7 +48,7 @@ class DetailsFragment : Fragment() {
     private val moviesViewModel by lazy {
         ViewModelProvider(this).get(MoviesViewModel::class.java)
     }
-    lateinit var binding: FragmentDetailsBinding
+    private var binding: FragmentDetailsBinding? = null
     private var isAddedToFavorite = false
     private lateinit var calendar: Calendar
     private var isLiked = false
@@ -54,82 +61,111 @@ class DetailsFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentDetailsBinding.inflate(inflater, container, false)
-        return binding.root
+        return binding?.root!!
     }
 
     override fun onResume() {
         super.onResume()
-
         (activity as MovieClickListener).hideBottomNav()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
 
-        binding.viewModel = moviesViewModel
-        binding.lifecycleOwner = viewLifecycleOwner
-
-        moviesViewModel.movieDetailed.observe(viewLifecycleOwner, { movie ->
-            setImage(binding.imageBackdrop, ("https://image.tmdb.org/t/p/w342" + movie.posterPath))
-
-            observeVideos()
-            setOnPlayTrailerBtnClickListener(movie.id)
-
-            setOnFabClickListener(movie)
-
-            favoriteListViewModel.movieDetailed.observe(viewLifecycleOwner, { result ->
-                if (result != null) {
-                    isAddedToFavorite =
-                        if (result.liked) {
-                            setIconLiked()
-                            true
-                        } else {
-                            setIconUnliked()
-                            false
-                        }
-                    isLiked = result.liked
-                    isToNotify = result.isToNotify
-                    reminder = result.reminder
-                } else {
-                    setIconUnliked()
-                }
-            })
-
-            favoriteListViewModel.selectById(movie.id)
-
-            inviteText = getString(R.string.invite_text) + " " + movie.title
-        })
+        setObservers()
 
         arguments?.getInt(MainActivity.MOVIE)?.let {
             moviesViewModel.getMovieDetails(it)
         }
 
-        (activity as MainActivity?)!!.setSupportActionBar(binding.toolbar)
+        (activity as MainActivity?)!!.setSupportActionBar(binding?.toolbar)
 
-        binding.toolbar.setNavigationOnClickListener {
+        binding?.coordinator?.setOnTouchListener(object: OnSwipeTouchListener(requireContext()) {
+            override fun onSwipeLeft() {
+
+            }
+            override fun onSwipeRight() {
+                lifecycleScope.launch {
+                    activity?.onBackPressed()
+                }
+            }
+        })
+
+        binding?.nestedScroll?.setOnTouchListener(object: OnSwipeTouchListener(requireContext()) {
+            override fun onSwipeLeft() {
+
+            }
+            override fun onSwipeRight() {
+                lifecycleScope.launch {
+                    activity?.onBackPressed()
+                }
+            }
+        })
+
+        binding?.toolbar?.setNavigationOnClickListener {
             activity?.onBackPressed()
         }
     }
 
-    private fun observeVideos() {
-        moviesViewModel.videoKey.observe(viewLifecycleOwner, {
-            if (!it.isNullOrEmpty()) {
-                val intentApp = Intent(Intent.ACTION_VIEW,
-                    Uri.parse(it))
-                val intentBrowser = Intent(Intent.ACTION_VIEW,
-                    Uri.parse(it))
-                try {
-                    activity?.startActivity(intentApp)
-                } catch (ex: ActivityNotFoundException) {
-                    activity?.startActivity(intentBrowser)
+    private fun setObservers() {
+        lifecycleScope.launch {
+            moviesViewModel.movieDetailed.collectLatest { movie ->
+                setImage(binding?.imageBackdrop!!, ("https://image.tmdb.org/t/p/w342" + movie?.posterPath))
+
+                binding?.collapsingToolbarLayout?.title = movie?.title
+                binding?.txtRating?.text = movie?.rating.toString()
+                binding?.txtTime?.text = movie?.time.toString()
+                binding?.txtDate?.text = movie?.releaseDate
+                binding?.txtLanguage?.text = movie?.language
+                binding?.txtDescr?.text = movie?.overview
+
+                movie?.id?.let { setOnPlayTrailerBtnClickListener(it) }
+
+                setOnFabClickListener(movie)
+
+                favoriteListViewModel.movieDetailed.collectLatest { result ->
+                    if (result != null) {
+                        isAddedToFavorite =
+                            if (result.liked) {
+                                setIconLiked()
+                                true
+                            } else {
+                                setIconUnliked()
+                                false
+                            }
+                        isLiked = result.liked
+                        isToNotify = result.isToNotify
+                        reminder = result.reminder
+                    } else {
+                        setIconUnliked()
+                    }
+                }
+
+                favoriteListViewModel.selectById(movie?.id!!)
+
+                inviteText = getString(R.string.invite_text) + " " + movie?.title
+            }
+
+            moviesViewModel.videoKey.collectLatest {
+                if (it.isNotEmpty()) {
+                    val intentApp = Intent(Intent.ACTION_VIEW,
+                        Uri.parse(it))
+                    val intentBrowser = Intent(Intent.ACTION_VIEW,
+                        Uri.parse(it))
+                    try {
+                        activity?.startActivity(intentApp)
+                    } catch (ex: ActivityNotFoundException) {
+                        activity?.startActivity(intentBrowser)
+                    }
                 }
             }
-        })
+        }
     }
 
     private fun setOnFabClickListener(movie: MovieNetwork?) {
-        binding.fabAddToFavorite.setOnClickListener {
+        binding?.fabAddToFavorite?.setOnClickListener {
             if (movie != null) {
                 if (isAddedToFavorite) {
                     isAddedToFavorite = false
@@ -189,7 +225,7 @@ class DetailsFragment : Fragment() {
                         target: com.bumptech.glide.request.target.Target<Drawable>?,
                         isFirstResource: Boolean,
                     ): Boolean {
-                        binding.progress.visibility = View.GONE
+                        binding?.progressBar?.visibility = View.GONE
                         return false
                     }
 
@@ -200,7 +236,7 @@ class DetailsFragment : Fragment() {
                         dataSource: DataSource?,
                         isFirstResource: Boolean,
                     ): Boolean {
-                        binding.progress.visibility = View.GONE
+                        binding?.progressBar?.visibility = View.GONE
                         return false
                     }
 
@@ -210,7 +246,7 @@ class DetailsFragment : Fragment() {
     }
 
     private fun setOnPlayTrailerBtnClickListener(id: Int) {
-        binding.btnPlayTrailer.setOnClickListener {
+        binding?.btnPlayTrailer?.setOnClickListener {
             moviesViewModel.getVideos(id)
         }
     }
@@ -223,16 +259,11 @@ class DetailsFragment : Fragment() {
                 activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             im.hideSoftInputFromWindow(view.windowToken, 0)
         }
-    }
-
-    private fun showSnackbar(text: String) {
-        view?.let {
-            Snackbar.make(it, text, Snackbar.LENGTH_SHORT).show()
-        }
+        binding = null
     }
 
     private fun setIconLiked() {
-        binding.fabAddToFavorite.setImageDrawable(
+        binding?.fabAddToFavorite?.setImageDrawable(
             ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.ic_favorite
@@ -241,7 +272,7 @@ class DetailsFragment : Fragment() {
     }
 
     private fun setIconUnliked() {
-        binding.fabAddToFavorite.setImageDrawable(
+        binding?.fabAddToFavorite?.setImageDrawable(
             ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.ic_favorite_border
@@ -253,21 +284,22 @@ class DetailsFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
         menu.clear()
         if (arguments?.getInt("source") == 3) {
-            binding.toolbar.inflateMenu(R.menu.watch_later_menu)
+            binding?.toolbar?.inflateMenu(R.menu.watch_later_menu)
         } else {
-            binding.toolbar.inflateMenu(R.menu.invite_menu)
+            binding?.toolbar?.inflateMenu(R.menu.invite_menu)
         }
     }
 
     private fun sendInviteToWatch() {
         val sendIntent = Intent()
         sendIntent.action = Intent.ACTION_SEND
-        sendIntent.putExtra(Intent.EXTRA_SUBJECT, binding.collapsingToolbarLayout.title)
+        sendIntent.putExtra(Intent.EXTRA_SUBJECT, binding?.collapsingToolbarLayout?.title)
         sendIntent.putExtra(Intent.EXTRA_TEXT, inviteText)
         sendIntent.type = "text/plain"
         startActivity(sendIntent)
     }
 
+    @SuppressLint("SimpleDateFormat")
     private fun scheduleNotification() {
         calendar = Calendar.getInstance()
         calendar.timeZone = TimeZone.getDefault()

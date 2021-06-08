@@ -11,7 +11,7 @@
         android:id="@+id/refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/itemColor"
+        android:background="@android:color/background_light"
         tools:context=".ui.fragments.HomeFragment">
 
         <FrameLayout
@@ -31,7 +31,6 @@
                     android:layout_marginTop="50dp"
                     android:layout_marginBottom="50dp"
                     android:background="@color/itemColor"
-                    android:layoutAnimation="@anim/layout_animation"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -59,7 +58,8 @@
                     android:background="@color/colorPrimaryDark"
                     android:paddingStart="8dp"
                     android:visibility="gone"
-                    app:layout_constraintTop_toBottomOf="@id/app_bar_layout">
+                    app:layout_constraintTop_toBottomOf="@id/app_bar_layout"
+                    tools:ignore="RtlSymmetry">
 
                     <com.google.android.material.chip.ChipGroup
                         android:id="@+id/group"

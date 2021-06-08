@@ -27,7 +27,8 @@
                 android:layout_width="match_parent"
                 android:transitionName="image_small"
                 android:scaleType="centerCrop"
-                android:layout_height="250dp" />
+                android:layout_height="250dp"
+                android:contentDescription="@string/movie_image" />
         </androidx.cardview.widget.CardView>
     </RelativeLayout>
 

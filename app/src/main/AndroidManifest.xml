@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/logo"
         android:supportsRtl="true"
         android:hardwareAccelerated="true"
-        android:theme="@style/Theme.Lesson3Homework">
+        android:theme="@style/Theme.MovieApp">
         <activity android:name="ru.mrrobot1413.movieapp.ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

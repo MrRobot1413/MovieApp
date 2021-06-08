@@ -15,11 +15,16 @@ import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.oshi.libsearchtoolbar.SearchAnimationToolbar
-import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.adapters.MoviesAdapter
 import ru.mrrobot1413.movieapp.databinding.FragmentHomeBinding
@@ -57,26 +62,8 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setObservers()
         initFields()
-
-        moviesViewModel.movies.observe(viewLifecycleOwner, {
-            snackbar.dismiss()
-            binding.errorAnimation.isVisible = false
-            binding.progressBar.isVisible = true
-            binding.recyclerView.visibility = View.VISIBLE
-            adapter.setMovies(it)
-            binding.refreshLayout.isRefreshing = false
-            binding.progressBar.isVisible = false
-        })
-
-        moviesViewModel.error.observe(viewLifecycleOwner, {
-            adapter.setMoviesFromMenu(mutableListOf())
-            binding.progressBar.isVisible = false
-            binding.errorAnimation.isVisible = true
-            binding.errorAnimation.playAnimation()
-            showSnackbar()
-            binding.refreshLayout.isRefreshing = false
-        })
 
         moviesViewModel.getPopularMovies(1,
             getString(R.string.error_loading_movies))
@@ -86,6 +73,37 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
         binding.recyclerView.layoutManager?.onRestoreInstanceState(savedInstanceState?.getParcelable(
             RECYCLER_VIEW_SAVE_STATE))
+    }
+
+    private fun setObservers(){
+        GlobalScope.launch {
+            withContext(Dispatchers.Main) {
+                moviesViewModel.isVisible.collectLatest {
+                    binding.progressBar.isVisible = it
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+
+            moviesViewModel.movies.collectLatest {
+                snackbar.dismiss()
+                binding.errorAnimation.isVisible = false
+                binding.recyclerView.visibility = View.VISIBLE
+                adapter.setMovies(it)
+                binding.refreshLayout.isRefreshing = false
+            }
+
+            moviesViewModel.error.collectLatest{
+                adapter.setMoviesFromMenu(mutableListOf())
+                binding.progressBar.isVisible = false
+                binding.errorAnimation.isVisible = true
+                binding.errorAnimation.playAnimation()
+                showSnackbar()
+                binding.refreshLayout.isRefreshing = false
+            }
+        }
+
     }
 
     private fun attachRecyclerScroll() {
@@ -158,7 +176,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.search -> toolbar.onSearchIconClick()
+            R.id.search -> binding.toolbar.onSearchIconClick()
             R.id.popular -> showPopularMovies()
             R.id.top_rated -> showTopRatedMovies()
             R.id.search_by_genre -> showGenreSearchArea()
@@ -207,6 +225,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
 
     override fun onSearchQueryChanged(query: String?) {
+        adapter.setMoviesFromMenu(mutableListOf())
         moviesViewModel.searchMovie(
             1,
             query,

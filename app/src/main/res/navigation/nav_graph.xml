@@ -25,4 +25,8 @@
             android:name="movie"
             app:argType="ru.mrrobot1413.movieapp.model.MovieNetwork" />
     </fragment>
+    <fragment
+        android:id="@+id/viewPagerFragment"
+        android:name="ru.mrrobot1413.movieapp.ui.onBoarding.ViewPagerFragment"
+        android:label="ViewPagerFragment" />
 </navigation>

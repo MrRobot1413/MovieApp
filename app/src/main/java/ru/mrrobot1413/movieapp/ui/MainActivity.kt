@@ -4,18 +4,16 @@ import android.os.Bundle
 import android.view.View
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.ui.setupWithNavController
-import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import jp.wasabeef.blurry.Blurry
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.interfaces.MovieClickListener
-import ru.mrrobot1413.movieapp.model.Movie
 
 class MainActivity : AppCompatActivity(), MovieClickListener {
 
@@ -55,6 +53,13 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
     override fun onBackPressed() {
         if (navController.currentDestination?.id == R.id.homeFragment) {
             val builder = MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)
+            val relativeLayout = findViewById<RelativeLayout>(R.id.relative)
+            val blur = Blurry.with(applicationContext)
+
+            blur.animate()
+            blur.onto(relativeLayout)
+
+            builder.background = ContextCompat.getDrawable(this, R.drawable.exit_dialog_bg)
 
             builder.setTitle(R.string.exit_text)
                 .setPositiveButton(getString(R.string.confirm_exit)) { _, _ ->
@@ -62,6 +67,10 @@ class MainActivity : AppCompatActivity(), MovieClickListener {
                 }
                 .setNegativeButton(getString(R.string.cancel_exit)) { dialog, _ ->
                     dialog.dismiss()
+                    Blurry.delete(relativeLayout)
+                }
+                .setOnDismissListener {
+                    Blurry.delete(relativeLayout)
                 }
             builder.show()
         } else {
