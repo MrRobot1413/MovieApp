@@ -71,8 +71,7 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
         binding.toolbar.setSupportActionBar(activity as AppCompatActivity)
         setHasOptionsMenu(true)
 
-        binding.recyclerView.layoutManager?.onRestoreInstanceState(savedInstanceState?.getParcelable(
-            RECYCLER_VIEW_SAVE_STATE))
+        
     }
 
     private fun setObservers(){

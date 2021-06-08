@@ -6,16 +6,33 @@
 
     <fragment
         android:id="@+id/favoriteListFragment"
-        android:name="ru.mrrobot1413.movieapp.ui.fragments.FavoriteListFragment" />
+        android:name="ru.mrrobot1413.movieapp.ui.fragments.FavoriteListFragment" >
+        <action
+            android:id="@+id/action_favoriteListFragment_to_watchLaterFragment"
+            app:destination="@id/watchLaterFragment" />
+        <action
+            android:id="@+id/action_favoriteListFragment_to_detailsFragment"
+            app:destination="@id/detailsFragment" />
+    </fragment>
     <fragment
         android:id="@+id/watchLaterFragment"
-        android:name="ru.mrrobot1413.movieapp.ui.fragments.WatchLaterFragment" />
+        android:name="ru.mrrobot1413.movieapp.ui.fragments.WatchLaterFragment" >
+        <action
+            android:id="@+id/action_watchLaterFragment_to_detailsFragment"
+            app:destination="@id/detailsFragment" />
+    </fragment>
     <fragment
         android:id="@+id/homeFragment"
         android:name="ru.mrrobot1413.movieapp.ui.fragments.HomeFragment" >
         <action
             android:id="@+id/action_homeFragment_to_detailsFragment"
             app:destination="@id/detailsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_watchLaterFragment"
+            app:destination="@id/watchLaterFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_favoriteListFragment"
+            app:destination="@id/favoriteListFragment" />
     </fragment>
     <fragment
         android:id="@+id/detailsFragment"
@@ -25,8 +42,4 @@
             android:name="movie"
             app:argType="ru.mrrobot1413.movieapp.model.MovieNetwork" />
     </fragment>
-    <fragment
-        android:id="@+id/viewPagerFragment"
-        android:name="ru.mrrobot1413.movieapp.ui.onBoarding.ViewPagerFragment"
-        android:label="ViewPagerFragment" />
 </navigation>

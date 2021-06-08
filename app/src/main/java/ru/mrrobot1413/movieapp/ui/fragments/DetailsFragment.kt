@@ -23,9 +23,7 @@ import com.bumptech.glide.request.RequestListener
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import ru.mrrobot1413.movieapp.ui.OnSwipeTouchListener
 import kotlinx.coroutines.launch
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.databinding.FragmentDetailsBinding
@@ -82,28 +80,6 @@ class DetailsFragment : Fragment() {
 
         (activity as MainActivity?)!!.setSupportActionBar(binding?.toolbar)
 
-        binding?.coordinator?.setOnTouchListener(object: OnSwipeTouchListener(requireContext()) {
-            override fun onSwipeLeft() {
-
-            }
-            override fun onSwipeRight() {
-                lifecycleScope.launch {
-                    activity?.onBackPressed()
-                }
-            }
-        })
-
-        binding?.nestedScroll?.setOnTouchListener(object: OnSwipeTouchListener(requireContext()) {
-            override fun onSwipeLeft() {
-
-            }
-            override fun onSwipeRight() {
-                lifecycleScope.launch {
-                    activity?.onBackPressed()
-                }
-            }
-        })
-
         binding?.toolbar?.setNavigationOnClickListener {
             activity?.onBackPressed()
         }
@@ -125,6 +101,8 @@ class DetailsFragment : Fragment() {
 
                 setOnFabClickListener(movie)
 
+                favoriteListViewModel.selectById(movie?.id!!)
+
                 favoriteListViewModel.movieDetailed.collectLatest { result ->
                     if (result != null) {
                         isAddedToFavorite =
@@ -142,8 +120,6 @@ class DetailsFragment : Fragment() {
                         setIconUnliked()
                     }
                 }
-
-                favoriteListViewModel.selectById(movie?.id!!)
 
                 inviteText = getString(R.string.invite_text) + " " + movie?.title
             }
