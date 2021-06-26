@@ -11,10 +11,11 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import jp.wasabeef.blurry.Blurry
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.interfaces.MovieClickListener
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), MovieClickListener {
 
     private lateinit var bottomNavigationView: BottomNavigationView

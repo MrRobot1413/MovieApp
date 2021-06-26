@@ -1,12 +1,15 @@
 package ru.mrrobot1413.movieapp.repositories
 
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.mrrobot1413.movieapp.App
 import ru.mrrobot1413.movieapp.dao.MovieDao
 import ru.mrrobot1413.movieapp.model.Movie
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class DbListRepository @Inject constructor(movieDaoSource: MovieDao) {
     private val movieDao: MovieDao = movieDaoSource
 

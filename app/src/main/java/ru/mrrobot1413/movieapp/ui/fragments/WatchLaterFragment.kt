@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.adapters.WatchLaterListAdapter
@@ -18,11 +19,9 @@ import ru.mrrobot1413.movieapp.databinding.FragmentWatchLaterBinding
 import ru.mrrobot1413.movieapp.interfaces.MovieClickListener
 import ru.mrrobot1413.movieapp.model.Movie
 import ru.mrrobot1413.movieapp.viewModels.FavoriteListViewModel
-
+@AndroidEntryPoint
 class WatchLaterFragment : Fragment() {
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var txtNoMovie: TextView
     private val adapter by lazy {
         WatchLaterListAdapter { movie: Movie ->
             (activity as? MovieClickListener)?.openDetailsFragment(movie.id, 3)

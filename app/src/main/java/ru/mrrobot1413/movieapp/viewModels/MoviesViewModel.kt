@@ -2,23 +2,18 @@ package ru.mrrobot1413.movieapp.viewModels
 
 import android.content.Context
 import android.util.Log
-import android.view.View
-import androidx.core.view.isVisible
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import com.airbnb.lottie.LottieAnimationView
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.mrrobot1413.movieapp.NotifyWorker
 import ru.mrrobot1413.movieapp.R
-import ru.mrrobot1413.movieapp.di.AppComponentSource.Companion.appComponentSource
 import ru.mrrobot1413.movieapp.model.Movie
 import ru.mrrobot1413.movieapp.model.MovieNetwork
 import ru.mrrobot1413.movieapp.repositories.DbListRepository
@@ -27,11 +22,10 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class MoviesViewModel : ViewModel() {
-    @Inject
-    lateinit var movieRepository: MovieRepository
-    @Inject
-    lateinit var dbRepository: DbListRepository
+@HiltViewModel
+class MoviesViewModel @Inject constructor(movieRepo: MovieRepository, dbRepo: DbListRepository): ViewModel() {
+    private var movieRepository: MovieRepository = movieRepo
+    private var dbRepository: DbListRepository = dbRepo
 
     private val _movies = MutableStateFlow<List<MovieNetwork>>(mutableListOf())
     val movies: StateFlow<List<MovieNetwork>> = _movies
@@ -53,10 +47,6 @@ class MoviesViewModel : ViewModel() {
     val isVisible: StateFlow<Boolean> = _isVisible
 
     var pages = 0
-
-    init {
-        appComponentSource.inject(this)
-    }
 
     fun getPopularMovies(
         page: Int,
@@ -122,7 +112,7 @@ class MoviesViewModel : ViewModel() {
             if (query?.length!! >= 2) {
                 try {
                     _isVisible.value = true
-                    delay(300)
+                    delay(100)
                     _movies.value = movieRepository.searchMovie(page, query).moviesList
                     _isVisible.value = false
                 } catch (e: Exception) {

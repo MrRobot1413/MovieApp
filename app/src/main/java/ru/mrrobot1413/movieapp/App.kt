@@ -1,21 +1,11 @@
 package ru.mrrobot1413.movieapp
 
 import android.app.Application
-import ru.mrrobot1413.movieapp.di.AppComponent
-import ru.mrrobot1413.movieapp.di.AppComponentSource
-import ru.mrrobot1413.movieapp.di.DaggerAppComponent
 import ru.mrrobot1413.movieapp.di.modules.*
-import ru.mrrobot1413.movieapp.ui.MainActivity
+import dagger.hilt.android.HiltAndroidApp
 
+@HiltAndroidApp
 class App : Application() {
-
-    private val appComponent: AppComponent = DaggerAppComponent
-        .builder()
-        .appModule(AppModule(this))
-        .networkModule(NetworkModule())
-        .roomModule(RoomModule(this))
-        .repositoriesModule(RepositoriesModule())
-        .build()
 
     companion object {
         const val BASE_URL = "https://api.themoviedb.org/3/"
@@ -30,6 +20,5 @@ class App : Application() {
         super.onCreate()
         instance = this
 
-        AppComponentSource.setAppComponent(appComponent)
     }
 }

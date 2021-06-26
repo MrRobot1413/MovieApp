@@ -8,11 +8,9 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
-import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -23,6 +21,7 @@ import com.bumptech.glide.request.RequestListener
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.mrrobot1413.movieapp.R
@@ -35,9 +34,8 @@ import ru.mrrobot1413.movieapp.viewModels.FavoriteListViewModel
 import ru.mrrobot1413.movieapp.viewModels.MoviesViewModel
 import java.text.SimpleDateFormat
 import java.util.*
-
-
-class DetailsFragment : Fragment() {
+@AndroidEntryPoint
+class DetailsFragment : androidx.fragment.app.Fragment() {
 
     private lateinit var inviteText: String
     private val favoriteListViewModel by lazy {
@@ -67,7 +65,6 @@ class DetailsFragment : Fragment() {
         (activity as MovieClickListener).hideBottomNav()
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
@@ -114,28 +111,16 @@ class DetailsFragment : Fragment() {
                                 false
                             }
                         isLiked = result.liked
+
                         isToNotify = result.isToNotify
                         reminder = result.reminder
                     } else {
                         setIconUnliked()
                     }
+                    inviteText = getString(R.string.invite_text) + " " + movie.title
                 }
 
-                inviteText = getString(R.string.invite_text) + " " + movie?.title
-            }
-
-            moviesViewModel.videoKey.collectLatest {
-                if (it.isNotEmpty()) {
-                    val intentApp = Intent(Intent.ACTION_VIEW,
-                        Uri.parse(it))
-                    val intentBrowser = Intent(Intent.ACTION_VIEW,
-                        Uri.parse(it))
-                    try {
-                        activity?.startActivity(intentApp)
-                    } catch (ex: ActivityNotFoundException) {
-                        activity?.startActivity(intentBrowser)
-                    }
-                }
+                inviteText = getString(R.string.invite_text) + " " + movie.title
             }
         }
     }
@@ -224,6 +209,22 @@ class DetailsFragment : Fragment() {
     private fun setOnPlayTrailerBtnClickListener(id: Int) {
         binding?.btnPlayTrailer?.setOnClickListener {
             moviesViewModel.getVideos(id)
+
+            lifecycleScope.launchWhenStarted {
+                moviesViewModel.videoKey.collectLatest {
+                    if (it.isNotEmpty()) {
+                        val intentApp = Intent(Intent.ACTION_VIEW,
+                            Uri.parse(it))
+                        val intentBrowser = Intent(Intent.ACTION_VIEW,
+                            Uri.parse(it))
+                        try {
+                            activity?.startActivity(intentApp)
+                        } catch (ex: ActivityNotFoundException) {
+                            activity?.startActivity(intentBrowser)
+                        }
+                    }
+                }
+            }
         }
     }
 

@@ -12,13 +12,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.adapters.FavoriteListAdapter
 import ru.mrrobot1413.movieapp.databinding.FragmentFavoriteBinding
 import ru.mrrobot1413.movieapp.interfaces.MovieClickListener
 import ru.mrrobot1413.movieapp.viewModels.FavoriteListViewModel
-
+@AndroidEntryPoint
 class FavoriteListFragment : Fragment() {
 
     private val adapter by lazy {

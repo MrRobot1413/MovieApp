@@ -1,21 +1,19 @@
 package ru.mrrobot1413.movieapp.repositories
 
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.mrrobot1413.movieapp.api.Api
-import ru.mrrobot1413.movieapp.di.AppComponentSource
 import ru.mrrobot1413.movieapp.model.MovieNetwork
 import ru.mrrobot1413.movieapp.model.MovieResponse
 import ru.mrrobot1413.movieapp.model.VideoResponse
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class MovieRepository @Inject constructor(apiSource: Api) {
     private val api: Api = apiSource
-
-    init {
-        AppComponentSource.appComponentSource.inject(this)
-    }
 
     suspend fun getPopularMovies(page: Int): MovieResponse {
         return withContext(Dispatchers.IO){

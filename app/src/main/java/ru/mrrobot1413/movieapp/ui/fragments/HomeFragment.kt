@@ -10,27 +10,26 @@ import android.transition.TransitionManager
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.oshi.libsearchtoolbar.SearchAnimationToolbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onStart
 import ru.mrrobot1413.movieapp.R
 import ru.mrrobot1413.movieapp.adapters.MoviesAdapter
 import ru.mrrobot1413.movieapp.databinding.FragmentHomeBinding
 import ru.mrrobot1413.movieapp.interfaces.MovieClickListener
 import ru.mrrobot1413.movieapp.viewModels.MoviesViewModel
 
+@AndroidEntryPoint
 class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedListener {
 
     private val adapter by lazy {
@@ -70,8 +69,6 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
         binding.toolbar.setSupportActionBar(activity as AppCompatActivity)
         setHasOptionsMenu(true)
-
-        
     }
 
     private fun setObservers(){
@@ -184,10 +181,6 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
     }
 
     private fun initFields() {
-        snackbar = Snackbar.make(binding.recyclerView,
-            getString(R.string.error_occurred),
-            Snackbar.LENGTH_INDEFINITE)
-
         layoutManager =
             if (this.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 GridLayoutManager(requireContext(), 3)
@@ -200,23 +193,33 @@ class HomeFragment : Fragment(), SearchAnimationToolbar.OnSearchQueryChangedList
 
         binding.toolbar.setOnSearchQueryChangedListener(this)
 
-        binding.refreshLayout.setOnRefreshListener {
-            moviesViewModel.getPopularMovies(1, getString(R.string.error_occurred))
-            binding.refreshLayout.isRefreshing = false
-            binding.recyclerView.scrollToPosition(0)
-            binding.group.clearCheck()
-        }
 
-        binding.refreshLayout.isEnabled = true
+        binding.apply {
+            snackbar = Snackbar.make(recyclerView,
+                getString(R.string.error_occurred),
+                Snackbar.LENGTH_INDEFINITE)
+
+            refreshLayout.setOnRefreshListener {
+                moviesViewModel.getPopularMovies(1, getString(R.string.error_occurred))
+                refreshLayout.isRefreshing = false
+                recyclerView.scrollToPosition(0)
+                group.clearCheck()
+            }
+
+            refreshLayout.isEnabled = true
+        }
     }
 
     private fun initRecycler() {
-        binding.recyclerView.layoutManager = layoutManager
-        binding.recyclerView.adapter = adapter
+        binding.apply {
+            recyclerView.layoutManager = layoutManager
+            recyclerView.adapter = adapter
+        }
         attachRecyclerScroll()
     }
 
     override fun onSearchCollapsed() {
+        adapter.setMoviesFromMenu(mutableListOf())
         moviesViewModel.getPopularMovies(
             1,
             getString(R.string.error_occurred)

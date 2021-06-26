@@ -2,18 +2,19 @@ package ru.mrrobot1413.movieapp.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import ru.mrrobot1413.movieapp.di.AppComponentSource.Companion.appComponentSource
 import ru.mrrobot1413.movieapp.model.Movie
 import ru.mrrobot1413.movieapp.repositories.DbListRepository
 import javax.inject.Inject
 
-class FavoriteListViewModel : ViewModel() {
+@HiltViewModel
+class FavoriteListViewModel @Inject constructor(dbRepo: DbListRepository): ViewModel() {
 
-    @Inject
-    lateinit var dbListRepository: DbListRepository
+    private var dbListRepository: DbListRepository = dbRepo
 
     private val _favoriteMovies = MutableStateFlow<List<Movie>>(mutableListOf())
     val favoriteMovies: StateFlow<List<Movie>> = _favoriteMovies
@@ -23,10 +24,6 @@ class FavoriteListViewModel : ViewModel() {
 
     private val _movieDetailed = MutableStateFlow<Movie?>(null)
     val movieDetailed: StateFlow<Movie?> = _movieDetailed
-
-    init {
-        appComponentSource.inject(this)
-    }
 
     fun getFavoriteMovies() {
         viewModelScope.launch {
