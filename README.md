@@ -9,7 +9,7 @@ Technologies:
 	<br>
  -MVVM
 	<br>
- -RxJava
+ -Kotlin Coroutines
 	<br>
 -Dagger
 	<br>
